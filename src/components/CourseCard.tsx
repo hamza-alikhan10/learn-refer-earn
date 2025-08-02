@@ -1,6 +1,7 @@
 
 import React from 'react';
-import { Star, Users, Clock, Share2 } from 'lucide-react';
+import { Star, Users, Clock, Share2, Eye, BookOpen } from 'lucide-react';
+import { Button } from './ui/button';
 
 interface Course {
   id: string;
@@ -29,66 +30,80 @@ const CourseCard: React.FC<CourseCardProps> = ({
   showReferButton = false 
 }) => {
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
-      <div className="relative">
+    <div className="bg-card rounded-xl shadow-md overflow-hidden card-hover border border-border">
+      <div className="relative group">
         <img
           src={`https://images.unsplash.com/${course.image}`}
           alt={course.title}
-          className="w-full h-48 object-cover"
+          className="w-full h-48 sm:h-52 object-cover transition-transform duration-300 group-hover:scale-105"
         />
-        <div className="absolute top-2 right-2 bg-blue-600 text-white px-2 py-1 rounded-md text-sm font-semibold">
-          ${course.price}
+        <div className="absolute top-3 right-3">
+          <div className="bg-primary text-primary-foreground px-3 py-1 rounded-full text-sm font-bold shadow-lg">
+            ${course.price}
+          </div>
+        </div>
+        <div className="absolute top-3 left-3">
+          <div className="bg-card/90 backdrop-blur-sm p-2 rounded-full shadow-lg">
+            <BookOpen className="w-5 h-5 text-primary icon-3d" />
+          </div>
         </div>
       </div>
       
-      <div className="p-6">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-sm text-blue-600 font-medium">{course.category}</span>
-          <div className="flex items-center space-x-1">
-            <Star className="w-4 h-4 text-yellow-400 fill-current" />
-            <span className="text-sm text-gray-600">{course.rating}</span>
+      <div className="p-4 sm:p-6">
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-sm font-medium px-3 py-1 bg-accent/20 text-accent rounded-full">
+            {course.category}
+          </span>
+          <div className="flex items-center space-x-1 bg-warning/10 px-2 py-1 rounded-full">
+            <Star className="w-4 h-4 text-warning fill-current icon-3d" />
+            <span className="text-sm font-medium text-warning">{course.rating}</span>
           </div>
         </div>
         
-        <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-2">
+        <h3 className="text-lg sm:text-xl font-bold text-card-foreground mb-2 line-clamp-2 leading-tight">
           {course.title}
         </h3>
         
-        <p className="text-gray-600 text-sm mb-3 line-clamp-2">
+        <p className="text-muted-foreground text-sm mb-3 line-clamp-2 leading-relaxed">
           {course.description}
         </p>
         
-        <p className="text-sm text-gray-700 mb-4">
-          by <span className="font-semibold">{course.instructor}</span>
+        <p className="text-sm text-muted-foreground mb-4">
+          by <span className="font-semibold text-card-foreground">{course.instructor}</span>
         </p>
         
-        <div className="flex items-center space-x-4 text-sm text-gray-500 mb-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 space-y-2 sm:space-y-0 text-sm text-muted-foreground mb-6">
           <div className="flex items-center space-x-1">
-            <Users className="w-4 h-4" />
+            <Users className="w-4 h-4 icon-3d" />
             <span>{course.students.toLocaleString()} students</span>
           </div>
           <div className="flex items-center space-x-1">
-            <Clock className="w-4 h-4" />
+            <Clock className="w-4 h-4 icon-3d" />
             <span>{course.duration}</span>
           </div>
         </div>
         
-        <div className="flex space-x-2">
-          <button
+        <div className="flex flex-col sm:flex-row gap-3">
+          <Button
             onClick={() => onViewDetails(course.id)}
-            className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors font-medium"
+            className="flex-1 group"
+            size="touch"
           >
+            <Eye className="w-4 h-4 mr-2 icon-3d" />
             View Details
-          </button>
+          </Button>
           
           {showReferButton && onReferCourse && (
-            <button
+            <Button
               onClick={() => onReferCourse(course.id)}
-              className="flex items-center justify-center bg-green-600 text-white p-2 rounded-md hover:bg-green-700 transition-colors"
-              title="Refer Course"
+              variant="accent"
+              size="touch"
+              className="sm:flex-none"
+              title="Refer Course & Earn 60%"
             >
-              <Share2 className="w-5 h-5" />
-            </button>
+              <Share2 className="w-4 h-4 mr-2 sm:mr-0 icon-3d" />
+              <span className="sm:hidden">Refer & Earn</span>
+            </Button>
           )}
         </div>
       </div>
