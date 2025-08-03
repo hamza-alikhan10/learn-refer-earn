@@ -24,7 +24,7 @@ const Homepage: React.FC<HomepageProps> = ({ onPageChange, onReferCourse, user }
     return matchesSearch && matchesCategory;
   });
 
-  const categories = ['All Categories', 'Web Development', 'Data Science', 'Marketing', 'Design'];
+  const categories = ['All Categories', 'Trading'];
 
   return (
     <div className="min-h-screen">
@@ -33,17 +33,17 @@ const Homepage: React.FC<HomepageProps> = ({ onPageChange, onReferCourse, user }
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h1 className="text-4xl md:text-6xl font-bold mb-6">
-              Learn. Share. <span className="text-yellow-300">Earn.</span>
+              Master Trading. Share Knowledge. <span className="text-yellow-300">Earn Big.</span>
             </h1>
             <p className="text-xl md:text-2xl mb-8 text-blue-100">
-              Master new skills with expert-led courses and earn 60% commission by referring others
+              Learn trading from experts and earn 50% + 10% commission by referring others
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button
                 onClick={() => onPageChange('courses')}
-                className="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
+                className="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors flex items-center justify-center space-x-2"
               >
-                Browse Courses
+                <span>Browse Trading Courses</span>
               </button>
               <button
                 onClick={() => onPageChange('referral-program')}
@@ -64,15 +64,15 @@ const Homepage: React.FC<HomepageProps> = ({ onPageChange, onReferCourse, user }
               <div className="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Users className="w-8 h-8 text-blue-600" />
               </div>
-              <h3 className="text-3xl font-bold text-gray-900">50,000+</h3>
-              <p className="text-gray-600">Students Enrolled</p>
+              <h3 className="text-3xl font-bold text-gray-900">25,000+</h3>
+              <p className="text-gray-600">Trading Students</p>
             </div>
             <div className="bg-white p-6 rounded-lg shadow-md">
               <div className="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Award className="w-8 h-8 text-green-600" />
               </div>
-              <h3 className="text-3xl font-bold text-gray-900">500+</h3>
-              <p className="text-gray-600">Expert Instructors</p>
+              <h3 className="text-3xl font-bold text-gray-900">50+</h3>
+              <p className="text-gray-600">Trading Experts</p>
             </div>
             <div className="bg-white p-6 rounded-lg shadow-md">
               <div className="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -85,8 +85,8 @@ const Homepage: React.FC<HomepageProps> = ({ onPageChange, onReferCourse, user }
               <div className="bg-yellow-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                 <TrendingUp className="w-8 h-8 text-yellow-600" />
               </div>
-              <h3 className="text-3xl font-bold text-gray-900">60%</h3>
-              <p className="text-gray-600">Referral Commission</p>
+              <h3 className="text-3xl font-bold text-gray-900">50%+10%</h3>
+              <p className="text-gray-600">Commission Structure</p>
             </div>
           </div>
         </div>
@@ -96,8 +96,8 @@ const Homepage: React.FC<HomepageProps> = ({ onPageChange, onReferCourse, user }
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Find Your Perfect Course</h2>
-            <p className="text-gray-600">Search through our extensive course library</p>
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Find Your Perfect Trading Course</h2>
+            <p className="text-gray-600">Search through our comprehensive trading course library</p>
           </div>
 
           <div className="max-w-4xl mx-auto">
@@ -175,12 +175,12 @@ const Homepage: React.FC<HomepageProps> = ({ onPageChange, onReferCourse, user }
             Earn While You Learn
           </h2>
           <p className="text-xl mb-8 text-green-100">
-            Share courses with friends and earn 60% commission on every successful referral
+            Share trading courses and earn 50% + 10% multi-level commission + ₹500 bonus every 5 referrals
           </p>
           <div className="bg-white text-gray-900 p-6 rounded-lg max-w-2xl mx-auto mb-8">
             <div className="text-3xl font-bold text-green-600 mb-2">Example:</div>
             <p className="text-lg">
-              Refer a $100 course → Earn <span className="font-bold text-green-600">$60</span> commission
+              Refer a ₹1000 course → Earn <span className="font-bold text-green-600">₹500</span> direct + <span className="font-bold text-blue-600">₹100</span> from sub-referrals
             </p>
           </div>
           <button
