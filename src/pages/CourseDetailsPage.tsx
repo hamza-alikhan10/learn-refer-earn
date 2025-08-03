@@ -128,7 +128,7 @@ const CourseDetailsPage: React.FC<CourseDetailsPageProps> = ({
             <div className="bg-white rounded-lg shadow-md p-6 sticky top-8">
               <div className="text-center mb-6">
                 <div className="text-3xl font-bold text-gray-900 mb-2">
-                  ${course.price}
+                  ₹{course.price}
                 </div>
                 <p className="text-gray-600">Full lifetime access</p>
               </div>
@@ -145,10 +145,10 @@ const CourseDetailsPage: React.FC<CourseDetailsPageProps> = ({
                 {user && onReferCourse && (
                   <button
                     onClick={() => onReferCourse(course.id)}
-                    className="w-full bg-green-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-green-700 transition-colors flex items-center justify-center space-x-2"
+                    className="w-full bg-gradient-to-r from-green-500 to-green-600 text-white py-3 px-6 rounded-lg font-semibold hover:from-green-600 hover:to-green-700 transition-all duration-200 hover:scale-105 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl"
                   >
                     <Share2 className="w-5 h-5" />
-                    <span>Refer & Earn ${Math.round(course.price * 0.6)}</span>
+                    <span>Refer & Earn ₹{Math.floor(course.price * 0.5)}</span>
                   </button>
                 )}
               </div>
@@ -177,13 +177,16 @@ const CourseDetailsPage: React.FC<CourseDetailsPageProps> = ({
 
               {user && (
                 <div className="border-t border-gray-200 pt-6 mt-6">
-                  <div className="bg-green-50 p-4 rounded-lg">
-                    <h4 className="font-semibold text-green-800 mb-2">Referral Earnings</h4>
+                  <div className="bg-gradient-to-r from-green-50 to-green-100 p-4 rounded-lg border border-green-200">
+                    <h4 className="font-semibold text-green-800 mb-2">💰 Referral Earnings</h4>
                     <p className="text-sm text-green-700 mb-2">
-                      Earn <span className="font-bold">${Math.round(course.price * 0.6)}</span> for each successful referral!
+                      Earn <span className="font-bold text-lg">₹{Math.floor(course.price * 0.5)}</span> for each direct referral!
                     </p>
-                    <p className="text-xs text-green-600">
-                      That's 60% of the course price per referral
+                    <p className="text-xs text-green-600 mb-2">
+                      + ₹{Math.floor(course.price * 0.1)} for each sub-referral (2nd level)
+                    </p>
+                    <p className="text-xs text-green-500 font-medium">
+                      🎁 Bonus: ₹500 for every 5 referrals!
                     </p>
                   </div>
                 </div>

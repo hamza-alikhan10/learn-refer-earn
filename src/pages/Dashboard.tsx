@@ -24,36 +24,43 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onPageChange }) => {
 
   // Mock data for demonstration
   const mockEnrolledCourses = [
-    { id: '1', title: 'Complete React Development Bootcamp', progress: 75, lastAccessed: '2 days ago' },
-    { id: '2', title: 'Python for Data Science Masterclass', progress: 45, lastAccessed: '1 week ago' },
+    { id: '1', title: 'Stock Market Basics for Beginners', progress: 75, lastAccessed: '2 days ago' },
+    { id: '3', title: 'Technical Analysis Mastery', progress: 45, lastAccessed: '1 week ago' },
   ];
 
   const mockReferrals = [
     {
       id: '1',
       courseId: '1',
-      courseTitle: 'Complete React Development Bootcamp',
-      link: `https://learnhub.example.com/course/1?ref=${user.id}`,
-      clicks: 15,
-      conversions: 3,
-      earnings: 267, // 3 * $149 * 0.6
+      courseTitle: 'Stock Market Basics for Beginners',
+      link: `https://tradingacademy.example.com/course/1?ref=${user.id}`,
+      clicks: 25,
+      conversions: 4,
+      level1Earnings: 1996, // 4 * ₹999 * 0.5
+      level2Earnings: 199, // 2 * ₹999 * 0.1 (from sub-referrals)
       status: 'active'
     },
     {
       id: '2',
-      courseId: '3',
-      courseTitle: 'Digital Marketing Fundamentals',
-      link: `https://learnhub.example.com/course/3?ref=${user.id}`,
-      clicks: 8,
-      conversions: 1,
-      earnings: 77.4, // 1 * $129 * 0.6
+      courseId: '4',
+      courseTitle: 'Forex Trading Complete Course',
+      link: `https://tradingacademy.example.com/course/4?ref=${user.id}`,
+      clicks: 12,
+      conversions: 2,
+      level1Earnings: 5000, // 2 * ₹5000 * 0.5
+      level2Earnings: 500, // 1 * ₹5000 * 0.1
       status: 'active'
     },
   ];
 
-  const totalEarnings = mockReferrals.reduce((sum, referral) => sum + referral.earnings, 0);
+  const totalLevel1Earnings = mockReferrals.reduce((sum, referral) => sum + referral.level1Earnings, 0);
+  const totalLevel2Earnings = mockReferrals.reduce((sum, referral) => sum + referral.level2Earnings, 0);
+  const totalReferrals = mockReferrals.reduce((sum, referral) => sum + referral.conversions, 0);
+  const bonusEarnings = Math.floor(totalReferrals / 5) * 500; // ₹500 per 5 referrals
+  const totalEarnings = totalLevel1Earnings + totalLevel2Earnings + bonusEarnings;
   const totalClicks = mockReferrals.reduce((sum, referral) => sum + referral.clicks, 0);
   const totalConversions = mockReferrals.reduce((sum, referral) => sum + referral.conversions, 0);
+  const nextBonusProgress = totalReferrals % 5;
 
   const handleCopyLink = (link: string, id: string) => {
     navigator.clipboard.writeText(link);
@@ -62,7 +69,11 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onPageChange }) => {
   };
 
   const handleWithdraw = () => {
-    alert(`Withdrawal request for $${totalEarnings.toFixed(2)} has been submitted. You will receive the funds within 3-5 business days.`);
+    if (totalEarnings >= 1000) {
+      alert(`Withdrawal request for ₹${totalEarnings} has been submitted. You will receive the funds within 3-5 business days after refund period ends.`);
+    } else {
+      alert('You need a minimum of ₹1000 balance to withdraw.');
+    }
   };
 
   return (
@@ -77,51 +88,87 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onPageChange }) => {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white p-6 rounded-lg shadow-md">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+          <div className="bg-gradient-to-r from-green-500 to-green-600 p-6 rounded-xl shadow-lg text-white">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Total Earnings</p>
-                <p className="text-2xl font-bold text-green-600">${totalEarnings.toFixed(2)}</p>
+                <p className="text-sm font-medium opacity-90">Total Earnings</p>
+                <p className="text-2xl font-bold">₹{totalEarnings}</p>
               </div>
-              <div className="bg-green-100 p-3 rounded-full">
-                <DollarSign className="w-6 h-6 text-green-600" />
+              <div className="bg-white bg-opacity-20 p-3 rounded-full">
+                <DollarSign className="w-6 h-6" />
               </div>
             </div>
           </div>
 
-          <div className="bg-white p-6 rounded-lg shadow-md">
+          <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-6 rounded-xl shadow-lg text-white">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Referral Clicks</p>
-                <p className="text-2xl font-bold text-blue-600">{totalClicks}</p>
+                <p className="text-sm font-medium opacity-90">Level 1 Earnings</p>
+                <p className="text-2xl font-bold">₹{totalLevel1Earnings}</p>
               </div>
-              <div className="bg-blue-100 p-3 rounded-full">
-                <Users className="w-6 h-6 text-blue-600" />
+              <div className="bg-white bg-opacity-20 p-3 rounded-full">
+                <Share2 className="w-6 h-6" />
               </div>
             </div>
           </div>
 
-          <div className="bg-white p-6 rounded-lg shadow-md">
+          <div className="bg-gradient-to-r from-purple-500 to-purple-600 p-6 rounded-xl shadow-lg text-white">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Conversions</p>
-                <p className="text-2xl font-bold text-purple-600">{totalConversions}</p>
+                <p className="text-sm font-medium opacity-90">Level 2 Earnings</p>
+                <p className="text-2xl font-bold">₹{totalLevel2Earnings}</p>
               </div>
-              <div className="bg-purple-100 p-3 rounded-full">
-                <TrendingUp className="w-6 h-6 text-purple-600" />
+              <div className="bg-white bg-opacity-20 p-3 rounded-full">
+                <Users className="w-6 h-6" />
               </div>
             </div>
           </div>
 
-          <div className="bg-white p-6 rounded-lg shadow-md">
+          <div className="bg-gradient-to-r from-orange-500 to-orange-600 p-6 rounded-xl shadow-lg text-white">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Courses Enrolled</p>
-                <p className="text-2xl font-bold text-indigo-600">{mockEnrolledCourses.length}</p>
+                <p className="text-sm font-medium opacity-90">Bonus Earned</p>
+                <p className="text-2xl font-bold">₹{bonusEarnings}</p>
               </div>
-              <div className="bg-indigo-100 p-3 rounded-full">
-                <CheckCircle className="w-6 h-6 text-indigo-600" />
+              <div className="bg-white bg-opacity-20 p-3 rounded-full">
+                <TrendingUp className="w-6 h-6" />
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-gradient-to-r from-indigo-500 to-indigo-600 p-6 rounded-xl shadow-lg text-white">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium opacity-90">Total Referrals</p>
+                <p className="text-2xl font-bold">{totalReferrals}</p>
+              </div>
+              <div className="bg-white bg-opacity-20 p-3 rounded-full">
+                <CheckCircle className="w-6 h-6" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Bonus Progress */}
+        <div className="bg-white p-6 rounded-xl shadow-lg mb-8 border-l-4 border-yellow-500">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-900">Bonus Progress</h3>
+            <span className="bg-yellow-100 text-yellow-800 text-sm font-semibold px-3 py-1 rounded-full">
+              ₹500 per 5 referrals
+            </span>
+          </div>
+          <div className="flex items-center space-x-4">
+            <div className="flex-1">
+              <div className="flex justify-between text-sm text-gray-600 mb-2">
+                <span>{nextBonusProgress}/5 referrals completed</span>
+                <span>Next: ₹500</span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-3">
+                <div
+                  className="bg-yellow-500 h-3 rounded-full transition-all duration-300"
+                  style={{ width: `${(nextBonusProgress / 5) * 100}%` }}
+                />
               </div>
             </div>
           </div>
@@ -219,7 +266,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onPageChange }) => {
                       <div className="flex justify-between items-start mb-4">
                         <div>
                           <h4 className="font-semibold text-gray-900 mb-2">{referral.courseTitle}</h4>
-                          <div className="grid grid-cols-3 gap-4 text-sm">
+                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                             <div>
                               <p className="text-gray-600">Clicks</p>
                               <p className="font-semibold">{referral.clicks}</p>
@@ -229,8 +276,12 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onPageChange }) => {
                               <p className="font-semibold">{referral.conversions}</p>
                             </div>
                             <div>
-                              <p className="text-gray-600">Earnings</p>
-                              <p className="font-semibold text-green-600">${referral.earnings.toFixed(2)}</p>
+                              <p className="text-gray-600">Level 1 (50%)</p>
+                              <p className="font-semibold text-green-600">₹{referral.level1Earnings}</p>
+                            </div>
+                            <div>
+                              <p className="text-gray-600">Level 2 (10%)</p>
+                              <p className="font-semibold text-blue-600">₹{referral.level2Earnings}</p>
                             </div>
                           </div>
                         </div>
@@ -273,19 +324,44 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onPageChange }) => {
 
             {activeTab === 'earnings' && (
               <div className="space-y-6">
-                <div className="bg-green-50 border border-green-200 rounded-lg p-6">
-                  <div className="flex justify-between items-center">
+                <div className="bg-gradient-to-r from-green-50 to-green-100 border border-green-200 rounded-xl p-6">
+                  <div className="flex flex-col md:flex-row md:justify-between md:items-center space-y-4 md:space-y-0">
                     <div>
                       <h3 className="text-lg font-semibold text-green-900">Available Earnings</h3>
-                      <p className="text-3xl font-bold text-green-600">${totalEarnings.toFixed(2)}</p>
-                      <p className="text-sm text-green-700 mt-1">Ready for withdrawal</p>
+                      <p className="text-3xl font-bold text-green-600">₹{totalEarnings}</p>
+                      <p className="text-sm text-green-700 mt-1">
+                        {totalEarnings >= 1000 ? 'Ready for withdrawal' : `Need ₹${1000 - totalEarnings} more to withdraw`}
+                      </p>
                     </div>
                     <button
                       onClick={handleWithdraw}
-                      className="bg-green-600 text-white px-6 py-3 rounded-md hover:bg-green-700 transition-colors font-semibold"
+                      className={`px-6 py-3 rounded-lg font-semibold transition-all duration-200 ${
+                        totalEarnings >= 1000
+                          ? 'bg-green-600 text-white hover:bg-green-700 hover:scale-105'
+                          : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                      }`}
                     >
                       Withdraw Earnings
                     </button>
+                  </div>
+                </div>
+
+                {/* Earnings Breakdown */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="bg-white p-4 rounded-lg border border-gray-200">
+                    <h4 className="font-semibold text-gray-700 mb-2">Level 1 Earnings (50%)</h4>
+                    <p className="text-2xl font-bold text-blue-600">₹{totalLevel1Earnings}</p>
+                    <p className="text-sm text-gray-500">Direct referrals</p>
+                  </div>
+                  <div className="bg-white p-4 rounded-lg border border-gray-200">
+                    <h4 className="font-semibold text-gray-700 mb-2">Level 2 Earnings (10%)</h4>
+                    <p className="text-2xl font-bold text-purple-600">₹{totalLevel2Earnings}</p>
+                    <p className="text-sm text-gray-500">Sub-referrals</p>
+                  </div>
+                  <div className="bg-white p-4 rounded-lg border border-gray-200">
+                    <h4 className="font-semibold text-gray-700 mb-2">Bonus Earnings</h4>
+                    <p className="text-2xl font-bold text-orange-600">₹{bonusEarnings}</p>
+                    <p className="text-sm text-gray-500">Milestone bonuses</p>
                   </div>
                 </div>
 
@@ -293,19 +369,19 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onPageChange }) => {
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">Earnings History</h3>
                   <div className="space-y-4">
                     {mockReferrals.map(referral => (
-                      <div key={referral.id} className="border border-gray-200 rounded-lg p-4">
-                        <div className="flex justify-between items-center">
+                      <div key={referral.id} className="bg-white border border-gray-200 rounded-lg p-4">
+                        <div className="flex flex-col md:flex-row md:justify-between md:items-center space-y-2 md:space-y-0">
                           <div>
                             <h4 className="font-medium text-gray-900">{referral.courseTitle}</h4>
                             <p className="text-sm text-gray-600">
                               {referral.conversions} conversion{referral.conversions !== 1 ? 's' : ''} 
                               {' • '}
-                              60% commission rate
+                              50% + 10% commission structure
                             </p>
                           </div>
                           <div className="text-right">
-                            <p className="font-semibold text-green-600">+${referral.earnings.toFixed(2)}</p>
-                            <p className="text-sm text-gray-500">Earned</p>
+                            <p className="font-semibold text-green-600">+₹{referral.level1Earnings + referral.level2Earnings}</p>
+                            <p className="text-sm text-gray-500">Total earned</p>
                           </div>
                         </div>
                       </div>
@@ -314,11 +390,13 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onPageChange }) => {
                 </div>
 
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-                  <h4 className="font-semibold text-blue-900 mb-2">Withdrawal Terms</h4>
+                  <h4 className="font-semibold text-blue-900 mb-3">Withdrawal Terms & Commission Structure</h4>
                   <ul className="text-sm text-blue-800 space-y-1">
-                    <li>• Minimum withdrawal amount: $50</li>
-                    <li>• Processing time: 3-5 business days</li>
-                    <li>• Earnings are credited after successful course completion</li>
+                    <li>• Minimum withdrawal amount: ₹1000</li>
+                    <li>• Processing time: 3-5 business days after refund period</li>
+                    <li>• Level 1: 50% commission on direct referrals</li>
+                    <li>• Level 2: 10% commission on sub-referrals (2nd level only)</li>
+                    <li>• Bonus: ₹500 for every 5 successful referrals</li>
                     <li>• No self-referrals allowed</li>
                   </ul>
                 </div>

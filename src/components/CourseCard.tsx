@@ -39,7 +39,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
         />
         <div className="absolute top-3 right-3">
           <div className="bg-primary text-primary-foreground px-3 py-1 rounded-full text-sm font-bold shadow-lg">
-            ${course.price}
+            ₹{course.price}
           </div>
         </div>
         <div className="absolute top-3 left-3">
@@ -98,11 +98,11 @@ const CourseCard: React.FC<CourseCardProps> = ({
               onClick={() => onReferCourse(course.id)}
               variant="accent"
               size="touch"
-              className="sm:flex-none"
-              title="Refer Course & Earn 60%"
+              className="sm:flex-none bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700"
+              title={`Refer Course & Earn ₹${Math.floor(course.price * 0.5)}`}
             >
-              <Share2 className="w-4 h-4 mr-2 sm:mr-0 icon-3d" />
-              <span className="sm:hidden">Refer & Earn</span>
+              <Share2 className="w-4 h-4 mr-2 icon-3d" />
+              <span>Earn ₹{Math.floor(course.price * 0.5)}</span>
             </Button>
           )}
         </div>
