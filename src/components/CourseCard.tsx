@@ -94,16 +94,21 @@ const CourseCard: React.FC<CourseCardProps> = ({
           </Button>
           
           {showReferButton && onReferCourse && (
-            <Button
-              onClick={() => onReferCourse(course.id)}
-              variant="accent"
-              size="touch"
-              className="sm:flex-none bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700"
-              title={`Refer Course & Earn ₹${Math.floor(course.price * 0.5)}`}
-            >
-              <Share2 className="w-4 h-4 mr-2 icon-3d" />
-              <span>Earn ₹{Math.floor(course.price * 0.5)}</span>
-            </Button>
+            <div className="space-y-2">
+              <Button
+                onClick={() => onReferCourse(course.id)}
+                variant="accent"
+                size="touch"
+                className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 shadow-lg hover:shadow-xl transition-all duration-200"
+                title={`Refer Course & Earn ₹${Math.floor(course.price * 0.5)}`}
+              >
+                <Share2 className="w-4 h-4 mr-2 icon-3d" />
+                <span>Refer & Earn</span>
+              </Button>
+              <p className="text-center text-sm font-semibold text-green-600">
+                Earn ₹{Math.floor(course.price * 0.5)} on referral
+              </p>
+            </div>
           )}
         </div>
       </div>

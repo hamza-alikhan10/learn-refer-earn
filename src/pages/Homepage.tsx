@@ -36,7 +36,7 @@ const Homepage: React.FC<HomepageProps> = ({ onPageChange, onReferCourse, user }
               Master Trading. Share Knowledge. <span className="text-yellow-300">Earn Big.</span>
             </h1>
             <p className="text-xl md:text-2xl mb-8 text-blue-100">
-              Learn trading from experts and earn 50% + 10% commission by referring others
+              Learn trading from experts and earn 50% direct + 10% second-level commission by referring others
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button
@@ -86,7 +86,7 @@ const Homepage: React.FC<HomepageProps> = ({ onPageChange, onReferCourse, user }
                 <TrendingUp className="w-8 h-8 text-yellow-600" />
               </div>
               <h3 className="text-3xl font-bold text-gray-900">50%+10%</h3>
-              <p className="text-gray-600">Commission Structure</p>
+              <p className="text-gray-600">Multi-Level Commission</p>
             </div>
           </div>
         </div>
@@ -175,13 +175,15 @@ const Homepage: React.FC<HomepageProps> = ({ onPageChange, onReferCourse, user }
             Earn While You Learn
           </h2>
           <p className="text-xl mb-8 text-green-100">
-            Share trading courses and earn 50% + 10% multi-level commission + ₹500 bonus every 5 referrals
+            Share trading courses and earn 50% direct + 10% second-level commission + ₹500 bonus every 5 referrals
           </p>
           <div className="bg-white text-gray-900 p-6 rounded-lg max-w-2xl mx-auto mb-8">
-            <div className="text-3xl font-bold text-green-600 mb-2">Example:</div>
-            <p className="text-lg">
-              Refer a ₹1000 course → Earn <span className="font-bold text-green-600">₹500</span> direct + <span className="font-bold text-blue-600">₹100</span> from sub-referrals
-            </p>
+            <div className="text-3xl font-bold text-green-600 mb-2">Commission Examples:</div>
+            <div className="space-y-2 text-lg">
+              <p>₹999 course → <span className="font-bold text-green-600">₹499</span> direct + <span className="font-bold text-blue-600">₹99</span> from sub-referrals</p>
+              <p>₹5000 course → <span className="font-bold text-green-600">₹2500</span> direct + <span className="font-bold text-blue-600">₹500</span> from sub-referrals</p>
+              <p>₹10000 course → <span className="font-bold text-green-600">₹5000</span> direct + <span className="font-bold text-blue-600">₹1000</span> from sub-referrals</p>
+            </div>
           </div>
           <button
             onClick={() => onPageChange('referral-program')}

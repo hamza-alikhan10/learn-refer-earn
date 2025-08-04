@@ -143,13 +143,18 @@ const CourseDetailsPage: React.FC<CourseDetailsPageProps> = ({
                 </button>
 
                 {user && onReferCourse && (
-                  <button
-                    onClick={() => onReferCourse(course.id)}
-                    className="w-full bg-gradient-to-r from-green-500 to-green-600 text-white py-3 px-6 rounded-lg font-semibold hover:from-green-600 hover:to-green-700 transition-all duration-200 hover:scale-105 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl"
-                  >
-                    <Share2 className="w-5 h-5" />
-                    <span>Refer & Earn ₹{Math.floor(course.price * 0.5)}</span>
-                  </button>
+                  <div className="space-y-3">
+                    <button
+                      onClick={() => onReferCourse(course.id)}
+                      className="w-full bg-gradient-to-r from-green-500 to-green-600 text-white py-3 px-6 rounded-lg font-semibold hover:from-green-600 hover:to-green-700 transition-all duration-200 hover:scale-105 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl"
+                    >
+                      <Share2 className="w-5 h-5" />
+                      <span>Refer & Earn</span>
+                    </button>
+                    <p className="text-center text-sm font-semibold text-green-600">
+                      Earn ₹{Math.floor(course.price * 0.5)} on referral
+                    </p>
+                  </div>
                 )}
               </div>
 
@@ -177,17 +182,30 @@ const CourseDetailsPage: React.FC<CourseDetailsPageProps> = ({
 
               {user && (
                 <div className="border-t border-gray-200 pt-6 mt-6">
-                  <div className="bg-gradient-to-r from-green-50 to-green-100 p-4 rounded-lg border border-green-200">
-                    <h4 className="font-semibold text-green-800 mb-2">💰 Referral Earnings</h4>
-                    <p className="text-sm text-green-700 mb-2">
-                      Earn <span className="font-bold text-lg">₹{Math.floor(course.price * 0.5)}</span> for each direct referral!
-                    </p>
-                    <p className="text-xs text-green-600 mb-2">
-                      + ₹{Math.floor(course.price * 0.1)} for each sub-referral (2nd level)
-                    </p>
-                    <p className="text-xs text-green-500 font-medium">
-                      🎁 Bonus: ₹500 for every 5 referrals!
-                    </p>
+                  <div className="bg-gradient-to-br from-green-50 to-blue-50 p-6 rounded-xl border border-green-200 shadow-sm">
+                    <h4 className="font-bold text-green-800 mb-4 text-center">💰 Referral Earnings Breakdown</h4>
+                    
+                    <div className="space-y-3 mb-4">
+                      <div className="flex justify-between items-center p-3 bg-white rounded-lg shadow-sm">
+                        <span className="text-sm text-gray-600">Direct Referral (50%)</span>
+                        <span className="font-bold text-green-600 text-lg">₹{Math.floor(course.price * 0.5)}</span>
+                      </div>
+                      
+                      <div className="flex justify-between items-center p-3 bg-white rounded-lg shadow-sm">
+                        <span className="text-sm text-gray-600">Sub-Referral (10%)</span>
+                        <span className="font-bold text-blue-600">₹{Math.floor(course.price * 0.1)}</span>
+                      </div>
+                      
+                      <div className="flex justify-between items-center p-3 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-lg border border-yellow-200">
+                        <span className="text-sm text-yellow-800">Bonus (Every 5 referrals)</span>
+                        <span className="font-bold text-yellow-600">₹500</span>
+                      </div>
+                    </div>
+                    
+                    <div className="text-center">
+                      <p className="text-xs text-gray-500 mb-2">Withdrawal minimum: ₹1000</p>
+                      <p className="text-xs text-gray-500">Commission credited after purchase completion</p>
+                    </div>
                   </div>
                 </div>
               )}
