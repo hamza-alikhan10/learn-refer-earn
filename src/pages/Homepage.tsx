@@ -31,26 +31,52 @@ const Homepage: React.FC<HomepageProps> = ({ onPageChange, onReferCourse, user }
       {/* Hero Section */}
       <section className="bg-gradient-to-r from-blue-600 to-purple-700 text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6">
-              Master Trading. Share Knowledge. <span className="text-yellow-300">Earn Big.</span>
-            </h1>
-            <p className="text-xl md:text-2xl mb-8 text-blue-100">
-              Learn trading from experts and earn 50% direct + 10% second-level commission by referring others
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button
-                onClick={() => onPageChange('courses')}
-                className="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors flex items-center justify-center space-x-2"
-              >
-                <span>Browse Trading Courses</span>
-              </button>
-              <button
-                onClick={() => onPageChange('referral-program')}
-                className="bg-yellow-500 text-white px-8 py-3 rounded-lg font-semibold hover:bg-yellow-600 transition-colors"
-              >
-                Learn About Referrals
-              </button>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div className="text-center lg:text-left">
+              <h1 className="text-4xl md:text-6xl font-bold mb-6">
+                Master Trading. Share Knowledge. <span className="text-yellow-300">Earn Big.</span>
+              </h1>
+              <p className="text-xl md:text-2xl mb-8 text-blue-100">
+                Learn trading from experts and earn 50% direct + 10% second-level commission by referring others
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                <button
+                  onClick={() => onPageChange('courses')}
+                  className="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors flex items-center justify-center space-x-2"
+                >
+                  <span>Browse Trading Courses</span>
+                </button>
+                <button
+                  onClick={() => onPageChange('referral-program')}
+                  className="bg-yellow-500 text-white px-8 py-3 rounded-lg font-semibold hover:bg-yellow-600 transition-colors"
+                >
+                  Learn About Referrals
+                </button>
+              </div>
+            </div>
+            
+            {/* MT5 Algo Trading Video */}
+            <div className="relative">
+              <div className="bg-black/20 backdrop-blur-sm rounded-2xl p-4 shadow-2xl">
+                <div className="relative aspect-video rounded-xl overflow-hidden">
+                  <img 
+                    src="/src/assets/mt5-algo-trading.jpg" 
+                    alt="MT5 Algorithmic Trading Demo - Watch our algo print money"
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                  <div className="absolute bottom-4 left-4 right-4 text-white">
+                    <p className="text-sm font-medium mb-1">Live Trading Demo</p>
+                    <p className="text-xs opacity-90">See our algorithm in action on MT5</p>
+                  </div>
+                  <div className="absolute top-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-bold animate-pulse">
+                    LIVE
+                  </div>
+                </div>
+                <p className="text-center text-white/80 text-sm mt-3">
+                  🚀 Watch our algorithm generate profits in real-time
+                </p>
+              </div>
             </div>
           </div>
         </div>

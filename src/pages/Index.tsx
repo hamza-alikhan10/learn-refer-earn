@@ -10,22 +10,84 @@ import CourseDetailsPage from './CourseDetailsPage';
 import Dashboard from './Dashboard';
 import StaticPages from './StaticPages';
 import { mockCourses } from '../data/mockData';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+import type { User, Session } from '@supabase/supabase-js';
 
 const Index = () => {
   const [currentPage, setCurrentPage] = useState('home');
   const [currentCourseId, setCurrentCourseId] = useState<string>('');
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
+  const [userProfile, setUserProfile] = useState<any>(null);
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [referralModalOpen, setReferralModalOpen] = useState(false);
   const [selectedCourseForReferral, setSelectedCourseForReferral] = useState<any>(null);
+  const [referralCode, setReferralCode] = useState<string>('');
+  const { toast } = useToast();
 
-  // Load user from localStorage on mount
+  // Check for referral code in URL
   useEffect(() => {
-    const savedUser = localStorage.getItem('learnhub_user');
-    if (savedUser) {
-      setUser(JSON.parse(savedUser));
+    const urlParams = new URLSearchParams(window.location.search);
+    const refCode = urlParams.get('ref');
+    if (refCode) {
+      setReferralCode(refCode);
+      setAuthModalOpen(true);
+      // Clean the URL without the ref parameter
+      window.history.replaceState({}, document.title, window.location.pathname);
     }
   }, []);
+
+  // Set up auth state listener and check for existing session
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        setSession(session);
+        setUser(session?.user ?? null);
+        
+        if (session?.user && event === 'SIGNED_IN') {
+          setTimeout(() => {
+            loadUserProfile(session.user.id);
+          }, 0);
+        }
+        
+        if (event === 'SIGNED_OUT') {
+          setUserProfile(null);
+        }
+      }
+    );
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      if (session?.user) {
+        loadUserProfile(session.user.id);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const loadUserProfile = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('user_id', userId)
+        .single();
+
+      if (error && error.code !== 'PGRST116') {
+        console.error('Error loading profile:', error);
+        return;
+      }
+
+      if (data) {
+        setUserProfile(data);
+      }
+    } catch (error) {
+      console.error('Error loading profile:', error);
+    }
+  };
 
   const handlePageChange = (page: string, courseId?: string) => {
     setCurrentPage(page);
@@ -36,18 +98,34 @@ const Index = () => {
   };
 
   const handleAuth = (userData: any) => {
-    setUser(userData);
+    // This is now handled by the auth state listener
     setAuthModalOpen(false);
   };
 
-  const handleLogout = () => {
-    setUser(null);
-    localStorage.removeItem('learnhub_user');
-    setCurrentPage('home');
+  const handleLogout = async () => {
+    try {
+      // Clean up auth state
+      Object.keys(localStorage).forEach((key) => {
+        if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
+          localStorage.removeItem(key);
+        }
+      });
+      
+      try {
+        await supabase.auth.signOut({ scope: 'global' });
+      } catch (err) {
+        // Ignore errors
+      }
+      
+      setCurrentPage('home');
+      window.location.href = '/';
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
   };
 
   const handleReferCourse = (courseId: string) => {
-    if (!user) {
+    if (!user || !userProfile) {
       setAuthModalOpen(true);
       return;
     }
@@ -59,23 +137,54 @@ const Index = () => {
     }
   };
 
-  const handlePurchase = (courseId: string) => {
-    if (!user) {
+  const handlePurchase = async (courseId: string) => {
+    if (!user || !userProfile) {
       setAuthModalOpen(true);
       return;
     }
 
     const course = mockCourses.find(c => c.id === courseId);
     if (course) {
-      alert(`Thank you for your purchase of "${course.title}"! You now have full access to the course content. Check your email for enrollment details.`);
-      
-      // Mock: Add to user's enrolled courses
-      const updatedUser = {
-        ...user,
-        enrolledCourses: [...(user.enrolledCourses || []), courseId]
-      };
-      setUser(updatedUser);
-      localStorage.setItem('learnhub_user', JSON.stringify(updatedUser));
+      try {
+        // Insert course enrollment
+        const { data, error } = await supabase
+          .from('course_enrollments')
+          .insert({
+            user_id: user.id,
+            course_id: courseId,
+            purchase_price: course.price
+          })
+          .select()
+          .single();
+
+        if (error) throw error;
+
+        // Call the referral earnings function
+        if (data) {
+          const { error: earningsError } = await supabase.rpc('process_referral_earnings', {
+            enrollment_id: data.id
+          });
+
+          if (earningsError) {
+            console.error('Error processing referral earnings:', earningsError);
+          }
+        }
+
+        toast({
+          title: "Purchase Successful!",
+          description: `You now have access to "${course.title}". Check your email for details.`,
+        });
+        
+        // Reload user profile to get updated earnings
+        loadUserProfile(user.id);
+      } catch (error: any) {
+        console.error('Error processing purchase:', error);
+        toast({
+          title: "Purchase Failed",
+          description: error.message || "There was an error processing your purchase. Please try again.",
+          variant: "destructive",
+        });
+      }
     }
   };
 
@@ -86,7 +195,7 @@ const Index = () => {
           <Homepage 
             onPageChange={handlePageChange} 
             onReferCourse={handleReferCourse}
-            user={user}
+            user={userProfile || user}
           />
         );
       case 'courses':
@@ -94,14 +203,14 @@ const Index = () => {
           <CoursesPage 
             onPageChange={handlePageChange} 
             onReferCourse={handleReferCourse}
-            user={user}
+            user={userProfile || user}
           />
         );
       case 'course-details':
         return (
           <CourseDetailsPage 
             courseId={currentCourseId}
-            user={user}
+            user={userProfile || user}
             onReferCourse={handleReferCourse}
             onPurchase={handlePurchase}
           />
@@ -109,7 +218,7 @@ const Index = () => {
       case 'dashboard':
         return user ? (
           <Dashboard 
-            user={user}
+            user={userProfile || user}
             onPageChange={handlePageChange}
           />
         ) : (
@@ -129,7 +238,6 @@ const Index = () => {
       case 'about':
       case 'how-it-works':
       case 'referral-program':
-      case 'contact':
         return (
           <StaticPages 
             page={currentPage}
@@ -172,15 +280,19 @@ const Index = () => {
 
       <AuthModal 
         isOpen={authModalOpen}
-        onClose={() => setAuthModalOpen(false)}
+        onClose={() => {
+          setAuthModalOpen(false);
+          setReferralCode('');
+        }}
         onAuth={handleAuth}
+        referralCode={referralCode}
       />
 
       <ReferralModal 
         isOpen={referralModalOpen}
         onClose={() => setReferralModalOpen(false)}
         course={selectedCourseForReferral}
-        user={user}
+        user={userProfile || user}
       />
     </div>
   );

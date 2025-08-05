@@ -15,8 +15,8 @@ const ReferralModal: React.FC<ReferralModalProps> = ({ isOpen, onClose, course, 
   
   if (!isOpen || !course || !user) return null;
 
-  const referralLink = `https://learnhub.example.com/course/${course.id}?ref=${user.id}`;
-  const commission = Math.round(course.price * 0.6);
+  const referralLink = `${window.location.origin}/?ref=${user.referral_code || user.id}`;
+  const commission = Math.round(course.price * 0.5);
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(referralLink);
@@ -42,7 +42,7 @@ const ReferralModal: React.FC<ReferralModalProps> = ({ isOpen, onClose, course, 
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-card rounded-xl max-w-md w-full p-6 relative shadow-2xl border border-border animate-scale-in">
+      <div className="bg-card rounded-xl max-w-md w-full max-h-[90vh] overflow-y-auto p-6 relative shadow-2xl border border-border animate-scale-in">
         <Button
           onClick={onClose}
           variant="ghost"

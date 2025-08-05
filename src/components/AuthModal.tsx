@@ -1,83 +1,310 @@
-
 import React, { useState } from 'react';
-import { X, Eye, EyeOff, User, Mail, Lock } from 'lucide-react';
+import { X, Eye, EyeOff, User, Mail, Lock, Loader2 } from 'lucide-react';
 import { Button } from './ui/button';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
   onAuth: (userData: any) => void;
+  referralCode?: string;
 }
 
-const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuth }) => {
-  const [isSignUp, setIsSignUp] = useState(false);
+const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuth, referralCode }) => {
+  const [isSignUp, setIsSignUp] = useState(!!referralCode);
+  const [isOtpVerification, setIsOtpVerification] = useState(false);
   const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [otp, setOtp] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
 
   if (!isOpen) return null;
 
-  const handleSubmit = () => {
+  const cleanupAuthState = () => {
+    Object.keys(localStorage).forEach((key) => {
+      if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
+        localStorage.removeItem(key);
+      }
+    });
+    Object.keys(sessionStorage || {}).forEach((key) => {
+      if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
+        sessionStorage.removeItem(key);
+      }
+    });
+  };
+
+  const handleSignUp = async () => {
     setError('');
-    
-    if (!email || !password || (isSignUp && !username)) {
+    setLoading(true);
+
+    if (!email || !password || !username) {
       setError('Please fill in all fields');
+      setLoading(false);
       return;
     }
 
     if (!email.includes('@')) {
       setError('Please enter a valid email address');
+      setLoading(false);
       return;
     }
 
     if (password.length < 6) {
       setError('Password must be at least 6 characters');
+      setLoading(false);
       return;
     }
 
-    // Mock authentication
-    const userData = {
-      id: Math.random().toString(36).substr(2, 9),
-      email,
-      username: username || email.split('@')[0],
-      enrolledCourses: [],
-      referrals: [],
-      earnings: 0
-    };
+    try {
+      cleanupAuthState();
+      
+      const signUpData: any = {
+        email,
+        password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/`,
+          data: {
+            display_name: username,
+          }
+        }
+      };
 
-    // Store in localStorage
-    localStorage.setItem('learnhub_user', JSON.stringify(userData));
-    
-    onAuth(userData);
-    handleClose();
+      if (referralCode) {
+        signUpData.options.data.referral_code = referralCode;
+      }
+
+      const { data, error } = await supabase.auth.signUp(signUpData);
+
+      if (error) throw error;
+
+      if (data.user && !data.user.email_confirmed_at) {
+        setIsOtpVerification(true);
+        toast({
+          title: "Check your email",
+          description: "We've sent you a 6-digit verification code",
+        });
+      }
+    } catch (error: any) {
+      setError(error.message || 'An error occurred during signup');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleGoogleAuth = () => {
-    // Mock Google authentication
-    const userData = {
-      id: Math.random().toString(36).substr(2, 9),
-      email: 'user@gmail.com',
-      username: 'Google User',
-      enrolledCourses: [],
-      referrals: [],
-      earnings: 0
-    };
+  const handleSignIn = async () => {
+    setError('');
+    setLoading(true);
 
-    localStorage.setItem('learnhub_user', JSON.stringify(userData));
-    onAuth(userData);
-    handleClose();
+    if (!email || !password) {
+      setError('Please fill in all fields');
+      setLoading(false);
+      return;
+    }
+
+    try {
+      cleanupAuthState();
+      
+      try {
+        await supabase.auth.signOut({ scope: 'global' });
+      } catch (err) {
+        // Continue even if this fails
+      }
+
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) throw error;
+
+      if (data.user) {
+        toast({
+          title: "Welcome back!",
+          description: "Successfully signed in",
+        });
+        window.location.href = '/';
+      }
+    } catch (error: any) {
+      setError(error.message || 'Invalid email or password');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleOtpVerification = async () => {
+    setError('');
+    setLoading(true);
+
+    if (!otp) {
+      setError('Please enter the verification code');
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase.auth.verifyOtp({
+        email,
+        token: otp,
+        type: 'signup'
+      });
+
+      if (error) throw error;
+
+      if (data.user) {
+        toast({
+          title: "Account verified!",
+          description: "Welcome to LearnHub Trading Academy",
+        });
+        window.location.href = '/';
+      }
+    } catch (error: any) {
+      setError(error.message || 'Invalid verification code');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleAuth = async () => {
+    setError('');
+    setLoading(true);
+
+    try {
+      cleanupAuthState();
+
+      const signInData: any = {
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/`,
+        }
+      };
+
+      if (referralCode) {
+        signInData.options.queryParams = {
+          referral_code: referralCode
+        };
+      }
+
+      const { error } = await supabase.auth.signInWithOAuth(signInData);
+
+      if (error) throw error;
+    } catch (error: any) {
+      setError(error.message || 'An error occurred with Google authentication');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleClose = () => {
     setEmail('');
     setUsername('');
     setPassword('');
+    setOtp('');
     setError('');
-    setIsSignUp(false);
+    setIsSignUp(!!referralCode);
+    setIsOtpVerification(false);
     onClose();
   };
+
+  const handleResendOtp = async () => {
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email: email,
+        options: {
+          emailRedirectTo: `${window.location.origin}/`
+        }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Code resent",
+        description: "Check your email for a new verification code",
+      });
+    } catch (error: any) {
+      setError(error.message || 'Failed to resend code');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (isOtpVerification) {
+    return (
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div className="bg-card rounded-xl max-w-md w-full p-6 relative shadow-2xl border border-border animate-scale-in">
+          <Button
+            onClick={handleClose}
+            variant="ghost"
+            size="icon"
+            className="absolute top-4 right-4 h-8 w-8"
+          >
+            <X className="w-4 h-4" />
+          </Button>
+
+          <div className="text-center mb-6">
+            <div className="bg-primary/10 p-3 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+              <Mail className="w-8 h-8 text-primary icon-3d" />
+            </div>
+            <h2 className="text-2xl font-bold text-card-foreground">
+              Verify Your Email
+            </h2>
+            <p className="text-muted-foreground mt-1">
+              Enter the 6-digit code sent to {email}
+            </p>
+          </div>
+
+          {error && (
+            <div className="bg-destructive/10 border border-destructive/20 text-destructive px-4 py-3 rounded-lg mb-4 animate-fade-in">
+              {error}
+            </div>
+          )}
+
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-card-foreground mb-2">
+                Verification Code
+              </label>
+              <input
+                type="text"
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
+                className="w-full px-4 py-3 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-background text-foreground placeholder:text-muted-foreground text-center text-2xl tracking-widest"
+                placeholder="000000"
+                maxLength={6}
+              />
+            </div>
+
+            <Button
+              onClick={handleOtpVerification}
+              className="w-full"
+              size="touch"
+              disabled={loading}
+            >
+              {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+              Verify Account
+            </Button>
+
+            <div className="text-center">
+              <Button
+                onClick={handleResendOtp}
+                variant="link"
+                className="text-sm"
+                disabled={loading}
+              >
+                Didn't receive code? Resend
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
@@ -101,6 +328,11 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuth }) => {
           <p className="text-muted-foreground mt-1">
             {isSignUp ? 'Join thousands of learners' : 'Sign in to your account'}
           </p>
+          {referralCode && (
+            <p className="text-primary text-sm mt-2 font-medium">
+              Invited with referral code: {referralCode}
+            </p>
+          )}
         </div>
 
         {error && (
@@ -170,10 +402,12 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuth }) => {
           </div>
 
           <Button
-            onClick={handleSubmit}
+            onClick={isSignUp ? handleSignUp : handleSignIn}
             className="w-full"
             size="touch"
+            disabled={loading}
           >
+            {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
             {isSignUp ? 'Create Account' : 'Sign In'}
           </Button>
 
@@ -191,22 +425,26 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuth }) => {
             variant="outline"
             className="w-full"
             size="touch"
+            disabled={loading}
           >
+            {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
             Continue with Google
           </Button>
 
-          <div className="text-center">
-            <Button
-              onClick={() => setIsSignUp(!isSignUp)}
-              variant="link"
-              className="text-sm"
-            >
-              {isSignUp 
-                ? 'Already have an account? Sign in' 
-                : "Don't have an account? Sign up"
-              }
-            </Button>
-          </div>
+          {!referralCode && (
+            <div className="text-center">
+              <Button
+                onClick={() => setIsSignUp(!isSignUp)}
+                variant="link"
+                className="text-sm"
+              >
+                {isSignUp 
+                  ? 'Already have an account? Sign in' 
+                  : "Don't have an account? Sign up"
+                }
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </div>
