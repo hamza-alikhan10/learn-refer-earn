@@ -14,13 +14,353 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      course_enrollments: {
+        Row: {
+          completed_at: string | null
+          course_id: string
+          enrolled_at: string | null
+          id: string
+          progress_percentage: number | null
+          purchase_price: number
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          course_id: string
+          enrolled_at?: string | null
+          id?: string
+          progress_percentage?: number | null
+          purchase_price: number
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          course_id?: string
+          enrolled_at?: string | null
+          id?: string
+          progress_percentage?: number | null
+          purchase_price?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "course_enrollments_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      courses: {
+        Row: {
+          created_at: string | null
+          curriculum: Json | null
+          description: string
+          duration: string
+          id: string
+          image_url: string | null
+          instructor: string
+          level: string
+          price: number
+          rating: number | null
+          title: string
+          total_students: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          curriculum?: Json | null
+          description: string
+          duration: string
+          id?: string
+          image_url?: string | null
+          instructor: string
+          level: string
+          price: number
+          rating?: number | null
+          title: string
+          total_students?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          curriculum?: Json | null
+          description?: string
+          duration?: string
+          id?: string
+          image_url?: string | null
+          instructor?: string
+          level?: string
+          price?: number
+          rating?: number | null
+          title?: string
+          total_students?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          available_balance: number | null
+          created_at: string | null
+          display_name: string | null
+          id: string
+          phone: string | null
+          referral_code: string
+          referred_by: string | null
+          total_bonuses: number | null
+          total_earnings: number | null
+          total_referrals: number | null
+          updated_at: string | null
+          user_id: string
+          username: string | null
+        }
+        Insert: {
+          available_balance?: number | null
+          created_at?: string | null
+          display_name?: string | null
+          id?: string
+          phone?: string | null
+          referral_code: string
+          referred_by?: string | null
+          total_bonuses?: number | null
+          total_earnings?: number | null
+          total_referrals?: number | null
+          updated_at?: string | null
+          user_id: string
+          username?: string | null
+        }
+        Update: {
+          available_balance?: number | null
+          created_at?: string | null
+          display_name?: string | null
+          id?: string
+          phone?: string | null
+          referral_code?: string
+          referred_by?: string | null
+          total_bonuses?: number | null
+          total_earnings?: number | null
+          total_referrals?: number | null
+          updated_at?: string | null
+          user_id?: string
+          username?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profiles_referred_by_fkey"
+            columns: ["referred_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      referral_bonuses: {
+        Row: {
+          bonus_amount: number
+          created_at: string | null
+          id: string
+          milestone_count: number
+          status: string | null
+          user_id: string
+        }
+        Insert: {
+          bonus_amount?: number
+          created_at?: string | null
+          id?: string
+          milestone_count: number
+          status?: string | null
+          user_id: string
+        }
+        Update: {
+          bonus_amount?: number
+          created_at?: string | null
+          id?: string
+          milestone_count?: number
+          status?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "referral_bonuses_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      referral_earnings: {
+        Row: {
+          commission_amount: number
+          commission_level: number
+          commission_percentage: number
+          course_id: string
+          course_price: number
+          created_at: string | null
+          credited_at: string | null
+          enrollment_id: string
+          id: string
+          referred_id: string
+          referrer_id: string
+          status: string | null
+        }
+        Insert: {
+          commission_amount: number
+          commission_level: number
+          commission_percentage: number
+          course_id: string
+          course_price: number
+          created_at?: string | null
+          credited_at?: string | null
+          enrollment_id: string
+          id?: string
+          referred_id: string
+          referrer_id: string
+          status?: string | null
+        }
+        Update: {
+          commission_amount?: number
+          commission_level?: number
+          commission_percentage?: number
+          course_id?: string
+          course_price?: number
+          created_at?: string | null
+          credited_at?: string | null
+          enrollment_id?: string
+          id?: string
+          referred_id?: string
+          referrer_id?: string
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "referral_earnings_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "referral_earnings_enrollment_id_fkey"
+            columns: ["enrollment_id"]
+            isOneToOne: false
+            referencedRelation: "course_enrollments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "referral_earnings_referred_id_fkey"
+            columns: ["referred_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "referral_earnings_referrer_id_fkey"
+            columns: ["referrer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      referrals: {
+        Row: {
+          created_at: string | null
+          id: string
+          level: number
+          referred_id: string
+          referrer_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          level: number
+          referred_id: string
+          referrer_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          level?: number
+          referred_id?: string
+          referrer_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "referrals_referred_id_fkey"
+            columns: ["referred_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "referrals_referrer_id_fkey"
+            columns: ["referrer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      withdrawals: {
+        Row: {
+          admin_notes: string | null
+          amount: number
+          id: string
+          payment_details: Json
+          payment_method: string
+          processed_at: string | null
+          requested_at: string | null
+          status: string | null
+          user_id: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          amount: number
+          id?: string
+          payment_details: Json
+          payment_method: string
+          processed_at?: string | null
+          requested_at?: string | null
+          status?: string | null
+          user_id: string
+        }
+        Update: {
+          admin_notes?: string | null
+          amount?: number
+          id?: string
+          payment_details?: Json
+          payment_method?: string
+          processed_at?: string | null
+          requested_at?: string | null
+          status?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "withdrawals_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      generate_referral_code: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      process_referral_earnings: {
+        Args: { enrollment_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
