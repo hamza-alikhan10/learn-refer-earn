@@ -60,7 +60,7 @@ const Homepage: React.FC<HomepageProps> = ({ onPageChange, onReferCourse, user }
               <div className="bg-black/20 backdrop-blur-sm rounded-2xl p-4 shadow-2xl">
                 <div className="relative aspect-video rounded-xl overflow-hidden">
                   <img 
-                    src="/src/assets/mt5-algo-trading.jpg" 
+                    src="src/assets/mt5-algo-trading.jpg"
                     alt="MT5 Algorithmic Trading Demo - Watch our algo print money"
                     className="w-full h-full object-cover"
                   />

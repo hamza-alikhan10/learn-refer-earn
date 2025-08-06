@@ -19,7 +19,6 @@ const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange, user, onAuth
     { id: 'about', label: 'About Us' },
     { id: 'how-it-works', label: 'How It Works' },
     { id: 'referral-program', label: 'Referral Program' },
-    { id: 'contact', label: 'Contact' },
   ];
 
   return (
@@ -56,7 +55,7 @@ const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange, user, onAuth
                   className="flex items-center space-x-2 text-gray-700 hover:text-blue-600"
                 >
                   <User className="w-5 h-5" />
-                  <span>{user.username}</span>
+                  <span>{user.display_name || user.username || user.email}</span>
                 </button>
                 <button
                   onClick={onLogout}
