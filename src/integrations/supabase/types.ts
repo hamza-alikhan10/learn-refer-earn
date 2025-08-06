@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      audit_logs: {
+        Row: {
+          action: string
+          created_at: string
+          id: string
+          ip_address: unknown | null
+          new_values: Json | null
+          old_values: Json | null
+          record_id: string | null
+          table_name: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          id?: string
+          ip_address?: unknown | null
+          new_values?: Json | null
+          old_values?: Json | null
+          record_id?: string | null
+          table_name?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          id?: string
+          ip_address?: unknown | null
+          new_values?: Json | null
+          old_values?: Json | null
+          record_id?: string | null
+          table_name?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       course_enrollments: {
         Row: {
           completed_at: string | null
@@ -99,6 +138,56 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      payment_transactions: {
+        Row: {
+          amount: number
+          completed_at: string | null
+          course_id: string | null
+          created_at: string
+          currency: string | null
+          id: string
+          payment_method: string | null
+          status: string | null
+          stripe_payment_intent_id: string | null
+          stripe_session_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          amount: number
+          completed_at?: string | null
+          course_id?: string | null
+          created_at?: string
+          currency?: string | null
+          id?: string
+          payment_method?: string | null
+          status?: string | null
+          stripe_payment_intent_id?: string | null
+          stripe_session_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          amount?: number
+          completed_at?: string | null
+          course_id?: string | null
+          created_at?: string
+          currency?: string | null
+          id?: string
+          payment_method?: string | null
+          status?: string | null
+          stripe_payment_intent_id?: string | null
+          stripe_session_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_transactions_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -304,38 +393,83 @@ export type Database = {
           },
         ]
       }
+      user_payment_methods: {
+        Row: {
+          account_details: Json
+          created_at: string
+          id: string
+          is_primary: boolean | null
+          is_verified: boolean | null
+          method_type: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          account_details: Json
+          created_at?: string
+          id?: string
+          is_primary?: boolean | null
+          is_verified?: boolean | null
+          method_type: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          account_details?: Json
+          created_at?: string
+          id?: string
+          is_primary?: boolean | null
+          is_verified?: boolean | null
+          method_type?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       withdrawals: {
         Row: {
           admin_notes: string | null
           amount: number
+          bank_details: Json | null
           id: string
+          net_amount: number | null
           payment_details: Json
           payment_method: string
           processed_at: string | null
+          processing_fee: number | null
           requested_at: string | null
           status: string | null
+          upi_id: string | null
           user_id: string
         }
         Insert: {
           admin_notes?: string | null
           amount: number
+          bank_details?: Json | null
           id?: string
+          net_amount?: number | null
           payment_details: Json
           payment_method: string
           processed_at?: string | null
+          processing_fee?: number | null
           requested_at?: string | null
           status?: string | null
+          upi_id?: string | null
           user_id: string
         }
         Update: {
           admin_notes?: string | null
           amount?: number
+          bank_details?: Json | null
           id?: string
+          net_amount?: number | null
           payment_details?: Json
           payment_method?: string
           processed_at?: string | null
+          processing_fee?: number | null
           requested_at?: string | null
           status?: string | null
+          upi_id?: string | null
           user_id?: string
         }
         Relationships: [
