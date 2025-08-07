@@ -137,30 +137,7 @@ const ReferralModal: React.FC<ReferralModalProps> = ({ isOpen, onClose, course, 
             </div>
           </div>
 
-          <div className="bg-primary/5 p-4 rounded-xl border border-primary/10">
-            <h4 className="font-semibold text-primary mb-3 flex items-center">
-              <Gift className="w-4 h-4 mr-2 icon-3d" />
-              How it works:
-            </h4>
-            <ul className="text-sm text-muted-foreground space-y-2">
-              <li className="flex items-start">
-                <span className="w-2 h-2 bg-primary rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                Share your unique referral link
-              </li>
-              <li className="flex items-start">
-                <span className="w-2 h-2 bg-primary rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                Earn 60% commission when someone purchases
-              </li>
-              <li className="flex items-start">
-                <span className="w-2 h-2 bg-primary rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                Track your earnings in your dashboard
-              </li>
-              <li className="flex items-start">
-                <span className="w-2 h-2 bg-primary rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                Withdraw earnings anytime
-              </li>
-            </ul>
-          </div>
+         
         </div>
       </div>
     </div>

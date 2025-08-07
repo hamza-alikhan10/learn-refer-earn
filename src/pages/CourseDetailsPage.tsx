@@ -180,35 +180,7 @@ const CourseDetailsPage: React.FC<CourseDetailsPageProps> = ({
                 </div>
               </div>
 
-              {user && (
-                <div className="border-t border-gray-200 pt-6 mt-6">
-                  <div className="bg-gradient-to-br from-green-50 to-blue-50 p-6 rounded-xl border border-green-200 shadow-sm">
-                    <h4 className="font-bold text-green-800 mb-4 text-center">💰 Referral Earnings Breakdown</h4>
-                    
-                    <div className="space-y-3 mb-4">
-                      <div className="flex justify-between items-center p-3 bg-white rounded-lg shadow-sm">
-                        <span className="text-sm text-gray-600">Direct Referral (50%)</span>
-                        <span className="font-bold text-green-600 text-lg">₹{Math.floor(course.price * 0.5)}</span>
-                      </div>
-                      
-                      <div className="flex justify-between items-center p-3 bg-white rounded-lg shadow-sm">
-                        <span className="text-sm text-gray-600">Sub-Referral (10%)</span>
-                        <span className="font-bold text-blue-600">₹{Math.floor(course.price * 0.1)}</span>
-                      </div>
-                      
-                      <div className="flex justify-between items-center p-3 bg-gradient-to-r from-yellow-50 to-orange-50 rounded-lg border border-yellow-200">
-                        <span className="text-sm text-yellow-800">Bonus (Every 5 referrals)</span>
-                        <span className="font-bold text-yellow-600">₹500</span>
-                      </div>
-                    </div>
-                    
-                    <div className="text-center">
-                      <p className="text-xs text-gray-500 mb-2">Withdrawal minimum: ₹1000</p>
-                      <p className="text-xs text-gray-500">Commission credited after purchase completion</p>
-                    </div>
-                  </div>
-                </div>
-              )}
+           
             </div>
           </div>
         </div>

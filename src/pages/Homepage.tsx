@@ -37,7 +37,7 @@ const Homepage: React.FC<HomepageProps> = ({ onPageChange, onReferCourse, user }
                 Master Trading. Share Knowledge. <span className="text-yellow-300">Earn Big.</span>
               </h1>
               <p className="text-xl md:text-2xl mb-8 text-blue-100">
-                Learn trading from experts and earn 50% direct + 10% second-level commission by referring others
+                Learn trading from experts and earn 50%  commission by referring others
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                 <button
@@ -194,31 +194,7 @@ const Homepage: React.FC<HomepageProps> = ({ onPageChange, onReferCourse, user }
         </div>
       </section>
 
-      {/* Referral Program Highlight */}
-      <section className="py-16 bg-gradient-to-r from-green-500 to-teal-600 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Earn While You Learn
-          </h2>
-          <p className="text-xl mb-8 text-green-100">
-            Share trading courses and earn 50% direct + 10% second-level commission + ₹500 bonus every 5 referrals
-          </p>
-          <div className="bg-white text-gray-900 p-6 rounded-lg max-w-2xl mx-auto mb-8">
-            <div className="text-3xl font-bold text-green-600 mb-2">Commission Examples:</div>
-            <div className="space-y-2 text-lg">
-              <p>₹999 course → <span className="font-bold text-green-600">₹499</span> direct + <span className="font-bold text-blue-600">₹99</span> from sub-referrals</p>
-              <p>₹5000 course → <span className="font-bold text-green-600">₹2500</span> direct + <span className="font-bold text-blue-600">₹500</span> from sub-referrals</p>
-              <p>₹10000 course → <span className="font-bold text-green-600">₹5000</span> direct + <span className="font-bold text-blue-600">₹1000</span> from sub-referrals</p>
-            </div>
-          </div>
-          <button
-            onClick={() => onPageChange('referral-program')}
-            className="bg-yellow-500 text-white px-8 py-3 rounded-lg font-semibold hover:bg-yellow-600 transition-colors"
-          >
-            Learn More About Referrals
-          </button>
-        </div>
-      </section>
+    
     </div>
   );
 };

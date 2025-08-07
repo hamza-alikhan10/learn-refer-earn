@@ -394,7 +394,6 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuth, referral
                   onChange={(e) => setUserReferralCode(e.target.value.toUpperCase())}
                   className="w-full px-4 py-3 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-background text-foreground placeholder:text-muted-foreground"
                   placeholder="Enter referral code"
-                  disabled={!!referralCode}
                 />
                 <p className="text-xs text-muted-foreground mt-1">
                   Use TEST001 or TEST002 for testing
