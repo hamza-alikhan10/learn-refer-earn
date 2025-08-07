@@ -89,12 +89,12 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuth, referral
 
       if (error) throw error;
 
-      if (data.user && !data.user.email_confirmed_at) {
-        setIsOtpVerification(true);
+      if (data.user) {
         toast({
-          title: "Check your email",
-          description: "We've sent you a 6-digit verification code",
+          title: "Account created!",
+          description: "Welcome to LearnHub Trading Academy",
         });
+        window.location.href = '/';
       }
     } catch (error: any) {
       setError(error.message || 'An error occurred during signup');
