@@ -21,6 +21,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuth, referral
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [userReferralCode, setUserReferralCode] = useState(referralCode || '');
   const { toast } = useToast();
 
   if (!isOpen) return null;
@@ -44,6 +45,12 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuth, referral
 
     if (!email || !password || !username) {
       setError('Please fill in all fields');
+      setLoading(false);
+      return;
+    }
+
+    if (!userReferralCode) {
+      setError('Referral code is required to create an account');
       setLoading(false);
       return;
     }
@@ -74,8 +81,8 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuth, referral
         }
       };
 
-      if (referralCode) {
-        signUpData.options.data.referral_code = referralCode;
+      if (userReferralCode) {
+        signUpData.options.data.referral_code = userReferralCode;
       }
 
       const { data, error } = await supabase.auth.signUp(signUpData);
@@ -183,9 +190,9 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuth, referral
         }
       };
 
-      if (referralCode) {
+      if (userReferralCode) {
         signInData.options.queryParams = {
-          referral_code: referralCode
+          referral_code: userReferralCode
         };
       }
 
@@ -207,6 +214,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuth, referral
     setError('');
     setIsSignUp(!!referralCode);
     setIsOtpVerification(false);
+    setUserReferralCode(referralCode || '');
     onClose();
   };
 
@@ -328,9 +336,9 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuth, referral
           <p className="text-muted-foreground mt-1">
             {isSignUp ? 'Join thousands of learners' : 'Sign in to your account'}
           </p>
-          {referralCode && (
+          {userReferralCode && (
             <p className="text-primary text-sm mt-2 font-medium">
-              Invited with referral code: {referralCode}
+              Invited with referral code: {userReferralCode}
             </p>
           )}
         </div>
@@ -359,21 +367,40 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuth, referral
           </div>
 
           {isSignUp && (
-            <div>
-              <label className="block text-sm font-medium text-card-foreground mb-2">
-                Username
-              </label>
-              <div className="relative">
-                <User className="absolute left-3 top-3 w-4 h-4 text-muted-foreground icon-3d" />
+            <>
+              <div>
+                <label className="block text-sm font-medium text-card-foreground mb-2">
+                  Username
+                </label>
+                <div className="relative">
+                  <User className="absolute left-3 top-3 w-4 h-4 text-muted-foreground icon-3d" />
+                  <input
+                    type="text"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    className="w-full pl-10 pr-4 py-3 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-background text-foreground placeholder:text-muted-foreground"
+                    placeholder="Your username"
+                  />
+                </div>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-card-foreground mb-2">
+                  Referral Code <span className="text-destructive">*</span>
+                </label>
                 <input
                   type="text"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-background text-foreground placeholder:text-muted-foreground"
-                  placeholder="Your username"
+                  value={userReferralCode}
+                  onChange={(e) => setUserReferralCode(e.target.value.toUpperCase())}
+                  className="w-full px-4 py-3 border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-background text-foreground placeholder:text-muted-foreground"
+                  placeholder="Enter referral code"
+                  disabled={!!referralCode}
                 />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Use TEST001 or TEST002 for testing
+                </p>
               </div>
-            </div>
+            </>
           )}
 
           <div>
@@ -431,20 +458,18 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuth, referral
             Continue with Google
           </Button>
 
-          {!referralCode && (
-            <div className="text-center">
-              <Button
-                onClick={() => setIsSignUp(!isSignUp)}
-                variant="link"
-                className="text-sm"
-              >
-                {isSignUp 
-                  ? 'Already have an account? Sign in' 
-                  : "Don't have an account? Sign up"
-                }
-              </Button>
-            </div>
-          )}
+          <div className="text-center">
+            <Button
+              onClick={() => setIsSignUp(!isSignUp)}
+              variant="link"
+              className="text-sm"
+            >
+              {isSignUp 
+                ? 'Already have an account? Sign in' 
+                : "Don't have an account? Sign up"
+              }
+            </Button>
+          </div>
         </div>
       </div>
     </div>
