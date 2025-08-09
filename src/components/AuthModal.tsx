@@ -50,7 +50,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuth, referral
     }
 
     if (!userReferralCode) {
-      setError('Referral code is required to create an account');
+      setError('Referral code is required to join AffiliateHub');
       setLoading(false);
       return;
     }
@@ -92,7 +92,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuth, referral
       if (data.user) {
         toast({
           title: "Account created!",
-          description: "Welcome to LearnHub Trading Academy",
+          description: "Welcome to AffiliateHub Marketing Academy",
         });
         window.location.href = '/';
       }
@@ -132,7 +132,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuth, referral
       if (data.user) {
         toast({
           title: "Welcome back!",
-          description: "Successfully signed in",
+          description: "Welcome back to AffiliateHub!",
         });
         window.location.href = '/';
       }

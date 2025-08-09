@@ -143,47 +143,55 @@ const Index = () => {
       return;
     }
 
+    // Redirect to payment page with UPI
     const course = mockCourses.find(c => c.id === courseId);
     if (course) {
-      try {
-        // Insert course enrollment
-        const { data, error } = await supabase
-          .from('course_enrollments')
-          .insert({
-            user_id: user.id,
-            course_id: courseId,
-            purchase_price: course.price
-          })
-          .select()
-          .single();
+      // For now, simulate purchase - in production this would redirect to payment gateway
+      const confirmPurchase = confirm(
+        `Purchase ${course.title} for ₹${course.price}?\n\nThis will unlock all lower-priced courses automatically.\n\nPayment Method: UPI`
+      );
+      
+      if (confirmPurchase) {
+        try {
+          // Insert course enrollment
+          const { data, error } = await supabase
+            .from('course_enrollments')
+            .insert({
+              user_id: user.id,
+              course_id: courseId,
+              purchase_price: course.price
+            })
+            .select()
+            .single();
 
-        if (error) throw error;
+          if (error) throw error;
 
-        // Call the referral earnings function
-        if (data) {
-          const { error: earningsError } = await supabase.rpc('process_referral_earnings', {
-            enrollment_id: data.id
-          });
+          // Call the referral earnings function
+          if (data) {
+            const { error: earningsError } = await supabase.rpc('process_referral_earnings', {
+              enrollment_id: data.id
+            });
 
-          if (earningsError) {
-            console.error('Error processing referral earnings:', earningsError);
+            if (earningsError) {
+              console.error('Error processing referral earnings:', earningsError);
+            }
           }
-        }
 
-        toast({
-          title: "Purchase Successful!",
-          description: `You now have access to "${course.title}". Check your email for details.`,
-        });
-        
-        // Reload user profile to get updated earnings
-        loadUserProfile(user.id);
-      } catch (error: any) {
-        console.error('Error processing purchase:', error);
-        toast({
-          title: "Purchase Failed",
-          description: error.message || "There was an error processing your purchase. Please try again.",
-          variant: "destructive",
-        });
+          toast({
+            title: "Purchase Successful!",
+            description: `You now have access to "${course.title}" and all lower-priced courses!`,
+          });
+          
+          // Reload user profile to get updated earnings
+          loadUserProfile(user.id);
+        } catch (error: any) {
+          console.error('Error processing purchase:', error);
+          toast({
+            title: "Purchase Failed",
+            description: error.message || "There was an error processing your purchase. Please try again.",
+            variant: "destructive",
+          });
+        }
       }
     }
   };

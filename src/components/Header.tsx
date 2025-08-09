@@ -27,7 +27,7 @@ const Header: React.FC<HeaderProps> = ({ currentPage, onPageChange, user, onAuth
         <div className="flex justify-between items-center py-4">
           <div className="flex items-center">
             <h1 className="text-2xl font-bold text-blue-600 cursor-pointer" onClick={() => onPageChange('home')}>
-              LearnHub
+              AffiliateHub
             </h1>
           </div>
 

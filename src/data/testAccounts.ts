@@ -4,75 +4,41 @@
 export const testReferralCodes = [
   {
     code: 'TEST001',
-    description: 'Master Trader - Has 8 referrals and ₹4,000 earnings',
-    ownerName: 'Master Trader'
+    description: 'Demo Account 1 - Has purchased Course 3 (₹4000), unlocked Courses 1, 2, 3',
+    ownerName: 'Demo Affiliate 1'
   },
   {
     code: 'TEST002', 
-    description: 'Pro Trader - Has 3 referrals and ₹1,500 earnings',
-    ownerName: 'Pro Trader'
-  },
-  {
-    code: 'TEST003',
-    description: 'Elite Trader - Has 12 referrals and ₹6,000 earnings',
-    ownerName: 'Elite Trader'
-  },
-  {
-    code: 'TEST004',
-    description: 'Advanced Trader - Has 5 referrals and ₹2,500 earnings',
-    ownerName: 'Advanced Trader'
-  },
-  {
-    code: 'TEST005',
-    description: 'Expert Trader - Has 15 referrals and ₹7,500 earnings',
-    ownerName: 'Expert Trader'
+    description: 'Demo Account 2 - Has purchased Course 1 (₹999) only',
+    ownerName: 'Demo Affiliate 2'
   }
 ];
 
 // Test URLs for easy testing:
-// http://localhost:5173/?ref=TEST001
-// http://localhost:5173/?ref=TEST002
-// http://localhost:5173/?ref=TEST003
-// http://localhost:5173/?ref=TEST004
-// http://localhost:5173/?ref=TEST005
+// http://localhost:8080/?ref=DEMO001
+// http://localhost:8080/?ref=DEMO002
 
 export const testLoginCredentials = {
-  note: 'These are mock credentials for testing. In production, users will create real accounts.',
+  note: 'Demo accounts for testing the affiliate marketing system and course unlocking.',
   accounts: [
     {
-      email: 'master.trader@example.com',
+      email: 'demo1@test.com',
       password: 'password123',
-      referralCode: 'TEST001',
-      name: 'Master Trader'
+      referralCode: 'DEMO001',
+      name: 'Demo Affiliate 1',
+      description: 'Has purchased Course 3 (₹4000) - can refer Courses 1, 2, 3'
     },
     {
-      email: 'pro.trader@example.com', 
+      email: 'demo2@test.com', 
       password: 'password123',
-      referralCode: 'TEST002',
-      name: 'Pro Trader'
-    },
-    {
-      email: 'elite.trader@example.com',
-      password: 'password123',
-      referralCode: 'TEST003',
-      name: 'Elite Trader'
-    },
-    {
-      email: 'advanced.trader@example.com',
-      password: 'password123',
-      referralCode: 'TEST004',
-      name: 'Advanced Trader'
-    },
-    {
-      email: 'expert.trader@example.com',
-      password: 'password123',
-      referralCode: 'TEST005',
-      name: 'Expert Trader'
+      referralCode: 'DEMO002',
+      name: 'Demo Affiliate 2',
+      description: 'Has purchased Course 1 (₹999) - can refer Course 1 only'
     }
   ]
 };
 
-console.log('Test Referral URLs for backtesting:');
+console.log('Demo Referral URLs for testing:');
 testReferralCodes.forEach(ref => {
-  console.log(`${ref.description}: ${window.location.origin}/?ref=${ref.code}`);
+  console.log(`${ref.description}: http://localhost:8080/?ref=${ref.code}`);
 });

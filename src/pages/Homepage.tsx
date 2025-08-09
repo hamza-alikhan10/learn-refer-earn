@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Search, Star, TrendingUp, Users, Award } from 'lucide-react';
 import CourseCard from '../components/CourseCard';
@@ -24,7 +23,7 @@ const Homepage: React.FC<HomepageProps> = ({ onPageChange, onReferCourse, user }
     return matchesSearch && matchesCategory;
   });
 
-  const categories = ['All Categories', 'Trading'];
+  const categories = ['All Categories', 'Affiliate Marketing'];
 
   return (
     <div className="min-h-screen">
@@ -34,17 +33,17 @@ const Homepage: React.FC<HomepageProps> = ({ onPageChange, onReferCourse, user }
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div className="text-center lg:text-left">
               <h1 className="text-4xl md:text-6xl font-bold mb-6">
-                Master Trading. Share Knowledge. <span className="text-yellow-300">Earn Big.</span>
+                Master Affiliate Marketing. Share Knowledge. <span className="text-yellow-300">Earn Big.</span>
               </h1>
               <p className="text-xl md:text-2xl mb-8 text-blue-100">
-                Learn trading from experts and earn 50%  commission by referring others
+                Learn affiliate marketing from experts and earn 50% commission by referring others
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                 <button
                   onClick={() => onPageChange('courses')}
                   className="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors flex items-center justify-center space-x-2"
                 >
-                  <span>Browse Trading Courses</span>
+                  <span>Browse Affiliate Marketing Courses</span>
                 </button>
                 <button
                   onClick={() => onPageChange('referral-program')}
@@ -60,21 +59,21 @@ const Homepage: React.FC<HomepageProps> = ({ onPageChange, onReferCourse, user }
               <div className="bg-black/20 backdrop-blur-sm rounded-2xl p-4 shadow-2xl">
                 <div className="relative aspect-video rounded-xl overflow-hidden">
                   <img 
-                    src="src/assets/mt5-algo-trading.jpg"
-                    alt="MT5 Algorithmic Trading Demo - Watch our algo print money"
+                    src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&h=400&fit=crop"
+                    alt="Affiliate Marketing Success Dashboard - See real earnings"
                     className="w-full h-full object-cover"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
                   <div className="absolute bottom-4 left-4 right-4 text-white">
-                    <p className="text-sm font-medium mb-1">Live Trading Demo</p>
-                    <p className="text-xs opacity-90">See our algorithm in action on MT5</p>
+                    <p className="text-sm font-medium mb-1">Live Affiliate Dashboard</p>
+                    <p className="text-xs opacity-90">See real affiliate marketing earnings</p>
                   </div>
                   <div className="absolute top-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-bold animate-pulse">
                     LIVE
                   </div>
                 </div>
                 <p className="text-center text-white/80 text-sm mt-3">
-                  🚀 Watch our algorithm generate profits in real-time
+                  🚀 Watch real affiliate marketers generate profits in real-time
                 </p>
               </div>
             </div>
@@ -90,15 +89,15 @@ const Homepage: React.FC<HomepageProps> = ({ onPageChange, onReferCourse, user }
               <div className="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Users className="w-8 h-8 text-blue-600" />
               </div>
-              <h3 className="text-3xl font-bold text-gray-900">25,000+</h3>
-              <p className="text-gray-600">Trading Students</p>
+              <h3 className="text-3xl font-bold text-gray-900">15,000+</h3>
+              <p className="text-gray-600">Affiliate Marketers</p>
             </div>
             <div className="bg-white p-6 rounded-lg shadow-md">
               <div className="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Award className="w-8 h-8 text-green-600" />
               </div>
-              <h3 className="text-3xl font-bold text-gray-900">50+</h3>
-              <p className="text-gray-600">Trading Experts</p>
+              <h3 className="text-3xl font-bold text-gray-900">25+</h3>
+              <p className="text-gray-600">Marketing Experts</p>
             </div>
             <div className="bg-white p-6 rounded-lg shadow-md">
               <div className="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -122,8 +121,8 @@ const Homepage: React.FC<HomepageProps> = ({ onPageChange, onReferCourse, user }
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Find Your Perfect Trading Course</h2>
-            <p className="text-gray-600">Search through our comprehensive trading course library</p>
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Find Your Perfect Affiliate Marketing Course</h2>
+            <p className="text-gray-600">Search through our comprehensive affiliate marketing course library</p>
           </div>
 
           <div className="max-w-4xl mx-auto">
@@ -132,7 +131,7 @@ const Homepage: React.FC<HomepageProps> = ({ onPageChange, onReferCourse, user }
                 <Search className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
                 <input
                   type="text"
-                  placeholder="Search courses, instructors, or topics..."
+                  placeholder="Search affiliate marketing courses, instructors, or topics..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"

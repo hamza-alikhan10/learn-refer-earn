@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { CheckCircle, Users, Target, Award, ArrowRight, Mail, MessageCircle, Phone, Globe, BookOpen, Share2, Gift, Coins, TrendingUp, Star, Shield, Clock, Zap } from 'lucide-react';
 import { Button } from '../components/ui/button';
@@ -17,7 +16,7 @@ const StaticPages: React.FC<StaticPagesProps> = ({ page, onPageChange }) => {
         </div>
         <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-6">About LearnHub</h1>
         <p className="text-lg sm:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-          Empowering learners worldwide through quality education and rewarding partnerships
+          Empowering affiliate marketers worldwide through quality education and rewarding partnerships
         </p>
       </div>
 
@@ -30,8 +29,8 @@ const StaticPages: React.FC<StaticPagesProps> = ({ page, onPageChange }) => {
             <h2 className="text-2xl sm:text-3xl font-bold text-foreground">Our Mission</h2>
           </div>
           <p className="text-muted-foreground leading-relaxed text-base sm:text-lg">
-            At LearnHub, we believe that quality education should be accessible to everyone, everywhere. 
-            Our mission is to democratize learning by connecting students with expert instructors and 
+            At LearnHub, we believe that affiliate marketing education should be accessible to everyone, everywhere. 
+            Our mission is to democratize affiliate marketing knowledge by connecting students with expert marketers and 
             creating opportunities for knowledge sharing that benefits entire communities.
           </p>
           <p className="text-muted-foreground leading-relaxed text-base sm:text-lg">
@@ -68,7 +67,7 @@ const StaticPages: React.FC<StaticPagesProps> = ({ page, onPageChange }) => {
             </div>
             <h3 className="font-bold text-foreground mb-3 text-lg">Expert-Led Courses</h3>
             <p className="text-muted-foreground leading-relaxed">
-              Learn from industry professionals with real-world experience and proven track records.
+              Learn from successful affiliate marketers with real-world experience and proven track records.
             </p>
           </div>
 
@@ -120,7 +119,7 @@ const StaticPages: React.FC<StaticPagesProps> = ({ page, onPageChange }) => {
         </div>
         <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-6">How Trading Academy Works</h1>
         <p className="text-lg sm:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-          Your step-by-step guide to learning trading and earning through our referral system
+          Your step-by-step guide to learning affiliate marketing and earning through our referral system
         </p>
       </div>
 
@@ -137,11 +136,11 @@ const StaticPages: React.FC<StaticPagesProps> = ({ page, onPageChange }) => {
             </div>
           </div>
           <p className="text-muted-foreground leading-relaxed mb-4">
-            Create your free Trading Academy account in seconds. Join thousands of traders learning and earning together.
+            Create your free Affiliate Marketing Academy account in seconds. Join thousands of marketers learning and earning together.
           </p>
           <div className="bg-muted/30 p-4 rounded-lg border border-border">
             <p className="text-sm text-muted-foreground">
-              <strong className="text-card-foreground">Pro tip:</strong> Complete your profile to get personalized trading course recommendations.
+              <strong className="text-card-foreground">Pro tip:</strong> Complete your profile to get personalized affiliate marketing course recommendations.
             </p>
           </div>
         </div>
@@ -154,11 +153,11 @@ const StaticPages: React.FC<StaticPagesProps> = ({ page, onPageChange }) => {
             </div>
             <div>
               <span className="text-sm font-semibold text-success bg-success/10 px-3 py-1 rounded-full">Step 2</span>
-              <h3 className="text-xl sm:text-2xl font-bold text-card-foreground mt-2">Browse Trading Courses</h3>
+              <h3 className="text-xl sm:text-2xl font-bold text-card-foreground mt-2">Browse Affiliate Marketing Courses</h3>
             </div>
           </div>
           <p className="text-muted-foreground leading-relaxed mb-4">
-            Explore our comprehensive library of trading courses with different price points for every learning level.
+            Explore our comprehensive library of affiliate marketing courses with different price points for every learning level.
           </p>
           <div className="grid grid-cols-2 gap-3 mb-4">
             <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-3 rounded-lg text-center border border-blue-200">
@@ -300,7 +299,7 @@ const StaticPages: React.FC<StaticPagesProps> = ({ page, onPageChange }) => {
       <div className="bg-gradient-to-r from-primary to-accent rounded-2xl p-8 sm:p-12 text-primary-foreground text-center">
         <h2 className="text-2xl sm:text-3xl font-bold mb-4">Ready to Start Earning?</h2>
         <p className="mb-8 text-primary-foreground/90 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
-          Join Trading Academy today and start your journey of learning trading and earning through referrals!
+          Join Affiliate Marketing Academy today and start your journey of learning affiliate marketing and earning through referrals!
         </p>
         <Button
           onClick={() => onPageChange('courses')}
@@ -309,7 +308,7 @@ const StaticPages: React.FC<StaticPagesProps> = ({ page, onPageChange }) => {
           className="shadow-lg"
         >
           <BookOpen className="w-5 h-5 mr-2 icon-3d" />
-          Explore Trading Courses
+          Explore Affiliate Marketing Courses
         </Button>
       </div>
     </div>
@@ -323,14 +322,14 @@ const StaticPages: React.FC<StaticPagesProps> = ({ page, onPageChange }) => {
         </div>
         <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-6">Referral Program Details</h1>
         <p className="text-lg sm:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-          Earn multi-level commissions and bonus rewards by sharing quality trading education
+          Earn multi-level commissions and bonus rewards by sharing quality affiliate marketing education
         </p>
       </div>
 
       <div className="bg-gradient-to-br from-success to-primary text-primary-foreground rounded-2xl p-8 sm:p-12 mb-16 text-center shadow-xl">
         <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-4">50% + 10% Commission Structure</h2>
         <p className="text-lg sm:text-xl text-primary-foreground/90 mb-8 max-w-2xl mx-auto leading-relaxed">
-          Industry-leading multi-level referral rewards + milestone bonuses
+          Industry-leading multi-level referral rewards for affiliate marketing education + milestone bonuses
         </p>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
           <div className="bg-card/10 backdrop-blur-sm border border-primary-foreground/20 p-6 rounded-xl">
@@ -341,15 +340,15 @@ const StaticPages: React.FC<StaticPagesProps> = ({ page, onPageChange }) => {
           </div>
           <div className="bg-card/10 backdrop-blur-sm border border-primary-foreground/20 p-6 rounded-xl">
             <p className="text-sm font-medium text-primary-foreground/80 mb-2">Advanced</p>
-            <p className="text-lg font-semibold text-primary-foreground">₹5000 Course</p>
-            <p className="text-2xl sm:text-3xl font-bold text-warning mt-2 mb-1">₹2500</p>
-            <p className="text-sm text-primary-foreground/80">Direct + ₹500 from sub-referrals</p>
+            <p className="text-lg font-semibold text-primary-foreground">₹4000 Course</p>
+            <p className="text-2xl sm:text-3xl font-bold text-warning mt-2 mb-1">₹2000</p>
+            <p className="text-sm text-primary-foreground/80">Direct + ₹400 from sub-referrals</p>
           </div>
           <div className="bg-card/10 backdrop-blur-sm border border-primary-foreground/20 p-6 rounded-xl">
             <p className="text-sm font-medium text-primary-foreground/80 mb-2">Professional</p>
-            <p className="text-lg font-semibold text-primary-foreground">₹10000 Course</p>
-            <p className="text-2xl sm:text-3xl font-bold text-warning mt-2 mb-1">₹5000</p>
-            <p className="text-sm text-primary-foreground/80">Direct + ₹1000 from sub-referrals</p>
+            <p className="text-lg font-semibold text-primary-foreground">₹5000 Course</p>
+            <p className="text-2xl sm:text-3xl font-bold text-warning mt-2 mb-1">₹2500</p>
+            <p className="text-sm text-primary-foreground/80">Direct + ₹500 from sub-referrals</p>
           </div>
         </div>
       </div>
@@ -367,7 +366,7 @@ const StaticPages: React.FC<StaticPagesProps> = ({ page, onPageChange }) => {
               </div>
               <div>
                 <p className="font-semibold text-card-foreground mb-1">Generate Referral Links</p>
-                <p className="text-muted-foreground text-sm leading-relaxed">Create unique links for any trading course instantly</p>
+                <p className="text-muted-foreground text-sm leading-relaxed">Create unique links for any affiliate marketing course instantly</p>
               </div>
             </div>
             <div className="flex items-start space-x-4">
@@ -421,7 +420,7 @@ const StaticPages: React.FC<StaticPagesProps> = ({ page, onPageChange }) => {
                 ₹1000 Withdrawal Minimum
               </h3>
               <p className="text-green-800 text-sm leading-relaxed">
-                Start earning from your first referral with a reasonable ₹1000 withdrawal threshold.
+                Start earning from your first affiliate marketing referral with a reasonable ₹1000 withdrawal threshold.
               </p>
             </div>
             <div className="bg-gradient-to-r from-purple-50 to-purple-100 p-4 rounded-xl border border-purple-200">
@@ -472,7 +471,7 @@ const StaticPages: React.FC<StaticPagesProps> = ({ page, onPageChange }) => {
               </li>
               <li className="flex items-start space-x-2">
                 <span className="text-success mt-1">•</span>
-                <span>30-day tracking period for referral attribution</span>
+                <span>30-day cookie tracking period for referral attribution</span>
               </li>
               <li className="flex items-start space-x-2">
                 <span className="text-success mt-1">•</span>
@@ -500,7 +499,7 @@ const StaticPages: React.FC<StaticPagesProps> = ({ page, onPageChange }) => {
               </li>
               <li className="flex items-start space-x-2">
                 <span className="text-warning mt-1">•</span>
-                <span>Must comply with promotional guidelines</span>
+                <span>Must comply with affiliate marketing promotional guidelines</span>
               </li>
             </ul>
           </div>
@@ -510,13 +509,13 @@ const StaticPages: React.FC<StaticPagesProps> = ({ page, onPageChange }) => {
       <div className="bg-blue-600 text-white rounded-lg p-8 text-center">
         <h2 className="text-2xl font-bold mb-4">Start Earning Today</h2>
         <p className="mb-6 text-blue-100">
-          Join our referral program and turn your network into a source of income!
+          Join our affiliate marketing referral program and turn your network into a source of income!
         </p>
         <button
           onClick={() => onPageChange('courses')}
           className="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
         >
-          Browse Courses to Refer
+          Browse Affiliate Marketing Courses to Refer
         </button>
       </div>
     </div>
