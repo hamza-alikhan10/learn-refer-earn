@@ -27,9 +27,9 @@ const CoursesPage: React.FC<CoursesPageProps> = ({ onPageChange, onReferCourse, 
     const matchesCategory = selectedCategory === 'All Categories' || course.category === selectedCategory;
     
     let matchesPrice = true;
-    if (priceRange === 'under100') matchesPrice = course.price < 100;
-    else if (priceRange === '100-200') matchesPrice = course.price >= 100 && course.price <= 200;
-    else if (priceRange === 'over200') matchesPrice = course.price > 200;
+    if (priceRange === 'under100') matchesPrice = course.price < 1000;
+    else if (priceRange === '100-200') matchesPrice = course.price >= 1000 && course.price <= 2000;
+    else if (priceRange === 'over200') matchesPrice = course.price > 2000;
 
     return matchesSearch && matchesCategory && matchesPrice;
   });
@@ -99,9 +99,9 @@ const CoursesPage: React.FC<CoursesPageProps> = ({ onPageChange, onReferCourse, 
               className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="all">All Prices</option>
-              <option value="under100">Under $100</option>
-              <option value="100-200">$100 - $200</option>
-              <option value="over200">Over $200</option>
+              <option value="under100">Under ₹1000</option>
+              <option value="100-200">₹1000 - ₹2000</option>
+              <option value="over200">Over ₹2000</option>
             </select>
 
             {/* Sort */}
