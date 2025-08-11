@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { TrendingUp, Users, DollarSign, Share2, ExternalLink, Copy, CheckCircle, Calendar, Eye, Lock, Unlock } from 'lucide-react';
+import { TrendingUp, Users, DollarSign, Share2, ExternalLink, Copy, CheckCircle, Calendar, Eye, ShoppingCart } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { mockCourses } from '../data/mockData';
 
 interface DashboardProps {
   user: any;
@@ -11,19 +12,10 @@ interface DashboardProps {
 const Dashboard: React.FC<DashboardProps> = ({ user, onPageChange }) => {
   const [activeTab, setActiveTab] = useState('overview');
   const [copiedLink, setCopiedLink] = useState('');
-  const [userCourseAccess, setUserCourseAccess] = useState<any[]>([]);
-  const [referralLinks, setReferralLinks] = useState<any[]>([]);
+  const [userEnrollments, setUserEnrollments] = useState<any[]>([]);
   const [earnings, setEarnings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
-
-  // All 4 courses with their details
-  const allCourses = [
-    { id: '1', title: 'Affiliate Marketing Fundamentals', price: 999, level: 'Beginner' },
-    { id: '2', title: 'Advanced Affiliate Strategies', price: 1999, level: 'Intermediate' },
-    { id: '3', title: 'Affiliate Marketing Mastery', price: 4000, level: 'Advanced' },
-    { id: '4', title: 'Affiliate Empire Blueprint', price: 5000, level: 'Expert' }
-  ];
 
   useEffect(() => {
     if (user) {
@@ -35,26 +27,14 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onPageChange }) => {
     try {
       setLoading(true);
       
-      // Load user course access
-      const { data: accessData, error: accessError } = await supabase
+      // Load user enrollments
+      const { data: enrollmentData, error: enrollmentError } = await supabase
         .from('course_enrollments')
         .select('*')
         .eq('user_id', user.user_id || user.id);
 
-      if (accessError) throw accessError;
-      setUserCourseAccess(accessData || []);
-
-      // Load referral links
-      // For now, generate referral links dynamically since the table doesn't exist yet
-      const referralCode = user.referral_code || user.id;
-      const baseUrl = window.location.origin;
-      const dynamicLinks = (accessData || []).map(enrollment => ({
-        course_id: enrollment.course_id,
-        referral_link: `${baseUrl}/course/${enrollment.course_id}?ref=${referralCode}`,
-        user_id: user.user_id || user.id
-      }));
-
-      setReferralLinks(dynamicLinks);
+      if (enrollmentError) throw enrollmentError;
+      setUserEnrollments(enrollmentData || []);
 
       // Load earnings
       const { data: earningsData, error: earningsError } = await supabase
@@ -80,35 +60,6 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onPageChange }) => {
     }
   };
 
-  const generateReferralLink = async (courseId: string) => {
-    try {
-      const baseUrl = window.location.origin;
-      const referralCode = user.referral_code || user.id;
-      const referralLink = `${baseUrl}/course/${courseId}?ref=${referralCode}`;
-
-      // For now, just add to local state since table doesn't exist yet
-      const newLink = {
-        user_id: user.user_id || user.id,
-        course_id: courseId,
-        referral_link: referralLink
-      };
-      
-      setReferralLinks(prev => [...prev.filter(link => link.course_id !== courseId), newLink]);
-
-      toast({
-        title: "Success",
-        description: "Referral link generated successfully!",
-      });
-    } catch (error) {
-      console.error('Error generating referral link:', error);
-      toast({
-        title: "Error",
-        description: "Failed to generate referral link",
-        variant: "destructive",
-      });
-    }
-  };
-
   if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -120,12 +71,8 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onPageChange }) => {
     );
   }
 
-  const hasAccessToCourse = (courseId: string) => {
-    return userCourseAccess.some(access => access.course_id === courseId);
-  };
-
-  const getReferralLinkForCourse = (courseId: string) => {
-    return referralLinks.find(link => link.course_id === courseId);
+  const isEnrolledInCourse = (courseId: string) => {
+    return userEnrollments.some(enrollment => enrollment.course_id === courseId);
   };
 
   const getEarningsForCourse = (courseId: string) => {
@@ -139,14 +86,76 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onPageChange }) => {
     navigator.clipboard.writeText(link);
     setCopiedLink(id);
     setTimeout(() => setCopiedLink(''), 2000);
+    toast({
+      title: "Link Copied!",
+      description: "Referral link copied to clipboard",
+    });
+  };
+
+  const handlePurchaseCourse = async (courseId: string) => {
+    const course = mockCourses.find(c => c.id === courseId);
+    if (!course) return;
+
+    const confirmPurchase = confirm(
+      `Purchase ${course.title} for ₹${course.price}?\n\nThis will be a one-click purchase with UPI payment.`
+    );
+    
+    if (confirmPurchase) {
+      try {
+        // Insert course enrollment
+        const { data, error } = await supabase
+          .from('course_enrollments')
+          .insert({
+            user_id: user.user_id || user.id,
+            course_id: courseId,
+            purchase_price: course.price
+          })
+          .select()
+          .single();
+
+        if (error) throw error;
+
+        // Process referral earnings if user was referred
+        if (data && user.referred_by) {
+          const { error: earningsError } = await supabase.rpc('process_referral_earnings', {
+            enrollment_id: data.id
+          });
+
+          if (earningsError) {
+            console.error('Error processing referral earnings:', earningsError);
+          }
+        }
+
+        toast({
+          title: "Purchase Successful!",
+          description: `You now have access to "${course.title}"!`,
+        });
+        
+        // Reload dashboard data
+        loadDashboardData();
+      } catch (error: any) {
+        console.error('Error processing purchase:', error);
+        toast({
+          title: "Purchase Failed",
+          description: error.message || "There was an error processing your purchase. Please try again.",
+          variant: "destructive",
+        });
+      }
+    }
   };
 
   const handleWithdraw = () => {
     if (totalEarnings >= 1000) {
-      alert(`Withdrawal request for ₹${totalEarnings.toFixed(2)} has been submitted. You will receive the funds within 3-5 business days.`);
+      alert(`Withdrawal request for ₹${totalEarnings.toFixed(2)} has been submitted. You will receive the funds within 3-5 business days via UPI.`);
     } else {
       alert('You need a minimum of ₹1000 balance to withdraw.');
     }
+  };
+
+  const generateReferralLink = (courseId: string) => {
+    const baseUrl = window.location.origin;
+    const referralCode = user.referral_code || user.id;
+    return `${baseUrl}/?ref=${referralCode}&course=${courseId}`;
   };
 
   if (loading) {
@@ -169,6 +178,9 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onPageChange }) => {
             Welcome back, {user.display_name || user.username || user.email}!
           </h1>
           <p className="text-gray-600">Track your affiliate marketing progress and referral earnings</p>
+          <div className="mt-2 text-sm text-blue-600 font-medium">
+            Your Referral Code: <span className="bg-blue-100 px-2 py-1 rounded">{user.referral_code || user.id}</span>
+          </div>
         </div>
 
         {/* Stats Cards */}
@@ -200,11 +212,11 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onPageChange }) => {
           <div className="bg-gradient-to-r from-purple-500 to-purple-600 p-4 sm:p-6 rounded-xl shadow-lg text-white">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs sm:text-sm font-medium opacity-90">Unlocked</p>
-                <p className="text-lg sm:text-2xl font-bold">{userCourseAccess.length}/4</p>
+                <p className="text-xs sm:text-sm font-medium opacity-90">Enrolled</p>
+                <p className="text-lg sm:text-2xl font-bold">{userEnrollments.length}/4</p>
               </div>
               <div className="bg-white bg-opacity-20 p-2 sm:p-3 rounded-full">
-                <Unlock className="w-4 h-4 sm:w-6 sm:h-6" />
+                <Eye className="w-4 h-4 sm:w-6 sm:h-6" />
               </div>
             </div>
           </div>
@@ -212,11 +224,11 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onPageChange }) => {
           <div className="bg-gradient-to-r from-orange-500 to-orange-600 p-4 sm:p-6 rounded-xl shadow-lg text-white">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs sm:text-sm font-medium opacity-90">Links</p>
-                <p className="text-lg sm:text-2xl font-bold">{referralLinks.length}</p>
+                <p className="text-xs sm:text-sm font-medium opacity-90">Available</p>
+                <p className="text-lg sm:text-2xl font-bold">{4 - userEnrollments.length}</p>
               </div>
               <div className="bg-white bg-opacity-20 p-2 sm:p-3 rounded-full">
-                <Share2 className="w-4 h-4 sm:w-6 sm:h-6" />
+                <ShoppingCart className="w-4 h-4 sm:w-6 sm:h-6" />
               </div>
             </div>
           </div>
@@ -234,7 +246,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onPageChange }) => {
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
-                Course Access
+                Courses & Purchase
               </button>
               <button
                 onClick={() => setActiveTab('referrals')}
@@ -263,36 +275,48 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onPageChange }) => {
             {activeTab === 'overview' && (
               <div className="space-y-6">
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Course Access Status</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">All Affiliate Marketing Courses</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {allCourses.map(course => {
-                      const hasAccess = hasAccessToCourse(course.id);
+                    {mockCourses.map(course => {
+                      const isEnrolled = isEnrolledInCourse(course.id);
                       return (
-                        <div key={course.id} className={`border rounded-lg p-4 ${hasAccess ? 'border-green-200 bg-green-50' : 'border-gray-200 bg-gray-50'}`}>
+                        <div key={course.id} className={`border rounded-lg p-4 ${isEnrolled ? 'border-green-200 bg-green-50' : 'border-gray-200 bg-white'}`}>
                           <div className="flex items-center justify-between mb-3">
                             <h4 className="font-medium text-gray-900">{course.title}</h4>
-                            {hasAccess ? (
-                              <Unlock className="w-5 h-5 text-green-600" />
+                            {isEnrolled ? (
+                              <span className="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">
+                                Enrolled
+                              </span>
                             ) : (
-                              <Lock className="w-5 h-5 text-gray-400" />
+                              <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">
+                                Available
+                              </span>
                             )}
                           </div>
-                          <div className="flex justify-between items-center text-sm">
+                          <div className="flex justify-between items-center text-sm mb-3">
                             <span className="text-gray-600">₹{course.price} • {course.level}</span>
-                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                              hasAccess ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'
-                            }`}>
-                              {hasAccess ? 'Unlocked' : 'Locked'}
-                            </span>
+                            <span className="text-gray-500">{course.duration}</span>
                           </div>
-                          {hasAccess && (
-                            <button
-                              onClick={() => onPageChange('course-details', course.id)}
-                              className="mt-3 w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors text-sm"
-                            >
-                              View Course
-                            </button>
-                          )}
+                          <p className="text-sm text-gray-600 mb-4">{course.description}</p>
+                          
+                          <div className="flex space-x-2">
+                            {isEnrolled ? (
+                              <button
+                                onClick={() => onPageChange('course-details', course.id)}
+                                className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors text-sm"
+                              >
+                                View Course
+                              </button>
+                            ) : (
+                              <button
+                                onClick={() => handlePurchaseCourse(course.id)}
+                                className="flex-1 bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition-colors text-sm flex items-center justify-center space-x-2"
+                              >
+                                <ShoppingCart className="w-4 h-4" />
+                                <span>Purchase ₹{course.price}</span>
+                              </button>
+                            )}
+                          </div>
                         </div>
                       );
                     })}
@@ -300,12 +324,13 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onPageChange }) => {
                 </div>
 
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  <h4 className="font-semibold text-blue-900 mb-2">Course Unlocking System</h4>
+                  <h4 className="font-semibold text-blue-900 mb-2">How It Works</h4>
                   <ul className="text-sm text-blue-800 space-y-1">
-                    <li>• Purchase Course 2 (₹1999) → Course 1 unlocks automatically</li>
-                    <li>• Purchase Course 3 (₹4000) → Courses 1 & 2 unlock automatically</li>
-                    <li>• Purchase Course 4 (₹5000) → All courses unlock automatically</li>
-                    <li>• You can only refer courses that you have unlocked</li>
+                    <li>• Purchase any course with one-click UPI payment</li>
+                    <li>• Generate referral links for any course (no restrictions)</li>
+                    <li>• Earn 50% commission on direct referrals + 10% on second-level</li>
+                    <li>• Get ₹500 bonus for every 5 successful referrals</li>
+                    <li>• Minimum withdrawal: ₹1000</li>
                   </ul>
                 </div>
               </div>
@@ -314,96 +339,72 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onPageChange }) => {
             {activeTab === 'referrals' && (
               <div className="space-y-6">
                 <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-3 sm:space-y-0">
-                  <h3 className="text-lg font-semibold text-gray-900">My Referral Links</h3>
-                  <p className="text-sm text-gray-600">Generate links for unlocked courses only</p>
+                  <h3 className="text-lg font-semibold text-gray-900">Referral Links</h3>
+                  <p className="text-sm text-gray-600">Generate links for any course</p>
                 </div>
 
                 <div className="space-y-4">
-                  {allCourses.map(course => {
-                    const hasAccess = hasAccessToCourse(course.id);
-                    const referralLink = getReferralLinkForCourse(course.id);
+                  {mockCourses.map(course => {
                     const courseEarnings = getEarningsForCourse(course.id);
                     const totalEarningsForCourse = courseEarnings.reduce((sum, earning) => sum + parseFloat(earning.commission_amount), 0);
+                    const referralLink = generateReferralLink(course.id);
 
                     return (
-                      <div key={course.id} className={`border rounded-lg p-4 sm:p-6 ${hasAccess ? 'border-gray-200' : 'border-gray-100 bg-gray-50'}`}>
+                      <div key={course.id} className="border rounded-lg p-4 sm:p-6 border-gray-200">
                         <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start mb-4 space-y-4 lg:space-y-0">
                           <div className="flex-1">
                             <div className="flex items-center space-x-2 mb-2">
                               <h4 className="font-semibold text-gray-900">{course.title}</h4>
-                              {hasAccess ? (
-                                <Unlock className="w-4 h-4 text-green-600" />
-                              ) : (
-                                <Lock className="w-4 h-4 text-gray-400" />
-                              )}
                             </div>
                             <p className="text-sm text-gray-600 mb-3">₹{course.price} • {course.level}</p>
                             
-                            {hasAccess && (
-                              <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
-                                <div>
-                                  <p className="text-gray-600">Potential Earning</p>
-                                  <p className="font-semibold text-green-600">₹{Math.floor(course.price * 0.5)}</p>
-                                </div>
-                                <div>
-                                  <p className="text-gray-600">Total Earned</p>
-                                  <p className="font-semibold text-blue-600">₹{totalEarningsForCourse.toFixed(0)}</p>
-                                </div>
-                                <div>
-                                  <p className="text-gray-600">Referrals</p>
-                                  <p className="font-semibold">{courseEarnings.length}</p>
-                                </div>
+                            <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
+                              <div>
+                                <p className="text-gray-600">Potential Earning</p>
+                                <p className="font-semibold text-green-600">₹{Math.floor(course.price * 0.5)}</p>
                               </div>
-                            )}
+                              <div>
+                                <p className="text-gray-600">Total Earned</p>
+                                <p className="font-semibold text-blue-600">₹{totalEarningsForCourse.toFixed(0)}</p>
+                              </div>
+                              <div>
+                                <p className="text-gray-600">Referrals</p>
+                                <p className="font-semibold">{courseEarnings.length}</p>
+                              </div>
+                            </div>
                           </div>
                         </div>
 
-                        {hasAccess ? (
-                          referralLink ? (
-                            <div className="space-y-3">
-                              <div className="flex flex-col sm:flex-row items-stretch sm:items-center space-y-2 sm:space-y-0 sm:space-x-2">
-                                <input
-                                  type="text"
-                                  value={referralLink.referral_link}
-                                  readOnly
-                                  className="flex-1 px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-sm"
-                                />
-                                <div className="flex space-x-2">
-                                  <button
-                                    onClick={() => handleCopyLink(referralLink.referral_link, course.id)}
-                                    className="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition-colors flex items-center space-x-2 flex-1 sm:flex-initial justify-center"
-                                  >
-                                    {copiedLink === course.id ? (
-                                      <CheckCircle className="w-4 h-4" />
-                                    ) : (
-                                      <Copy className="w-4 h-4" />
-                                    )}
-                                    <span className="text-sm">Copy</span>
-                                  </button>
-                                  <button
-                                    onClick={() => window.open(referralLink.referral_link, '_blank')}
-                                    className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors flex items-center space-x-2 flex-1 sm:flex-initial justify-center"
-                                  >
-                                    <ExternalLink className="w-4 h-4" />
-                                    <span className="text-sm">Visit</span>
-                                  </button>
-                                </div>
-                              </div>
+                        <div className="space-y-3">
+                          <div className="flex flex-col sm:flex-row items-stretch sm:items-center space-y-2 sm:space-y-0 sm:space-x-2">
+                            <input
+                              type="text"
+                              value={referralLink}
+                              readOnly
+                              className="flex-1 px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-sm"
+                            />
+                            <div className="flex space-x-2">
+                              <button
+                                onClick={() => handleCopyLink(referralLink, course.id)}
+                                className="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition-colors flex items-center space-x-2 flex-1 sm:flex-initial justify-center"
+                              >
+                                {copiedLink === course.id ? (
+                                  <CheckCircle className="w-4 h-4" />
+                                ) : (
+                                  <Copy className="w-4 h-4" />
+                                )}
+                                <span className="text-sm">Copy</span>
+                              </button>
+                              <button
+                                onClick={() => window.open(referralLink, '_blank')}
+                                className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors flex items-center space-x-2 flex-1 sm:flex-initial justify-center"
+                              >
+                                <ExternalLink className="w-4 h-4" />
+                                <span className="text-sm">Visit</span>
+                              </button>
                             </div>
-                          ) : (
-                            <button
-                              onClick={() => generateReferralLink(course.id)}
-                              className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors"
-                            >
-                              Generate Referral Link
-                            </button>
-                          )
-                        ) : (
-                          <div className="bg-gray-100 border border-gray-200 rounded-md p-3 text-center">
-                            <Lock className="w-6 h-6 text-gray-400 mx-auto mb-2" />
-                            <p className="text-sm text-gray-600">Purchase this course or a higher-tier course to unlock referral link</p>
                           </div>
-                        )}
+                        </div>
                       </div>
                     );
                   })}
@@ -430,7 +431,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onPageChange }) => {
                           : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                       }`}
                     >
-                      Withdraw Earnings
+                      Withdraw via UPI
                     </button>
                   </div>
                 </div>
@@ -439,7 +440,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onPageChange }) => {
                 <div>
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">Earnings by Course</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {allCourses.map(course => {
+                    {mockCourses.map(course => {
                       const courseEarnings = getEarningsForCourse(course.id);
                       const totalForCourse = courseEarnings.reduce((sum, earning) => sum + parseFloat(earning.commission_amount), 0);
                       

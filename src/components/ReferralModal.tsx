@@ -15,7 +15,7 @@ const ReferralModal: React.FC<ReferralModalProps> = ({ isOpen, onClose, course, 
   
   if (!isOpen || !course || !user) return null;
 
-  const referralLink = `${window.location.origin}/?ref=${user.referral_code || user.id}`;
+  const referralLink = `${window.location.origin}/?ref=${user.referral_code || user.id}&course=${course.id}`;
   const commission = Math.round(course.price * 0.5);
 
   const handleCopyLink = () => {
@@ -25,7 +25,7 @@ const ReferralModal: React.FC<ReferralModalProps> = ({ isOpen, onClose, course, 
   };
 
   const handleShare = (platform: string) => {
-    const message = `Check out this amazing course: ${course.title} on LearnHub! ${referralLink}`;
+    const message = `Check out this amazing affiliate marketing course: ${course.title} on AffiliateHub! ${referralLink}`;
     
     switch (platform) {
       case 'email':
@@ -58,7 +58,7 @@ const ReferralModal: React.FC<ReferralModalProps> = ({ isOpen, onClose, course, 
           </div>
           <h2 className="text-2xl font-bold text-card-foreground">Share & Earn</h2>
           <p className="text-muted-foreground mt-2">
-            Earn <span className="font-bold text-success text-xl">${commission}</span> for each successful referral!
+            Earn <span className="font-bold text-success text-xl">₹{commission}</span> for each successful referral!
           </p>
         </div>
 
@@ -67,7 +67,7 @@ const ReferralModal: React.FC<ReferralModalProps> = ({ isOpen, onClose, course, 
           <p className="text-sm text-muted-foreground mb-2">by {course.instructor}</p>
           <div className="flex items-center space-x-2">
             <Coins className="w-5 h-5 text-warning icon-3d" />
-            <p className="text-lg font-bold text-primary">${course.price}</p>
+            <p className="text-lg font-bold text-primary">₹{course.price}</p>
           </div>
         </div>
 

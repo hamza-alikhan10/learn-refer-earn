@@ -92,9 +92,10 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuth, referral
       if (data.user) {
         toast({
           title: "Account created!",
-          description: "Welcome to AffiliateHub Marketing Academy",
+          description: "Welcome to AffiliateHub! Redirecting to dashboard...",
         });
-        window.location.href = '/';
+        // Let the parent component handle the redirect
+        onAuth(data.user);
       }
     } catch (error: any) {
       setError(error.message || 'An error occurred during signup');
@@ -132,9 +133,10 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuth, referral
       if (data.user) {
         toast({
           title: "Welcome back!",
-          description: "Welcome back to AffiliateHub!",
+          description: "Welcome back to AffiliateHub! Redirecting to dashboard...",
         });
-        window.location.href = '/';
+        // Let the parent component handle the redirect
+        onAuth(data.user);
       }
     } catch (error: any) {
       setError(error.message || 'Invalid email or password');
@@ -386,7 +388,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuth, referral
               
               <div>
                 <label className="block text-sm font-medium text-card-foreground mb-2">
-                  Referral Code <span className="text-destructive">*</span>
+                  Referral Code <span className="text-destructive">* (Required)</span>
                 </label>
                 <input
                   type="text"
@@ -396,7 +398,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onAuth, referral
                   placeholder="Enter referral code"
                 />
                 <p className="text-xs text-muted-foreground mt-1">
-                  Use TEST001 or TEST002 for testing
+                  Referral code is required to join AffiliateHub
                 </p>
               </div>
             </>

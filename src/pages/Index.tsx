@@ -100,6 +100,8 @@ const Index = () => {
   const handleAuth = (userData: any) => {
     // This is now handled by the auth state listener
     setAuthModalOpen(false);
+    // Redirect to dashboard after successful auth
+    setCurrentPage('dashboard');
   };
 
   const handleLogout = async () => {
@@ -143,12 +145,10 @@ const Index = () => {
       return;
     }
 
-    // Redirect to payment page with UPI
     const course = mockCourses.find(c => c.id === courseId);
     if (course) {
-      // For now, simulate purchase - in production this would redirect to payment gateway
       const confirmPurchase = confirm(
-        `Purchase ${course.title} for ₹${course.price}?\n\nThis will unlock all lower-priced courses automatically.\n\nPayment Method: UPI`
+        `Purchase ${course.title} for ₹${course.price}?\n\nOne-click purchase with UPI payment.`
       );
       
       if (confirmPurchase) {
@@ -179,7 +179,7 @@ const Index = () => {
 
           toast({
             title: "Purchase Successful!",
-            description: `You now have access to "${course.title}" and all lower-priced courses!`,
+            description: `You now have access to "${course.title}"!`,
           });
           
           // Reload user profile to get updated earnings

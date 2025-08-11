@@ -106,7 +106,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
                 <span>Refer & Earn</span>
               </Button>
               <p className="text-center text-sm font-semibold text-green-600">
-                Earn ₹{Math.floor(course.price * 0.5)} on referral
+                Earn ₹{Math.floor(course.price * 0.5)} per referral
               </p>
             </div>
           )}
