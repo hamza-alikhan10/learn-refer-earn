@@ -37,7 +37,7 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onPageChange }) => {
       
       // Load user course access
       const { data: accessData, error: accessError } = await supabase
-        .from('user_course_access')
+        .from('course_enrollments')
         .select('*')
         .eq('user_id', user.user_id || user.id);
 
@@ -45,13 +45,16 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onPageChange }) => {
       setUserCourseAccess(accessData || []);
 
       // Load referral links
-      const { data: linksData, error: linksError } = await supabase
-        .from('course_referral_links')
-        .select('*')
-        .eq('user_id', user.user_id || user.id);
+      // For now, generate referral links dynamically since the table doesn't exist yet
+      const referralCode = user.referral_code || user.id;
+      const baseUrl = window.location.origin;
+      const dynamicLinks = (accessData || []).map(enrollment => ({
+        course_id: enrollment.course_id,
+        referral_link: `${baseUrl}/course/${enrollment.course_id}?ref=${referralCode}`,
+        user_id: user.user_id || user.id
+      }));
 
-      if (linksError) throw linksError;
-      setReferralLinks(linksData || []);
+      setReferralLinks(dynamicLinks);
 
       // Load earnings
       const { data: earningsData, error: earningsError } = await supabase
@@ -83,19 +86,15 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onPageChange }) => {
       const referralCode = user.referral_code || user.id;
       const referralLink = `${baseUrl}/course/${courseId}?ref=${referralCode}`;
 
-      const { error } = await supabase
-        .from('course_referral_links')
-        .upsert({
-          user_id: user.user_id || user.id,
-          course_id: courseId,
-          referral_link: referralLink
-        });
-
-      if (error) throw error;
-
-      // Reload referral links
-      loadDashboardData();
+      // For now, just add to local state since table doesn't exist yet
+      const newLink = {
+        user_id: user.user_id || user.id,
+        course_id: courseId,
+        referral_link: referralLink
+      };
       
+      setReferralLinks(prev => [...prev.filter(link => link.course_id !== courseId), newLink]);
+
       toast({
         title: "Success",
         description: "Referral link generated successfully!",
