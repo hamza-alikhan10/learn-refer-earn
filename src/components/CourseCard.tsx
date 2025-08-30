@@ -2,6 +2,14 @@
 import React from 'react';
 import { Star, Users, Clock, Share2, Eye, BookOpen } from 'lucide-react';
 import { Button } from './ui/button';
+import { useNavigate } from "react-router-dom";
+import { useAppSelector, useAppDispatch } from '@/ReduxStore/hooks';
+import { useLazyGetReferralDataQuery } from '@/ReduxStore/features/api/referralModelData';
+import {
+  setIsOpen,
+  setCourseData,
+  setReferralData,
+} from '@/ReduxStore/features/slices/referralModelData';
 
 interface Course {
   id: string;
@@ -18,22 +26,61 @@ interface Course {
 
 interface CourseCardProps {
   course: Course;
-  onViewDetails: (courseId: string) => void;
-  onReferCourse?: (courseId: string) => void;
-  showReferButton?: boolean;
 }
+
+// Helper function to fetch referral + course data
+const fetchReferralData = async (
+  courseId: string,
+  userId: string,
+  trigger: any,
+  dispatch: any
+) => {
+  try {
+    // Call RTK Query endpoint
+    const result = await trigger({ courseId, userId }).unwrap();
+
+    // Save course + referral in Redux
+    dispatch(setCourseData(result.course));
+    dispatch(setReferralData(result.referral));
+
+    // Open modal
+    dispatch(setIsOpen(true));
+  } catch (err) {
+    console.error("Failed to fetch referral data", err);
+  }
+};
 
 const CourseCard: React.FC<CourseCardProps> = ({ 
   course, 
-  onViewDetails, 
-  onReferCourse, 
-  showReferButton = false 
 }) => {
+
+    const navigate = useNavigate();  
+    const dispatch = useAppDispatch();
+    const { userId } = useAppSelector((state) => state.auth); 
+    
+    const handleView = () => {
+    const url = userId 
+      ? `/courses/${course.id}?userId=${userId}` 
+      : `/courses/${course.id}`;
+    navigate(url);
+  }; 
+  
+  const [trigger, { isLoading:referralModelLoading }] = useLazyGetReferralDataQuery();
+
+  const handleOpenReferralModal = () => {
+    if (!userId) {
+      console.warn("User not logged in!");
+      return;
+    }
+    fetchReferralData(course.id, userId, trigger, dispatch);
+  };
+
+
   return (
     <div className="bg-card rounded-xl shadow-md overflow-hidden card-hover border border-border">
       <div className="relative group">
         <img
-          src={`https://images.unsplash.com/${course.image}`}
+          src={`https://csfrwmlgvlznrbcqcveo.supabase.co/storage/v1/object/public/learn-refer-earn/images/${course.image}`}
           alt={course.title}
           className="w-full h-48 sm:h-52 object-cover transition-transform duration-300 group-hover:scale-105"
         />
@@ -85,7 +132,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
         
         <div className="flex flex-col sm:flex-row gap-3">
           <Button
-            onClick={() => onViewDetails(course.id)}
+            onClick={handleView}
             className="flex-1 group"
             size="touch"
           >
@@ -93,18 +140,25 @@ const CourseCard: React.FC<CourseCardProps> = ({
             View Details
           </Button>
           
-          {showReferButton && onReferCourse && (
+          {userId && (
             <div className="space-y-2">
-              <Button
-                onClick={() => onReferCourse(course.id)}
-                variant="accent"
-                size="touch"
-                className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 shadow-lg hover:shadow-xl transition-all duration-200"
-                title={`Refer Course & Earn ₹${Math.floor(course.price * 0.5)}`}
-              >
-                <Share2 className="w-4 h-4 mr-2 icon-3d" />
-                <span>Refer & Earn</span>
-              </Button>
+            <Button
+              onClick={handleOpenReferralModal}
+              disabled={referralModelLoading}
+              variant="accent"
+              size="touch"
+              className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 shadow-lg hover:shadow-xl transition-all duration-200"
+              title={`Refer Course & Earn ₹${Math.floor(course.price * 0.5)}`}
+            >
+              {referralModelLoading ? (
+                <span className="animate-spin border-2 border-white border-t-transparent rounded-full w-4 h-4" />
+              ) : (
+                <>
+                  <Share2 className="w-4 h-4 mr-2 icon-3d" />
+                  <span>Refer & Earn</span>
+                </>
+              )}
+            </Button>
               <p className="text-center text-sm font-semibold text-green-600">
                 Earn ₹{Math.floor(course.price * 0.5)} per referral
               </p>

@@ -1,19 +1,19 @@
 
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
-interface FooterProps {
-  onPageChange: (page: string) => void;
-}
 
-const Footer: React.FC<FooterProps> = ({ onPageChange }) => {
+const Footer: React.FC= () => {
   const footerLinks = [
-    { id: 'home', label: 'Homepage' },
-    { id: 'courses', label: 'Courses' },
-    { id: 'about', label: 'About Us' },
-    { id: 'how-it-works', label: 'How It Works' },
-    { id: 'referral-program', label: 'Referral Program' },
-    { id: 'contact', label: 'Contact Us' },
+    { id: 'home', label: 'Homepage' , path: '/'},
+    { id: 'courses', label: 'Courses', path: '/course-page' },
+    { id: 'about', label: 'About Us' , path: '/about'},
+    { id: 'how-it-works', label: 'How It Works', path: '/how-it-works' },
+    { id: 'referral-program', label: 'Referral Program', path: '/referral-program' },
+    { id: 'contact', label: 'Contact Us' , path: '/contact-us'},
   ];
+
+  const navigate = useNavigate();
 
   return (
     <footer className="bg-gray-900 text-white py-12">
@@ -35,7 +35,7 @@ const Footer: React.FC<FooterProps> = ({ onPageChange }) => {
               {footerLinks.map((link) => (
                 <li key={link.id}>
                   <button
-                    onClick={() => onPageChange(link.id)}
+                    onClick={() => navigate(link.path)}
                     className="text-gray-300 hover:text-blue-400 transition-colors"
                   >
                     {link.label}
