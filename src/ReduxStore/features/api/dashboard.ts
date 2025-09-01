@@ -1,4 +1,4 @@
-// ReduxStore/features/api/dashboard.ts
+// src/ReduxStore/features/api/dashboard.ts
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 const BaseURL = import.meta.env.VITE_SUPABASE_FUNCTIONS_URL;
@@ -15,7 +15,6 @@ export interface CourseItem {
   referrals: number;
   potential_per_sale: number;
   enrolled_status?: "enrolled" | "not_enrolled";
-
 }
 
 export interface DashboardResponse {
@@ -27,6 +26,12 @@ export interface DashboardResponse {
   enrolled_users: number;
   available_courses: number;
   courses: CourseItem[];
+  // Add optional fields to match Dashboard.tsx usage
+  primary_referrals?: number;
+  secondary_referrals?: number;
+  daily_earnings?: number;
+  weekly_earnings?: number;
+  monthly_earnings?: number;
 }
 
 export const dashboardApi = createApi({

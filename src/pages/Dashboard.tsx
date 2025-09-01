@@ -1,31 +1,26 @@
 import React, { useState } from 'react';
 import { useAppDispatch, useAppSelector } from '@/ReduxStore/hooks';
-import { TrendingUp, Users, DollarSign, ExternalLink, Copy, CheckCircle, Eye, ShoppingCart } from 'lucide-react';
+import { TrendingUp, Users, DollarSign, ExternalLink, Copy, CheckCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { setIsAuthModelOpen, setLoading } from '@/ReduxStore/features/slices/auth';
+import { setIsAuthModelOpen } from '@/ReduxStore/features/slices/auth';
 import { useGetDashboardQuery } from '@/ReduxStore/features/api/dashboard';
 import { useNavigate } from 'react-router-dom';
 import { useGetPaymentMethodsMutation } from '@/ReduxStore/features/api/paymentMethods';
 import WithdrawalModal from '@/components/WithdrawalModal';
 
-
 const Dashboard = () => {
-  const [activeTab, setActiveTab] = useState('overview');
-  const [copiedLink, setCopiedLink] = useState('');
+  const [copiedLink, setCopiedLink] = useState(false);
   const { toast } = useToast();
-  const dispatch = useAppDispatch();  
+  const dispatch = useAppDispatch();
   const { user, userId, email, username } = useAppSelector((state) => state.auth);
   const navigate = useNavigate();
 
-
-  const [getMethods, { isLoading:paymentMethodLoading }] = useGetPaymentMethodsMutation();
+  const [getMethods, { isLoading: paymentMethodLoading }] = useGetPaymentMethodsMutation();
   const [modalOpen, setModalOpen] = useState(false);
-  const [payload, setPayload] = useState<any>(null); // GetPaymentMethodsResponse
+  const [payload, setPayload] = useState<any>(null);
 
-
-    const handleOpen = async () => {
+  const handleOpen = async () => {
     if (!userId) {
-      // if there is no user, redirect or show auth depending on your app
       dispatch(setIsAuthModelOpen(true));
       navigate('/');
       return;
@@ -36,79 +31,74 @@ const Dashboard = () => {
       setModalOpen(true);
     } catch (err) {
       console.error("Failed to fetch payment methods:", err);
-      // show toast if you want
     }
   };
 
-  // Fetch dashboard data for this user
-  const { data: dashboardData, isLoading: isLoadingDashboard, isError, error } =   useGetDashboardQuery(
-    { userId: userId || '' },   // first arg: params
-    { skip: !userId }           // second arg: options
+  const { data: dashboardData, isLoading: isLoadingDashboard, isError, error } = useGetDashboardQuery(
+    { userId: userId || '' },
+    { skip: !userId }
   );
   console.log("Dashboard data:", dashboardData);
-  // If user is not logged in, show Access Denied
+
   if (!userId) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-slate-950">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Access Denied</h1>
-          <p className="text-gray-600">Please sign in to view your dashboard.</p>
+          <h1 className="text-2xl font-bold text-white mb-2">Access Denied</h1>
+          <p className="text-gray-400">Please sign in to view your dashboard.</p>
         </div>
       </div>
     );
   }
 
-
-  // Show loading spinner while fetching data
   if (isLoadingDashboard) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-slate-950">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading dashboard...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-500 mx-auto mb-4"></div>
+          <p className="text-gray-400">Loading dashboard...</p>
         </div>
       </div>
     );
   }
 
-  // Handle error state (optional handling)
   if (isError) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-slate-950">
         <div className="text-center">
-          <h1 className="text-xl font-semibold text-red-600 mb-2">Error Loading Dashboard</h1>
-          <p className="text-gray-600">{error?.toString() || 'An unexpected error occurred.'}</p>
+          <h1 className="text-xl font-semibold text-red-500 mb-2">Error Loading Dashboard</h1>
+          <p className="text-gray-400">{error?.toString() || 'An unexpected error occurred.'}</p>
         </div>
       </div>
     );
   }
 
-  // Ensure data is loaded
   if (!dashboardData) {
-    return null; // or a fallback UI
+    return null;
   }
 
-  
-  // Helper: generate referral link using API's referral code
-  const generateReferralLink = (courseId: string) => {
+  const referralLink = (() => {
     const baseUrl = window.location.origin;
     const referralCode = dashboardData.referral_code || userId;
     return `${baseUrl}/?ref=${encodeURIComponent(referralCode)}`;
-  };
+  })();
 
-  // Calculate total courses for display
-  const totalCourses = dashboardData.enrolled_users + dashboardData.available_courses;
-
-  // Handle Copy Link action
-  const handleCopyLink = (link: string, id: string) => {
+  const handleCopyLink = (link: string) => {
     navigator.clipboard.writeText(link);
-    setCopiedLink(id);
-    setTimeout(() => setCopiedLink(''), 2000);
+    setCopiedLink(true);
+    setTimeout(() => setCopiedLink(false), 2000);
     toast({
       title: "Link Copied!",
       description: "Referral link copied to clipboard",
     });
   };
+
+  const totalReferrals = dashboardData.referrals || 0;
+  const primaryReferrals = dashboardData.primary_referrals ?? 0;
+  const secondaryReferrals = dashboardData.secondary_referrals ?? 0;
+  const dailyEarnings = dashboardData.daily_earnings ?? 0;
+  const weeklyEarnings = dashboardData.weekly_earnings ?? 0;
+  const monthlyEarnings = dashboardData.monthly_earnings ?? 0;
 
   return (
     <>
@@ -122,313 +112,244 @@ const Dashboard = () => {
         />
       )}
 
-      <div className="min-h-screen bg-gray-50 py-4 sm:py-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Header */}
+      <div className="min-h-screen bg-slate-950 py-4 sm:py-8 relative overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(79,70,229,0.1)_0%,transparent_50%)] pointer-events-none" />
+        <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTM2IDM0YzAtMS4xMDQtLjg5Ni0yLTItMmgxYzAtMS4xMDQtLjg5Ni0yLTItMnMtMiAuODk2LTIgMnMuODk2IDIgMiAyaC0xYzAgMS4xMDQuODk2IDIgMiAyaC0xYzAgMS4xMDQuODk2IDIgMiAyIi8+PC9nPjwvZz48L3N2Zz4=)', backgroundSize: '30px 30px' }} />
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="mb-6 sm:mb-8">
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
+            <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">
               Welcome back, {user || username || email}!
             </h1>
-            <p className="text-gray-600">Track your affiliate marketing progress and referral earnings</p>
-            <div className="mt-2 text-sm text-blue-600 font-medium">
-              Your Referral Code: <span className="bg-blue-100 px-2 py-1 rounded">{dashboardData.referral_code || userId}</span>
+            <p className="text-gray-400">Track your affiliate marketing progress and referral earnings</p>
+            <div className="mt-2 text-sm text-indigo-400 font-medium flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <span>Your Referral Code: <span className="bg-indigo-900/50 px-2 py-1 rounded">{dashboardData.referral_code || userId}</span></span>
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 w-full sm:w-auto">
+                <input
+                  type="text"
+                  value={referralLink}
+                  readOnly
+                  className="px-3 py-1 border border-indigo-500/50 rounded-md bg-slate-900 text-sm text-gray-300 w-full sm:w-64 mb-2 sm:mb-0"
+                />
+                <div className="flex gap-2 w-full sm:w-auto">
+                  <button
+                    onClick={() => handleCopyLink(referralLink)}
+                    className="group relative flex items-center gap-2 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-500 px-3 py-1 text-xs font-medium text-white transition-all duration-300 hover:from-indigo-600 hover:to-purple-600 w-full sm:w-auto"
+                  >
+                    {copiedLink ? <CheckCircle className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                    Copy
+                  </button>
+                  <button
+                    onClick={() => window.open(referralLink, '_blank')}
+                    className="group relative flex items-center gap-2 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 px-3 py-1 text-xs font-medium text-white transition-all duration-300 hover:from-purple-600 hover:to-pink-600 w-full sm:w-auto"
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                    Visit
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* Stats Cards */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
-            <div className="bg-gradient-to-r from-green-500 to-green-600 p-4 sm:p-6 rounded-xl shadow-lg text-white">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs sm:text-sm font-medium opacity-90">Total Earnings</p>
-                  <p className="text-lg sm:text-2xl font-bold">₹{dashboardData.total_earnings.toFixed(0)}</p>
-                </div>
-                <div className="bg-white bg-opacity-20 p-2 sm:p-3 rounded-full">
-                  <DollarSign className="w-4 h-4 sm:w-6 sm:h-6" />
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-4 sm:p-6 rounded-xl shadow-lg text-white">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs sm:text-sm font-medium opacity-90">Referrals</p>
-                  <p className="text-lg sm:text-2xl font-bold">{dashboardData.referrals}</p>
-                </div>
-                <div className="bg-white bg-opacity-20 p-2 sm:p-3 rounded-full">
-                  <Users className="w-4 h-4 sm:w-6 sm:h-6" />
+            <div className="group relative flex flex-col rounded-xl bg-slate-950 p-4 shadow-2xl transition-all duration-300 hover:scale-[1.02] hover:shadow-indigo-500/20">
+              <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 opacity-20 blur-sm transition-opacity duration-300 group-hover:opacity-30" />
+              <div className="absolute inset-px rounded-[11px] bg-slate-950" />
+              <div className="relative">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs sm:text-sm font-medium text-gray-400">Total Earnings</p>
+                    <p className="text-lg sm:text-2xl font-bold text-white">₹{dashboardData.total_earnings.toFixed(0)}</p>
+                  </div>
+                  <div className="bg-indigo-500/20 p-2 sm:p-3 rounded-full">
+                    <DollarSign className="w-4 h-4 sm:w-6 sm:h-6 text-indigo-400" />
+                  </div>
                 </div>
               </div>
             </div>
 
-            <div className="bg-gradient-to-r from-purple-500 to-purple-600 p-4 sm:p-6 rounded-xl shadow-lg text-white">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs sm:text-sm font-medium opacity-90">Enrolled</p>
-                    <p className="text-lg sm:text-2xl font-bold">
-                      {dashboardData.enrolled_users === 0 && dashboardData.referrals === 0
-                        ? 0
-                        : `${dashboardData.enrolled_users}/${dashboardData.referrals}`}
-                    </p>
-                </div>
-                <div className="bg-white bg-opacity-20 p-2 sm:p-3 rounded-full">
-                  <Eye className="w-4 h-4 sm:w-6 sm:h-6" />
+            <div className="group relative flex flex-col rounded-xl bg-slate-950 p-4 shadow-2xl transition-all duration-300 hover:scale-[1.02] hover:shadow-purple-500/20">
+              <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-purple-500 via-pink-500 to-indigo-500 opacity-20 blur-sm transition-opacity duration-300 group-hover:opacity-30" />
+              <div className="absolute inset-px rounded-[11px] bg-slate-950" />
+              <div className="relative">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs sm:text-sm font-medium text-gray-400">Total Referrals</p>
+                    <p className="text-lg sm:text-2xl font-bold text-white">{totalReferrals}</p>
+                  </div>
+                  <div className="bg-purple-500/20 p-2 sm:p-3 rounded-full">
+                    <Users className="w-4 h-4 sm:w-6 sm:h-6 text-purple-400" />
+                  </div>
                 </div>
               </div>
             </div>
 
-            <div className="bg-gradient-to-r from-orange-500 to-orange-600 p-4 sm:p-6 rounded-xl shadow-lg text-white">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs sm:text-sm font-medium opacity-90">Available</p>
-                  <p className="text-lg sm:text-2xl font-bold">{dashboardData.available_courses}</p>
+            <div className="group relative flex flex-col rounded-xl bg-slate-950 p-4 shadow-2xl transition-all duration-300 hover:scale-[1.02] hover:shadow-pink-500/20">
+              <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-pink-500 via-indigo-500 to-purple-500 opacity-20 blur-sm transition-opacity duration-300 group-hover:opacity-30" />
+              <div className="absolute inset-px rounded-[11px] bg-slate-950" />
+              <div className="relative">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs sm:text-sm font-medium text-gray-400">Primary Referrals</p>
+                    <p className="text-lg sm:text-2xl font-bold text-white">{primaryReferrals}</p>
+                  </div>
+                  <div className="bg-pink-500/20 p-2 sm:p-3 rounded-full">
+                    <TrendingUp className="w-4 h-4 sm:w-6 sm:h-6 text-pink-400" />
+                  </div>
                 </div>
-                <div className="bg-white bg-opacity-20 p-2 sm:p-3 rounded-full">
-                  <ShoppingCart className="w-4 h-4 sm:w-6 sm:h-6" />
+              </div>
+            </div>
+
+            <div className="group relative flex flex-col rounded-xl bg-slate-950 p-4 shadow-2xl transition-all duration-300 hover:scale-[1.02] hover:shadow-emerald-500/20">
+              <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-emerald-500 via-teal-500 to-green-500 opacity-20 blur-sm transition-opacity duration-300 group-hover:opacity-30" />
+              <div className="absolute inset-px rounded-[11px] bg-slate-950" />
+              <div className="relative">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs sm:text-sm font-medium text-gray-400">Secondary Referrals</p>
+                    <p className="text-lg sm:text-2xl font-bold text-white">{secondaryReferrals}</p>
+                  </div>
+                  <div className="bg-emerald-500/20 p-2 sm:p-3 rounded-full">
+                    <Users className="w-4 h-4 sm:w-6 sm:h-6 text-emerald-400" />
+                  </div>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Tabs */}
-          <div className="bg-white rounded-lg shadow-md mb-8">
-            <div className="border-b border-gray-200 overflow-x-auto">
-              <nav className="flex space-x-4 sm:space-x-8 px-4 sm:px-6 min-w-max">
-                <button
-                  onClick={() => setActiveTab('overview')}
-                  className={`py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
-                    activeTab === 'overview'
-                      ? 'border-blue-500 text-blue-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  }`}
-                >
-                  Courses & Purchase
-                </button>
-                <button
-                  onClick={() => setActiveTab('referrals')}
-                  className={`py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
-                    activeTab === 'referrals'
-                      ? 'border-blue-500 text-blue-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  }`}
-                >
-                  Referral Links
-                </button>
-                <button
-                  onClick={() => setActiveTab('earnings')}
-                  className={`py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
-                    activeTab === 'earnings'
-                      ? 'border-blue-500 text-blue-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  }`}
-                >
-                  Earnings
-                </button>
-              </nav>
-            </div>
-
+          <div className="bg-slate-900/50 rounded-lg shadow-md mb-8 border-none">
             <div className="p-4 sm:p-6">
-              {/* Overview Tab */}
-              {activeTab === 'overview' && (
-                <div className="space-y-6">
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">All Affiliate Marketing Courses</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {dashboardData.courses.map(course => (
-                      <div key={course.course_id} className="border rounded-lg p-4 border-gray-200 bg-white flex flex-col h-full">
-                        <div className="flex items-center justify-between mb-3">
-                          <h4 className="font-medium text-gray-900">{course.title}</h4>
-                          <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">
-                            Available
-                          </span>
-                        </div>
+              <div className="space-y-6">
+                <div className="bg-gradient-to-r from-indigo-500/20 to-purple-500/20 rounded-xl p-4 sm:p-6">
+                  <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center space-y-4 lg:space-y-0">
+                    <div>
+                      <h3 className="text-lg font-semibold text-indigo-300">Available Earnings</h3>
+                      <p className="text-2xl sm:text-3xl font-bold text-white">
+                        ₹{dashboardData.available_balance.toFixed(2)}
+                      </p>
+                      <p className="text-sm text-indigo-400 mt-1">
+                        {dashboardData.available_balance >= 1000
+                          ? 'Ready for withdrawal'
+                          : `Need ₹${(1000 - dashboardData.available_balance).toFixed(0)} more to withdraw`}
+                      </p>
+                    </div>
+                    <button
+                      onClick={handleOpen}
+                      disabled={paymentMethodLoading || dashboardData.available_balance < 1000}
+                      className={`group relative px-6 py-3 rounded-lg font-semibold transition-all duration-200 w-full sm:w-auto ${
+                        dashboardData.available_balance >= 1000
+                          ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white hover:from-indigo-600 hover:to-purple-600 hover:scale-105'
+                          : 'bg-slate-800 text-gray-500 cursor-not-allowed'
+                      }`}
+                    >
+                      {paymentMethodLoading ? (
+                        <span className="animate-spin border-2 border-white border-t-transparent rounded-full w-4 h-4 inline-block" />
+                      ) : (
+                        <span className="flex items-center justify-center gap-2">
+                          Withdraw via UPI
+                          <svg className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                          </svg>
+                        </span>
+                      )}
+                      <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 opacity-0 blur-md transition-all duration-300 group-hover:opacity-20" />
+                    </button>
+                  </div>
+                </div>
 
-                        <div className="flex justify-between items-center text-sm mb-3">
-                          <span className="text-gray-600">₹{course.price} • {course.level}</span>
-                          <span className="text-gray-500">{course.duration}</span>
-                        </div>
-
-                        {/* Description area — will grow/shrink but won't push the button out of place */}
-                        <p className="text-sm text-gray-600 mb-4">{course.description ?? "No description available."}</p>
-
-                        {/* This spacer + mt-auto ensures the button is always pushed to the bottom */}
-                        <div className="mt-auto flex space-x-2">
-                        {course.enrolled_status === "enrolled" ? (
-                            <button
-                              onClick={() => navigate(`/courses/${course.course_id}`)}
-                              className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors text-sm flex items-center justify-center space-x-2"
-                            >
-                              <Eye className="w-4 h-4" />
-                              <span>Ready to study</span>
-                            </button>
-                            ) : (
-                              <button
-                                onClick={() => navigate(`/courses/${course.course_id}`)}
-                                className="flex-1 bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition-colors text-sm flex items-center justify-center space-x-2"
-                              >
-                                <ShoppingCart className="w-4 h-4" />
-                                <span>Purchase ₹{course.price}</span>
-                              </button>
-                            )}
-                        </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-white mb-4">Earnings Overview</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <div className="group relative flex flex-col rounded-xl bg-slate-950 p-4 shadow-2xl transition-all duration-300 hover:scale-[1.02] hover:shadow-emerald-500/20">
+                      <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-emerald-500 via-teal-500 to-green-500 opacity-20 blur-sm transition-opacity duration-300 group-hover:opacity-30" />
+                      <div className="absolute inset-px rounded-[11px] bg-slate-950" />
+                      <div className="relative">
+                        <p className="text-xs font-medium text-gray-400">Daily Earnings</p>
+                        <p className="text-lg font-bold text-white">₹{dailyEarnings.toFixed(2)}</p>
                       </div>
-                      ))}
+                    </div>
+                    <div className="group relative flex flex-col rounded-xl bg-slate-950 p-4 shadow-2xl transition-all duration-300 hover:scale-[1.02] hover:shadow-teal-500/20">
+                      <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-teal-500 via-emerald-500 to-green-500 opacity-20 blur-sm transition-opacity duration-300 group-hover:opacity-30" />
+                      <div className="absolute inset-px rounded-[11px] bg-slate-950" />
+                      <div className="relative">
+                        <p className="text-xs font-medium text-gray-400">Weekly Earnings</p>
+                        <p className="text-lg font-bold text-white">₹{weeklyEarnings.toFixed(2)}</p>
+                      </div>
+                    </div>
+                    <div className="group relative flex flex-col rounded-xl bg-slate-950 p-4 shadow-2xl transition-all duration-300 hover:scale-[1.02] hover:shadow-green-500/20">
+                      <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-green-500 via-teal-500 to-emerald-500 opacity-20 blur-sm transition-opacity duration-300 group-hover:opacity-30" />
+                      <div className="absolute inset-px rounded-[11px] bg-slate-950" />
+                      <div className="relative">
+                        <p className="text-xs font-medium text-gray-400">Monthly Earnings</p>
+                        <p className="text-lg font-bold text-white">₹{monthlyEarnings.toFixed(2)}</p>
+                      </div>
                     </div>
                   </div>
 
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                    <h4 className="font-semibold text-blue-900 mb-2">How It Works</h4>
-                    <ul className="text-sm text-blue-800 space-y-1">
-                      <li>• Purchase any course with one-click UPI payment</li>
-                      <li>• Generate referral links for any course (no restrictions)</li>
-                      <li>• Earn 50% commission on direct referrals + 10% on second-level</li>
-                      <li>• Get ₹500 bonus for every 5 successful referrals</li>
-                      <li>• Minimum withdrawal: ₹1000</li>
-                    </ul>
-                  </div>
-                </div>
-              )}
-
-              {/* Referrals Tab */}
-              {activeTab === 'referrals' && (
-                <div className="space-y-6">
-                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-3 sm:space-y-0">
-                    <h3 className="text-lg font-semibold text-gray-900">Referral Links</h3>
-                    <p className="text-sm text-gray-600">Generate links for any course</p>
-                  </div>
-
-                  <div className="space-y-4">
-                    {dashboardData.courses.map(course => {
-                      const referralLink = generateReferralLink(course.course_id);
-                      return (
-                        <div key={course.course_id} className="border rounded-lg p-4 sm:p-6 border-gray-200">
-                          <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start mb-4 space-y-4 lg:space-y-0">
-                            <div className="flex-1">
-                              <div className="flex items-center space-x-2 mb-2">
-                                <h4 className="font-semibold text-gray-900">{course.title}</h4>
-                              </div>
-                              <p className="text-sm text-gray-600 mb-3">₹{course.price} • {course.level}</p>
-                              
-                              <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
-                                <div>
-                                  <p className="text-gray-600">Potential Earning</p>
-                                  <p className="font-semibold text-green-600">₹{Math.floor(course.potential_per_sale)}</p>
-                                </div>
-                                <div>
-                                  <p className="text-gray-600">Total Earned</p>
-                                  <p className="font-semibold text-blue-600">₹{course.total_earned.toFixed(0)}</p>
-                                </div>
-                                <div>
-                                  <p className="text-gray-600">Referrals</p>
-                                  <p className="font-semibold">{course.referrals}</p>
-                                </div>
-                              </div>
-                            </div>
+                  <div className="group relative flex flex-col rounded-xl bg-slate-950 p-4 shadow-2xl transition-all duration-300 hover:scale-[1.02] hover:shadow-indigo-500/20">
+                    <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 opacity-20 blur-sm transition-opacity duration-300 group-hover:opacity-30" />
+                    <div className="absolute inset-px rounded-[11px] bg-slate-950" />
+                    <div className="relative">
+                      <div className="mb-4 flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-purple-500">
+                            <svg className="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                            </svg>
                           </div>
-
-                          <div className="space-y-3">
-                            <div className="flex flex-col sm:flex-row items-stretch sm:items-center space-y-2 sm:space-y-0 sm:space-x-2">
-                              <input
-                                type="text"
-                                value={referralLink}
-                                readOnly
-                                className="flex-1 px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-sm"
-                              />
-                              <div className="flex space-x-2">
-                                <button
-                                  onClick={() => handleCopyLink(referralLink, course.course_id)}
-                                  className="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition-colors flex items-center space-x-2 flex-1 sm:flex-initial justify-center"
-                                >
-                                  {copiedLink === course.course_id ? (
-                                    <CheckCircle className="w-4 h-4" />
-                                  ) : (
-                                    <Copy className="w-4 h-4" />
-                                  )}
-                                  <span className="text-sm">Copy</span>
-                                </button>
-                                <button
-                                  onClick={() => window.open(referralLink, '_blank')}
-                                  className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors flex items-center space-x-2 flex-1 sm:flex-initial justify-center"
-                                >
-                                  <ExternalLink className="w-4 h-4" />
-                                  <span className="text-sm">Visit</span>
-                                </button>
-                              </div>
-                            </div>
+                          <h3 className="text-sm font-semibold text-white">Earnings Trend</h3>
+                        </div>
+                        <span className="flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-1 text-xs font-medium text-emerald-500">
+                          <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                          Live
+                        </span>
+                      </div>
+                      <div className="mb-4 h-24 w-full overflow-hidden rounded-lg bg-slate-900/50 p-3">
+                        <div className="flex h-full w-full items-end justify-between gap-1">
+                          <div className="h-[40%] w-3 rounded-sm bg-indigo-500/30 group-hover:animate-pulse">
+                            <div className="h-[60%] w-full rounded-sm bg-indigo-500 transition-all duration-300 group-hover:h-[70%]" style={{ height: `${(dailyEarnings / Math.max(dailyEarnings, weeklyEarnings, monthlyEarnings) || 1) * 100}%` }} />
+                          </div>
+                          <div className="h-[60%] w-3 rounded-sm bg-indigo-500/30 group-hover:animate-pulse">
+                            <div className="h-[40%] w-full rounded-sm bg-indigo-500 transition-all duration-300 group-hover:h-[50%]" style={{ height: `${(weeklyEarnings / Math.max(dailyEarnings, weeklyEarnings, monthlyEarnings) || 1) * 100}%` }} />
+                          </div>
+                          <div className="h-[75%] w-3 rounded-sm bg-indigo-500/30 group-hover:animate-pulse">
+                            <div className="h-[80%] w-full rounded-sm bg-indigo-500 transition-all duration-300 group-hover:h-[90%]" style={{ height: `${(monthlyEarnings / Math.max(dailyEarnings, weeklyEarnings, monthlyEarnings) || 1) * 100}%` }} />
                           </div>
                         </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-
-              {/* Earnings Tab */}
-              {activeTab === 'earnings' && (
-                <div className="space-y-6">
-                  <div className="bg-gradient-to-r from-green-50 to-green-100 border border-green-200 rounded-xl p-4 sm:p-6">
-                    <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center space-y-4 lg:space-y-0">
-                      <div>
-                        <h3 className="text-lg font-semibold text-green-900">Available Earnings</h3>
-                        <p className="text-2xl sm:text-3xl font-bold text-green-600">
-                          ₹{dashboardData.available_balance.toFixed(2)}
-                        </p>
-                        <p className="text-sm text-green-700 mt-1">
-                          {dashboardData.available_balance >= 1000
-                            ? 'Ready for withdrawal'
-                            : `Need ₹${(1000 - dashboardData.available_balance).toFixed(0)} more to withdraw`}
-                        </p>
                       </div>
-                      <button
-                          onClick={handleOpen}
-                          disabled={paymentMethodLoading}
-                          className={`px-6 py-3 rounded-lg font-semibold transition-all duration-200 w-full sm:w-auto ${
-                          dashboardData.available_balance >= 1000
-                            ? 'bg-green-600 text-white hover:bg-green-700 hover:scale-105'
-                            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                        }`}
-                          title="Open withdrawal"
-                        >
-                          {paymentMethodLoading ? (
-                            <span className="animate-spin border-2 border-white border-t-transparent rounded-full w-4 h-4" />
-                          ) : (
-                            <span>  Withdraw via UPI</span>
-                          )}
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-sm">
+                        <div className="text-gray-400">Today Earnings: ₹{dailyEarnings.toFixed(2)}</div>
+                        <div className="text-gray-400">Last Weekly Earnings: ₹{weeklyEarnings.toFixed(2)}</div>
+                        <div className="text-gray-400">Monthly Earnings: ₹{monthlyEarnings.toFixed(2)}</div>
+                      </div>
+                      <div className="flex items-center justify-between mt-4">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-medium text-gray-400">Last 30 days</span>
+                          <svg className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                          </svg>
+                        </div>
+                        <button className="flex items-center gap-1 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-500 px-3 py-1 text-xs font-medium text-white transition-all duration-300 hover:from-indigo-600 hover:to-purple-600">
+                          View Details
+                          <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                          </svg>
                         </button>
-                    </div>
-                  </div>
-
-                  {/* Earnings by Course */}
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Earnings by Course</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {dashboardData.courses.map(course => (
-                        <div key={course.course_id} className="bg-white p-4 rounded-lg border border-gray-200">
-                          <h4 className="font-semibold text-gray-900 mb-2">{course.title}</h4>
-                          <div className="space-y-2">
-                            <div className="flex justify-between">
-                              <span className="text-sm text-gray-600">Total Earned:</span>
-                              <span className="font-semibold text-green-600">
-                                ₹{course.total_earned.toFixed(2)}
-                              </span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span className="text-sm text-gray-600">Referrals:</span>
-                              <span className="font-semibold">{course.referrals}</span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span className="text-sm text-gray-600">Potential per sale:</span>
-                              <span className="font-semibold text-blue-600">
-                                ₹{Math.floor(course.potential_per_sale)}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
+                      </div>
                     </div>
                   </div>
                 </div>
-              )}
+
+                <div className="bg-indigo-900/50 rounded-lg p-4">
+                  <h4 className="font-semibold text-indigo-300 mb-2">How It Works</h4>
+                  <ul className="text-sm text-indigo-200 space-y-1">
+                    <li>• Generate referral links and share</li>
+                    <li>• Earn 50% commission on direct referrals + 10% on second-level</li>
+                    <li>• Get ₹500 bonus for every 5 successful referrals</li>
+                    <li>• Minimum withdrawal: ₹1000</li>
+                  </ul>
+                </div>
+              </div>
             </div>
           </div>
         </div>
