@@ -258,7 +258,7 @@ const Homepage = () => {
                 Master Affiliate Marketing. <span className="text-yellow-300">Earn Big.</span>
               </h1>
               <p className="text-base sm:text-lg lg:text-xl mb-6 sm:mb-8 text-blue-100 font-noto-sans">
-                Learn from top experts and earn up to 60% commission by sharing courses with your network.
+                Learn from top experts and earn up to 70% commission by sharing courses with your network.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                 <Button

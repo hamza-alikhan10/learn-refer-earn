@@ -131,7 +131,7 @@ const HowItWorks = () => {
                 <Coins className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 text-success-foreground icon-3d" />
               </div>
               <span className="text-xs sm:text-sm font-semibold text-success bg-success/10 px-2 sm:px-3 md:px-4 py-1 rounded-full">Step 5</span>
-              <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-card-foreground mt-2 sm:mt-4 mb-2 sm:mb-4 font-poppins">Earn up to 60% Commission on Every Sale!</h3>
+              <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-card-foreground mt-2 sm:mt-4 mb-2 sm:mb-4 font-poppins">Earn up to 70% Commission on Every Sale!</h3>
               <p className="text-muted-foreground leading-relaxed text-sm sm:text-base md:text-lg max-w-xl sm:max-w-2xl mx-auto font-noto-sans">
                 When someone purchases through your link, you earn commissions. Plus, earn from their referrals too!
               </p>
@@ -158,17 +158,17 @@ const HowItWorks = () => {
                   <tbody>
                     <tr className="hover:bg-muted/30 transition-all duration-200">
                       <td className="p-1 sm:p-2 md:p-3 lg:p-4 text-sm sm:text-base text-muted-foreground font-noto-sans border-b border-border">₹1000</td>
-                      <td className="p-1 sm:p-2 md:p-3 lg:p-4 text-sm sm:text-base font-bold text-blue-600 font-noto-sans border-b border-border">40%</td>
+                      <td className="p-1 sm:p-2 md:p-3 lg:p-4 text-sm sm:text-base font-bold text-blue-600 font-noto-sans border-b border-border">50%</td>
                       <td className="p-1 sm:p-2 md:p-3 lg:p-4 text-sm sm:text-base font-bold text-green-600 font-noto-sans border-b border-border">5%</td>
                     </tr>
                     <tr className="hover:bg-muted/30 transition-all duration-200">
                       <td className="p-1 sm:p-2 md:p-3 lg:p-4 text-sm sm:text-base text-muted-foreground font-noto-sans border-b border-border">₹3000</td>
-                      <td className="p-1 sm:p-2 md:p-3 lg:p-4 text-sm sm:text-base font-bold text-blue-600 font-noto-sans border-b border-border">50%</td>
+                      <td className="p-1 sm:p-2 md:p-3 lg:p-4 text-sm sm:text-base font-bold text-blue-600 font-noto-sans border-b border-border">60%</td>
                       <td className="p-1 sm:p-2 md:p-3 lg:p-4 text-sm sm:text-base font-bold text-green-600 font-noto-sans border-b border-border">8%</td>
                     </tr>
                     <tr className="hover:bg-muted/30 transition-all duration-200">
                       <td className="p-1 sm:p-2 md:p-3 lg:p-4 text-sm sm:text-base text-muted-foreground font-noto-sans border-b border-border">₹5000</td>
-                      <td className="p-1 sm:p-2 md:p-3 lg:p-4 text-sm sm:text-base font-bold text-blue-600 font-noto-sans border-b border-border">60%</td>
+                      <td className="p-1 sm:p-2 md:p-3 lg:p-4 text-sm sm:text-base font-bold text-blue-600 font-noto-sans border-b border-border">70%</td>
                       <td className="p-1 sm:p-2 md:p-3 lg:p-4 text-sm sm:text-base font-bold text-green-600 font-noto-sans border-b border-border">10%</td>
                     </tr>
                   </tbody>
@@ -184,15 +184,15 @@ const HowItWorks = () => {
               <div className="space-y-1 sm:space-y-2 md:space-y-3">
                 <div className="flex flex-col sm:flex-row justify-between items-center p-1 sm:p-2 md:p-3 bg-muted/30 rounded-lg">
                   <span className="text-sm sm:text-base text-muted-foreground font-noto-sans">₹1000 course</span>
-                  <span className="text-sm sm:text-base font-bold text-green-600 font-noto-sans">₹400 direct + ₹50 from sub-referrals</span>
+                  <span className="text-sm sm:text-base font-bold text-green-600 font-noto-sans">₹500 direct + ₹50 from sub-referrals</span>
                 </div>
                 <div className="flex flex-col sm:flex-row justify-between items-center p-1 sm:p-2 md:p-3 bg-muted/30 rounded-lg">
                   <span className="text-sm sm:text-base text-muted-foreground font-noto-sans">₹3000 course</span>
-                  <span className="text-sm sm:text-base font-bold text-green-600 font-noto-sans">₹1500 direct + ₹240 from sub-referrals</span>
+                  <span className="text-sm sm:text-base font-bold text-green-600 font-noto-sans">₹1800 direct + ₹240 from sub-referrals</span>
                 </div>
                 <div className="flex flex-col sm:flex-row justify-between items-center p-1 sm:p-2 md:p-3 bg-muted/30 rounded-lg">
                   <span className="text-sm sm:text-base text-muted-foreground font-noto-sans">₹5000 course</span>
-                  <span className="text-sm sm:text-base font-bold text-green-600 font-noto-sans">₹3000 direct + ₹500 from sub-referrals</span>
+                  <span className="text-sm sm:text-base font-bold text-green-600 font-noto-sans">₹3500 direct + ₹500 from sub-referrals</span>
                 </div>
               </div>
             </div>
@@ -210,7 +210,7 @@ const HowItWorks = () => {
                     Multi-Level Commission
                   </h3>
                   <p className="text-blue-800 text-xs sm:text-sm md:text-base leading-relaxed font-noto-sans">
-                    Earn 40%–60% on direct referrals + 5%–10% on second-level referrals - the highest structure in trading education.
+                    Earn 50%–70% on direct referrals + 5%–10% on second-level referrals - the highest structure in trading education.
                   </p>
                 </div>
                 <div className="bg-gradient-to-r from-green-50 to-green-100 p-2 sm:p-3 md:p-4 rounded-xl border border-green-200">
@@ -258,7 +258,7 @@ const HowItWorks = () => {
                   <ul className="space-y-1 sm:space-y-2 text-muted-foreground text-xs sm:text-sm md:text-base font-noto-sans">
                     <li className="flex items-start space-x-1 sm:space-x-2">
                       <span className="text-success mt-1">•</span>
-                      <span>40%–60% commission on direct referrals + 5%–10% on second-level</span>
+                      <span>50%–70% commission on direct referrals + 5%–10% on second-level</span>
                     </li>
                     <li className="flex items-start space-x-1 sm:space-x-2">
                       <span className="text-success mt-1">•</span>
