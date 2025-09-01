@@ -10,9 +10,9 @@ const StyledWrapper = styled.div`
   .nav-container {
     position: relative;
     display: flex;
-    flex-wrap: nowrap; /* Prevent wrapping for consistent layout */
+    flex-wrap: nowrap;
     border-radius: 0.5rem;
-    background-color: #EEE; /* Solid gray background for the entire navbar */
+    background-color: #EEE;
     box-sizing: border-box;
     box-shadow: 0 0 0px 1px rgba(0, 0, 0, 0.06);
     padding: 0.25rem;
@@ -24,7 +24,7 @@ const StyledWrapper = styled.div`
   .nav-container .nav-item {
     flex: 1 1 auto;
     text-align: center;
-    min-width: 0; /* Allow items to shrink without overflow */
+    min-width: 0;
   }
 
   .nav-container .nav-item input {
@@ -42,21 +42,21 @@ const StyledWrapper = styled.div`
     color: rgba(51, 65, 85, 1);
     transition: all 0.15s ease-in-out;
     font-weight: 500;
-    white-space: nowrap; /* Prevent text wrapping */
-    overflow: hidden; /* Hide overflow text */
-    text-overflow: ellipsis; /* Add ellipsis for truncated text */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .nav-container .nav-item input:checked + .name {
-    background-color: #fff; /* White background for active item */
+    background-color: #fff;
     font-weight: 600;
   }
 
   .nav-container .nav-item .name:hover {
-    background-color: #fff; /* White background on hover for non-active items */
+    background-color: #fff;
   }
 
-  @media (max-width: 1023px) {
+  @media (max-width: 1279px) {
     .nav-container {
       display: none; /* Hide styled nav on xl and below */
     }
@@ -89,7 +89,7 @@ const Header = () => {
 
   return (
     <header className="bg-white/95 backdrop-blur-md shadow-lg sticky top-0 z-50 border-b border-gray-100">
-      <div className="w-full px-3 sm:px-4 lg:px-6 xl:px-8">
+      <div className="w-full px-2 sm:px-4 md:px-6 lg:px-8">
         <div className="flex justify-between items-center py-3">
           {/* Logo */}
           <div className="flex items-center flex-shrink-0">
@@ -102,7 +102,7 @@ const Header = () => {
           </div>
 
           {/* Desktop Navigation (xl and above) */}
-          <div className="hidden xl:block flex-1 max-w-2xl mx-8">
+          <div className="hidden xl:block flex-1 max-w-2xl mx-4 sm:mx-6 lg:mx-8">
             <StyledWrapper>
               <div className="nav-container">
                 {navItems.map((item) => (
@@ -121,12 +121,12 @@ const Header = () => {
           </div>
 
           {/* Regular Navigation for Large screens (lg to xl) */}
-          <nav className="hidden lg:flex xl:hidden space-x-4 flex-1 justify-center max-w-xl mx-4">
+          <nav className="hidden lg:flex xl:hidden space-x-2 sm:space-x-4 flex-1 justify-center max-w-md sm:max-w-lg mx-2 sm:mx-4">
             {navItems.map((item) => (
               <button
                 key={item.id}
                 onClick={() => navigate(item.path)}
-                className={`text-sm font-medium text-gray-700 hover:text-blue-600 transition-all duration-200 px-3 py-2 rounded-lg hover:bg-blue-50
+                className={`text-sm font-medium text-gray-700 hover:text-blue-600 transition-all duration-200 px-2 py-2 rounded-lg hover:bg-blue-50
                   ${location.pathname === item.path ? 'text-blue-600 font-semibold bg-blue-50' : ''}`}
               >
                 {item.label}
@@ -135,16 +135,15 @@ const Header = () => {
           </nav>
 
           {/* Medium Screen Navigation (md to lg) */}
-          <nav className="hidden md:flex lg:hidden space-x-2 flex-1 justify-center max-w-lg mx-4">
+          <nav className="hidden md:flex lg:hidden space-x-1 sm:space-x-2 flex-1 justify-center max-w-xs sm:max-w-md mx-2">
             {navItems.map((item) => (
               <button
                 key={item.id}
                 onClick={() => navigate(item.path)}
-                className={`text-xs font-medium text-gray-700 hover:text-blue-600 transition-all duration-200 px-2 py-2 rounded-md hover:bg-blue-50
+                className={`text-xs font-medium text-gray-700 hover:text-blue-600 transition-all duration-200 px-1 sm:px-2 py-1 sm:py-2 rounded-md hover:bg-blue-50
                   ${location.pathname === item.path ? 'text-blue-600 font-semibold bg-blue-50' : ''}`}
               >
-                {item.id === 'how-it-works' ? 'How It Works' : 
-                 item.id === 'referral-program' ? 'Referral' : item.label}
+                {item.label}
               </button>
             ))}
           </nav>
@@ -153,7 +152,7 @@ const Header = () => {
           <div className="hidden md:flex items-center flex-shrink-0">
             <button
               onClick={handleAuthClick}
-              className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition-colors px-3 py-2 rounded-lg hover:bg-gray-50"
+              className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition-colors px-2 sm:px-3 py-2 rounded-lg hover:bg-gray-50"
             >
               <LogIn className="w-5 h-5" />
               {user && (
@@ -166,7 +165,7 @@ const Header = () => {
 
           {/* Mobile Menu Button */}
           <button
-            className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors flex-shrink-0"
+            className="md:hidden p-1 sm:p-2 rounded-lg hover:bg-gray-100 transition-colors flex-shrink-0"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
             {mobileMenuOpen ? (
@@ -180,7 +179,7 @@ const Header = () => {
         {/* Mobile Navigation */}
         {mobileMenuOpen && (
           <div className="md:hidden pb-4 border-t border-gray-200 bg-white/95 backdrop-blur-sm">
-            <div className="flex flex-col space-y-1 pt-4">
+            <div className="flex flex-col space-y-1 pt-2 sm:pt-4">
               {navItems.map((item) => (
                 <button
                   key={item.id}
@@ -188,7 +187,7 @@ const Header = () => {
                     navigate(item.path);
                     setMobileMenuOpen(false);
                   }}
-                  className={`text-left px-4 py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200 rounded-lg mx-2 font-medium ${
+                  className={`text-left px-2 sm:px-4 py-2 sm:py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200 rounded-lg mx-1 sm:mx-2 font-medium ${
                     location.pathname === item.path ? 'text-blue-600 font-semibold bg-blue-50' : ''
                   }`}
                 >
@@ -197,15 +196,15 @@ const Header = () => {
               ))}
               
               {/* Mobile Auth Section */}
-              <div className="pt-3 border-t border-gray-200 mx-2 mt-3">
+              <div className="pt-2 sm:pt-3 border-t border-gray-200 mx-1 sm:mx-2 mt-2 sm:mt-3">
                 <button
                   onClick={() => {
                     handleAuthClick();
                     setMobileMenuOpen(false);
                   }}
-                  className="flex items-center space-x-2 text-left text-blue-600 hover:text-blue-700 px-4 py-3 rounded-lg hover:bg-blue-50 transition-all duration-200 font-medium"
+                  className="flex items-center space-x-1 sm:space-x-2 text-left text-blue-600 hover:text-blue-700 px-2 sm:px-4 py-2 sm:py-3 rounded-lg hover:bg-blue-50 transition-all duration-200 font-medium"
                 >
-                  <LogIn className="w-4 h-4" />
+                  <LogIn className="w-4 h-4 sm:w-5 sm:h-5" />
                   <span>{user ? (user || username || email) : 'Sign In'}</span>
                 </button>
                 {user && (
@@ -214,7 +213,7 @@ const Header = () => {
                       handleLogout();
                       setMobileMenuOpen(false);
                     }}
-                    className="text-left bg-red-600 text-white px-4 py-3 rounded-lg hover:bg-red-700 transition-all duration-200 font-medium"
+                    className="text-left bg-red-600 text-white px-2 sm:px-4 py-2 sm:py-3 rounded-lg hover:bg-red-700 transition-all duration-200 font-medium"
                   >
                     Logout
                   </button>
