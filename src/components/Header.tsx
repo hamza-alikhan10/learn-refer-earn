@@ -16,8 +16,7 @@ const StyledWrapper = styled.div`
     box-sizing: border-box;
     box-shadow: 0 0 0px 1px rgba(0, 0, 0, 0.06);
     padding: 0.25rem;
-    width: 100%;
-    max-width: 500px;
+    width: 100%; /* Full width, responsive */
     font-size: 14px;
     margin: 0 auto;
   }
@@ -25,6 +24,7 @@ const StyledWrapper = styled.div`
   .nav-container .nav-item {
     flex: 1 1 auto;
     text-align: center;
+    min-width: 0; /* Allow items to shrink without overflow */
   }
 
   .nav-container .nav-item input {
@@ -42,6 +42,9 @@ const StyledWrapper = styled.div`
     color: rgba(51, 65, 85, 1);
     transition: all 0.15s ease-in-out;
     font-weight: 500;
+    white-space: nowrap; /* Prevent text wrapping */
+    overflow: hidden; /* Hide overflow text */
+    text-overflow: ellipsis; /* Add ellipsis for truncated text */
   }
 
   .nav-container .nav-item input:checked + .name {
@@ -51,6 +54,12 @@ const StyledWrapper = styled.div`
 
   .nav-container .nav-item .name:hover {
     background-color: #fff; /* White background on hover for non-active items */
+  }
+
+  @media (max-width: 1023px) {
+    .nav-container {
+      display: none; /* Hide styled nav on xl and below */
+    }
   }
 `;
 
@@ -67,7 +76,6 @@ const Header = () => {
     { id: 'courses', label: 'Courses', path: '/course-page' },
     { id: 'about', label: 'About', path: '/about' },
     { id: 'how-it-works', label: 'How It Works', path: '/how-it-works' },
-   
   ];
 
   const handleAuthClick = () => {
@@ -93,7 +101,7 @@ const Header = () => {
             </h1>
           </div>
 
-          {/* Desktop Navigation */}
+          {/* Desktop Navigation (xl and above) */}
           <div className="hidden xl:block flex-1 max-w-2xl mx-8">
             <StyledWrapper>
               <div className="nav-container">
@@ -112,28 +120,28 @@ const Header = () => {
             </StyledWrapper>
           </div>
 
-          {/* Regular Navigation for Large screens */}
+          {/* Regular Navigation for Large screens (lg to xl) */}
           <nav className="hidden lg:flex xl:hidden space-x-4 flex-1 justify-center max-w-xl mx-4">
             {navItems.map((item) => (
               <button
                 key={item.id}
                 onClick={() => navigate(item.path)}
                 className={`text-sm font-medium text-gray-700 hover:text-blue-600 transition-all duration-200 px-3 py-2 rounded-lg hover:bg-blue-50
-                   ${location.pathname === item.path ? 'text-blue-600 font-semibold bg-blue-50' : ''}`}
+                  ${location.pathname === item.path ? 'text-blue-600 font-semibold bg-blue-50' : ''}`}
               >
                 {item.label}
               </button>
             ))}
           </nav>
 
-          {/* Medium Screen Navigation */}
+          {/* Medium Screen Navigation (md to lg) */}
           <nav className="hidden md:flex lg:hidden space-x-2 flex-1 justify-center max-w-lg mx-4">
             {navItems.map((item) => (
               <button
                 key={item.id}
                 onClick={() => navigate(item.path)}
                 className={`text-xs font-medium text-gray-700 hover:text-blue-600 transition-all duration-200 px-2 py-2 rounded-md hover:bg-blue-50
-                   ${location.pathname === item.path ? 'text-blue-600 font-semibold bg-blue-50' : ''}`}
+                  ${location.pathname === item.path ? 'text-blue-600 font-semibold bg-blue-50' : ''}`}
               >
                 {item.id === 'how-it-works' ? 'How It Works' : 
                  item.id === 'referral-program' ? 'Referral' : item.label}
