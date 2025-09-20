@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { User, Menu, X, LogIn } from 'lucide-react';
+import { User, Menu, X, LogIn, LogOut } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '@/ReduxStore/hooks';
 import { setIsAuthModelOpen, setIsSignUp } from "@/ReduxStore/features/slices/auth";
@@ -82,7 +82,6 @@ const Header = () => {
     if (user) {
       navigate('/dashboard');
     } else {
-      dispatch(setIsSignUp(false));
       dispatch(setIsAuthModelOpen(true));
     }
   };
@@ -150,17 +149,28 @@ const Header = () => {
 
           {/* Auth Section - Desktop & Tablet */}
           <div className="hidden md:flex items-center flex-shrink-0">
-            <button
-              onClick={handleAuthClick}
-              className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition-colors px-2 sm:px-3 py-2 rounded-lg hover:bg-gray-50"
-            >
-              <LogIn className="w-5 h-5" />
-              {user && (
-                <span className="text-sm font-medium max-w-24 truncate">
-                  {user || username || email}
-                </span>
-              )}
-            </button>
+                <button
+                  onClick={() => {
+                    handleAuthClick();
+                    setMobileMenuOpen(false);
+                  }}
+                  className="flex items-center space-x-1 sm:space-x-2 text-left text-blue-600 hover:text-blue-700 px-2 sm:px-4 py-2 sm:py-3 rounded-lg hover:bg-blue-50 transition-all duration-200 font-medium"
+                >
+                  {!user && <LogIn className="w-4 h-4 sm:w-5 sm:h-5" />}
+                  <span>{user ? (user || username || email) : 'Sign In'}</span>
+                </button>
+                {user && (
+                <button
+                  onClick={() => {
+                    handleLogout();
+                    setMobileMenuOpen(false);
+                  }}
+                  className="flex items-center gap-2 hover:bg-red-600 text-red-500 px-2 sm:px-4 py-2 sm:py-3 rounded-lg hover:text-white transition-all duration-200 font-medium"
+                >
+                  <span>Logout</span>
+                  <LogOut className="w-4 h-4 sm:w-5 sm:h-5" />
+                </button>
+                )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -204,18 +214,19 @@ const Header = () => {
                   }}
                   className="flex items-center space-x-1 sm:space-x-2 text-left text-blue-600 hover:text-blue-700 px-2 sm:px-4 py-2 sm:py-3 rounded-lg hover:bg-blue-50 transition-all duration-200 font-medium"
                 >
-                  <LogIn className="w-4 h-4 sm:w-5 sm:h-5" />
+                  {!user && <LogIn className="w-4 h-4 sm:w-5 sm:h-5" />}
                   <span>{user ? (user || username || email) : 'Sign In'}</span>
                 </button>
                 {user && (
-                  <button
+                 <button
                     onClick={() => {
                       handleLogout();
                       setMobileMenuOpen(false);
                     }}
-                    className="text-left bg-red-600 text-white px-2 sm:px-4 py-2 sm:py-3 rounded-lg hover:bg-red-700 transition-all duration-200 font-medium"
+                    className="flex items-center gap-2 hover:bg-red-600 text-red-500 px-2 sm:px-4 py-2 sm:py-3 rounded-lg hover:text-white transition-all duration-200 font-medium"
                   >
-                    Logout
+                    <span>Logout</span>
+                    <LogOut className="w-4 h-4 sm:w-5 sm:h-5" />
                   </button>
                 )}
               </div>

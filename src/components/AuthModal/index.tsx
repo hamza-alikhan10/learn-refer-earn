@@ -3,7 +3,7 @@ import React , {useEffect} from "react";
 import { X, User, Mail } from "lucide-react";
 import { Button } from "../ui/button";
 import AuthForm from "./AuthForm";
-import OtpVerification from "./OtpVerification";
+import SendResetPassword from "./forgetpassword";
 import useAuthModal from "./useAuthModal";
 import { setIsAuthModelOpen } from "@/ReduxStore/features/slices/auth";
 import { useAppDispatch, useAppSelector } from "../../ReduxStore/hooks";
@@ -25,7 +25,7 @@ const AuthModalContent: React.FC<Props> = () => {
     handleOtpVerification,
     handleSignIn,
     handleSignUp, 
-    handleResendOtp,  
+    handleForgotPassword,  
     formProps,
   } = useAuthModal();
   const dispatch = useAppDispatch();
@@ -44,23 +44,17 @@ const AuthModalContent: React.FC<Props> = () => {
   //   });    }
   // }, [error, email]);
 
-  if (!isAuthModelOpen) return null;
 
 
   if (isOtpVerification) {
     return (
-      <OtpVerification
-        email={email}
-        otp={formProps.otp}
-        setOtp={formProps.setOtp}
-        loading={loading}
-        error={error}
-        onVerify={handleOtpVerification}
-        onResend={handleResendOtp}
+      <SendResetPassword
         onClose={handleClose}
       />
     );
   }
+  if (!isAuthModelOpen) return null;
+
 
   return (
    <div onClick={() => setIsAuthModelOpen(!isAuthModelOpen)} className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
@@ -99,6 +93,8 @@ const AuthModalContent: React.FC<Props> = () => {
       loading={loading}
       onSignIn={formProps.onSignIn}
       onSignUp={formProps.onSignUp}
+      handleForgotPassword={handleForgotPassword}
+      error={error}
     />
   </div>
 </div>

@@ -15,8 +15,9 @@ import { transactions } from './features/api/transection';
 import { dashboardApi } from './features/api/dashboard';
 import { paymentMethodsApi } from './features/api/paymentMethods';
 import { payoutApi } from './features/api/payoutApi';
-
-
+import { historyApi } from './features/api/history';
+import { contactApi } from './features/api/contactApi';
+import { enrollmentApi } from './features/api/enrollmentApi';
 
 /* ----------  Per‑slice persistence configs  ---------- */
 const persistConfigLayout = {
@@ -44,6 +45,9 @@ export const store = configureStore({
     [dashboardApi.reducerPath]: dashboardApi.reducer,
     [paymentMethodsApi.reducerPath]: paymentMethodsApi.reducer,
     [payoutApi.reducerPath]: payoutApi.reducer,
+    [historyApi.reducerPath]: historyApi.reducer,
+    [contactApi.reducerPath]: contactApi.reducer,
+    [enrollmentApi.reducerPath]: enrollmentApi.reducer,
 
     },
 
@@ -61,6 +65,9 @@ export const store = configureStore({
       dashboardApi.middleware,
       paymentMethodsApi.middleware,
       payoutApi.middleware,
+      historyApi.middleware,
+      contactApi.middleware,
+      enrollmentApi.middleware,
     ),
 });
 

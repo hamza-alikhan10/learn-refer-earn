@@ -4,8 +4,11 @@ import React, { useState, useEffect } from "react";
 import { X, Check } from "lucide-react";
 import { Button } from "./ui/button";
 import { PaymentMethod, GetPaymentMethodsResponse } from "@/ReduxStore/features/api/paymentMethods";
+import { useWithdrawalViaEmailMutation } from "@/ReduxStore/features/api/dashboard";
 import { useAppSelector } from "@/ReduxStore/hooks";
-import { useCreatePayoutMutation } from "@/ReduxStore/features/api/payoutApi";
+import { toast } from "@/components/ui/use-toast"; 
+
+// import { useCreatePayoutMutation } from "@/ReduxStore/features/api/payoutApi";
 
 type Props = {
   payload: GetPaymentMethodsResponse;
@@ -89,8 +92,10 @@ export function WithdrawalForm({
   const [copied, setCopied] = useState(false);
 
 
-  const [createPayout, { isLoading: createPayoutLoading }] = useCreatePayoutMutation();
-
+  // const [createPayout, { isLoading: createPayoutLoading }] = useCreatePayoutMutation();
+  const { email } = useAppSelector((state) => state.auth);
+  const [withdrawalViaEmail, { isLoading: createPayoutLoading, isError, error, isSuccess }] = useWithdrawalViaEmailMutation();
+ console.log(" user Email is ", email);
   useEffect(() => {
     // update fields if initial props change
     setVpa(initialVpa ?? "");
@@ -99,11 +104,18 @@ export function WithdrawalForm({
 
   function validate(): string | null {
     if (!vpa && !phone) return "Enter UPI ID or Mobile number";
+    
+    // Validate mobile number if entered
+    if (phone && !/^[0-9]{10}$/.test(phone)) {
+      return "Enter a valid 10-digit mobile number";
+    }
+
     if (!amount || Number(amount) <= 0) return "Enter a valid amount";
     if (Number(amount) > balance) return "Insufficient balance";
     if (Number(amount) < 1) return "Minimum withdrawal is ₹1";
     return null;
   }
+
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -123,34 +135,43 @@ export function WithdrawalForm({
 
     setLoading(true);
     try {
+      // Prepare payload for withdrawalViaEmail
       const payload = {
         userId: reduxUserId,
         amount: Number(amount),
-        vpa: vpa?.trim() || undefined,
-        phone: phone?.trim() || undefined,
+        email: email?.trim() || undefined,
+        upiId: vpa?.trim() || undefined,
+        mobileNo: phone?.trim() || undefined,
       };
 
-      // call RTK mutation
-      const res = await createPayout(payload).unwrap();
+      if (!payload.upiId) {
+        setMessage("UPI ID is required.");
+        return;
+      }
+      // Call the RTK mutation
+      const res = await withdrawalViaEmail(payload).unwrap();
 
-      if (res?.success) {
+      if (res?.ok) {
         setSuccessData(res);
-        setMessage("Withdrawal successful. Receipt ready.");
-        // optionally close modal after short delay:
-        setTimeout(() => {
-          if (onClose) onClose();
-        }, 1800);
+        toast({
+          title: "Withdrawal Successful",
+          description: `Your withdrawal of ₹${amount} was successful. Money 💸 will arrive in your account 🏦 within 30 minutes.`,
+          variant: "default", // green toast
+        });
+        // optionally close modal after short delay
+        onClose();
+
       } else {
         setMessage("Withdrawal failed: unknown response.");
       }
+
     } catch (e: any) {
-      // e may be a FetchBaseQueryError or serialized error
-      console.error("createPayout error", e);
+      console.error("withdrawalViaEmail error", e);
       const errMsg =
         (e?.data as any)?.error ??
         (e?.data as any)?.message ??
         e?.message ??
-        "Payout failed. Try again.";
+        "Withdrawal failed. Try again.";
 
       setMessage(String(errMsg));
     } finally {

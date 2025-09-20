@@ -123,27 +123,11 @@ const handleGoogleAuth = async () => {
   }
 };
 
-  const handleResendOtp = async () => {
+  const handleForgotPassword = async () => {
     dispatch(setError(null));
     dispatch(setLoading(true));
-
-    try {
-      const { error } = await supabase.auth.resend({
-        type: "signup",
-        email,
-      });
-
-      if (error) throw error;
-
-      toast({
-        title: "Verification email sent!",
-        description: "Please check your inbox again.",
-      });
-    } catch (e: any) {
-      dispatch(setError(e?.message || "Failed to resend verification code"));
-    } finally {
-      dispatch(setLoading(false));
-    }
+    dispatch(setIsAuthModelOpen(false));
+    dispatch(setOtpVerification(true));
   };
   
 const handleSignUp = async () => {
@@ -408,7 +392,7 @@ const handleSignUp = async () => {
     error,
     handleClose,
     handleOtpVerification,
-    handleResendOtp,  
+    handleForgotPassword,  
     handleSignIn,
     handleSignUp,
     handleLogout,

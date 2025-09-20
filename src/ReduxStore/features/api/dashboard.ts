@@ -1,4 +1,3 @@
-// src/ReduxStore/features/api/dashboard.ts
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 const BaseURL = import.meta.env.VITE_SUPABASE_FUNCTIONS_URL;
@@ -22,34 +21,55 @@ export interface DashboardResponse {
   referral_code: string;
   total_earnings: number;
   available_balance: number;
-  referrals: number;
-  enrolled_users: number;
-  available_courses: number;
-  courses: CourseItem[];
-  // Add optional fields to match Dashboard.tsx usage
-  primary_referrals?: number;
-  secondary_referrals?: number;
-  daily_earnings?: number;
-  weekly_earnings?: number;
-  monthly_earnings?: number;
+  referrals_primary?: number;
+  referrals_secondary?: number;
+  enrolled_users_primary?: number;
+  enrolled_users_secondary?: number;
+  earnings_daily?: number;
+  earnings_weekly?: number;
+  earnings_monthly?: number;
 }
 
+// Reuse the same dashboardApi
 export const dashboardApi = createApi({
   reducerPath: "dashboardApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: `${BaseURL}`, // e.g. https://<your-functions-domain>/
+    baseUrl: `${BaseURL}`,
     prepareHeaders: (headers) => {
-      // match transactions.ts style: send anon key + content-type
       headers.set("Authorization", `Bearer ${anonKey}`);
+      headers.set("Content-Type", "application/json");
       return headers;
     },
   }),
+  tagTypes: ["Dashboard"], // <- needed for invalidation
   endpoints: (builder) => ({
     getDashboard: builder.query<DashboardResponse, { userId: string }>({
-      // use same URL style as your function (no extra leading slash)
       query: ({ userId }) => `get_dashboard?userId=${encodeURIComponent(userId)}`,
+      providesTags: ["Dashboard"],
+    }),
+
+    // The new withdrawalViaEmail mutation
+    withdrawalViaEmail: builder.mutation<
+      { ok: boolean }, // response type from your edge function
+      {
+        userId: string;
+        email?: string;
+        upiId?: string;
+        mobileNo?: string;
+        amount: number;
+      }
+    >({
+      query: (body) => ({
+        url: "send-payment-email",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["Dashboard"], // <- will refetch dashboard after success
     }),
   }),
 });
 
-export const { useGetDashboardQuery } = dashboardApi;
+export const {
+  useGetDashboardQuery,
+  useWithdrawalViaEmailMutation,
+} = dashboardApi;

@@ -8,6 +8,8 @@ import { useNavigate } from 'react-router-dom';
 import { useGetPaymentMethodsMutation } from '@/ReduxStore/features/api/paymentMethods';
 import WithdrawalModal from '@/components/WithdrawalModal';
 
+import { useLazyGetReferralHistoryQuery } from '@/ReduxStore/features/api/history';
+
 const Dashboard = () => {
   const [copiedLink, setCopiedLink] = useState(false);
   const { toast } = useToast();
@@ -18,6 +20,9 @@ const Dashboard = () => {
   const [getMethods, { isLoading: paymentMethodLoading }] = useGetPaymentMethodsMutation();
   const [modalOpen, setModalOpen] = useState(false);
   const [payload, setPayload] = useState<any>(null);
+
+  const [triggerHistory, historyResult] = useLazyGetReferralHistoryQuery();
+  const { data: historyData, isFetching: historyLoading, isError: historyIsError, error: historyError } = historyResult;
 
   const handleOpen = async () => {
     if (!userId) {
@@ -93,12 +98,24 @@ const Dashboard = () => {
     });
   };
 
-  const totalReferrals = dashboardData.referrals || 0;
-  const primaryReferrals = dashboardData.primary_referrals ?? 0;
-  const secondaryReferrals = dashboardData.secondary_referrals ?? 0;
-  const dailyEarnings = dashboardData.daily_earnings ?? 0;
-  const weeklyEarnings = dashboardData.weekly_earnings ?? 0;
-  const monthlyEarnings = dashboardData.monthly_earnings ?? 0;
+  const totalReferrals = dashboardData.referrals_primary + dashboardData.enrolled_users_secondary || 0;
+  const primaryReferrals = dashboardData.referrals_primary ?? 0;
+  const secondaryReferrals = dashboardData.referrals_secondary ?? 0;
+  const dailyEarnings = dashboardData.earnings_daily ?? 0;
+  const weeklyEarnings = dashboardData.earnings_weekly ?? 0;
+  const monthlyEarnings = dashboardData.earnings_monthly ?? 0;
+  const primaryEnrolled = dashboardData.enrolled_users_primary ?? 0;
+  const secondaryEnrolled = dashboardData.enrolled_users_secondary ?? 0;
+
+    // Handler to trigger history fetch
+  const handleLoadHistory = () => {
+    if (!userId) {
+      dispatch(setIsAuthModelOpen(true));
+      return;
+    }
+    triggerHistory({ userId });
+  };
+
 
   return (
     <>
@@ -139,13 +156,13 @@ const Dashboard = () => {
                     {copiedLink ? <CheckCircle className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                     Copy
                   </button>
-                  <button
+                  {/* <button
                     onClick={() => window.open(referralLink, '_blank')}
                     className="group relative flex items-center gap-2 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 px-3 py-1 text-xs font-medium text-white transition-all duration-300 hover:from-purple-600 hover:to-pink-600 w-full sm:w-auto"
                   >
                     <ExternalLink className="w-4 h-4" />
                     Visit
-                  </button>
+                  </button> */}
                 </div>
               </div>
             </div>
@@ -191,7 +208,7 @@ const Dashboard = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-xs sm:text-sm font-medium text-gray-400">Primary Referrals</p>
-                    <p className="text-lg sm:text-2xl font-bold text-white">{primaryReferrals}</p>
+                    <p className="text-lg sm:text-2xl font-bold text-white">{primaryEnrolled+"/"+primaryReferrals}</p>
                   </div>
                   <div className="bg-pink-500/20 p-2 sm:p-3 rounded-full">
                     <TrendingUp className="w-4 h-4 sm:w-6 sm:h-6 text-pink-400" />
@@ -207,7 +224,7 @@ const Dashboard = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-xs sm:text-sm font-medium text-gray-400">Secondary Referrals</p>
-                    <p className="text-lg sm:text-2xl font-bold text-white">{secondaryReferrals}</p>
+                    <p className="text-lg sm:text-2xl font-bold text-white">{secondaryEnrolled+"/"+secondaryReferrals}</p>
                   </div>
                   <div className="bg-emerald-500/20 p-2 sm:p-3 rounded-full">
                     <Users className="w-4 h-4 sm:w-6 sm:h-6 text-emerald-400" />
@@ -290,7 +307,8 @@ const Dashboard = () => {
                     <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 opacity-20 blur-sm transition-opacity duration-300 group-hover:opacity-30" />
                     <div className="absolute inset-px rounded-[11px] bg-slate-950" />
                     <div className="relative">
-                      <div className="mb-4 flex items-center justify-between">
+               <>
+                             <div className="mb-4 flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-purple-500">
                             <svg className="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -304,6 +322,7 @@ const Dashboard = () => {
                           Live
                         </span>
                       </div>
+                      
                       <div className="mb-4 h-24 w-full overflow-hidden rounded-lg bg-slate-900/50 p-3">
                         <div className="flex h-full w-full items-end justify-between gap-1">
                           <div className="h-[40%] w-3 rounded-sm bg-indigo-500/30 group-hover:animate-pulse">
@@ -317,24 +336,129 @@ const Dashboard = () => {
                           </div>
                         </div>
                       </div>
+                      
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-sm">
                         <div className="text-gray-400">Today Earnings: ₹{dailyEarnings.toFixed(2)}</div>
                         <div className="text-gray-400">Last Weekly Earnings: ₹{weeklyEarnings.toFixed(2)}</div>
                         <div className="text-gray-400">Monthly Earnings: ₹{monthlyEarnings.toFixed(2)}</div>
                       </div>
-                      <div className="flex items-center justify-between mt-4">
-                        <div className="flex items-center gap-2">
+               </>
+
+
+                      <div className="mt-4 w-full">
+                        <button type= "button" disabled={!userId || historyLoading}  onClick={handleLoadHistory} className="flex  items-center gap-2">
                           <span className="text-xs font-medium text-gray-400">Last 30 days</span>
+                        {historyLoading ? 
+                          <svg className="h-4 w-4 animate-spin text-gray-400" viewBox="0 0 24 24" fill="none" role="status" aria-hidden="true" >
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                          </svg>
+                          :
                           <svg className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                          </svg>
-                        </div>
-                        <button className="flex items-center gap-1 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-500 px-3 py-1 text-xs font-medium text-white transition-all duration-300 hover:from-indigo-600 hover:to-purple-600">
+                          </svg>}
+                        </button>
+
+                        {/* <button className="flex items-center gap-1 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-500 px-3 py-1 text-xs font-medium text-white transition-all duration-300 hover:from-indigo-600 hover:to-purple-600">
                           View Details
                           <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                           </svg>
-                        </button>
+                        </button> */}
+
+                        {/* History content */}
+                       <div className="mt-4 w-full overflow-x-auto scrollbar-hide">
+                          {historyLoading && (
+                            <div className="text-sm text-gray-500 text-center">Loading history…</div>
+                          )}
+
+                          {historyIsError && (
+                            <div className="text-sm text-red-600 text-center">
+                              Error loading history: {String((historyError as any)?.data ?? (historyError as any)?.error ?? historyError)}
+                            </div>
+                          )}
+
+                          {!historyLoading && historyData && (
+                            <>
+                              <div className="text-sm text-gray-400 mb-2 text-center">
+                                Showing <strong>{historyData.earnings_count}</strong> events since{" "}
+                                <strong>{new Date(historyData.since).toLocaleString()}</strong>
+                              </div>
+
+                              {/* BONUS TABLE: show only if there are bonuses */}
+                              {historyData.bonuses && historyData.bonuses.length > 0 && (
+                                <div className="mb-4 w-full">
+                                  <p className="text-sm text-gray-400 mb-2 text-left">Bonus History</p>
+                                  <table className="min-w-max border-collapse border w-full border-white text-sm text-gray-200 mb-4">
+                                    <thead>
+                                      <tr className="border border-gray-500 ">
+                                        <th className="border border-gray-500 px-2 py-1 text-left">No.</th>
+                                        <th className="border border-gray-500 px-2 py-1 text-left">Milestone</th>
+                                        <th className="border border-gray-500  px-2 py-1 text-left">Amount</th>
+                                        <th className="border border-gray-500  px-2 py-1 text-left">Status</th>
+                                        <th className="border border-gray-500  px-2 py-1 text-left">Time</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody>
+                                      {historyData.bonuses.map((b, idx) => {
+                                        const milestone = b.milestone_count ?? "-";
+                                        const amount = typeof b.bonus_amount === "number" ? `₹${b.bonus_amount.toFixed(2)}` : "-";
+                                        const time = b.created_at ?? null;
+
+                                        return (
+                                          <tr key={b.bonus_id} className="border border-gray-500 ">
+                                            <td className="border border-gray-500  px-2 py-1">{idx + 1}</td>
+                                            <td className="border border-gray-500  px-2 py-1">{milestone}</td>
+                                            <td className="border border-gray-500  px-2 py-1">{amount}</td>
+                                            <td className="border border-gray-500  px-2 py-1">{b.status ?? "-"}</td>
+                                            <td className="border border-gray-500  px-2 py-1">
+                                              {time ? new Date(time).toLocaleString() : "-"}
+                                            </td>
+                                          </tr>
+                                        );
+                                      })}
+                                    </tbody>
+                                  </table>
+                                </div>
+                              )}
+                              <p className="text-sm text-gray-400 mb-2 text-left">Earnings History</p>
+                              {/* HISTORY / EARNINGS TABLE (unchanged layout, only uses updated count variable) */}
+                              <table className="min-w-max w-full border-collapse border border-white text-sm text-gray-200">
+                                <thead>
+                                  <tr className="border border-gray-500">
+                                    <th className="border border-gray-500 px-2 py-1 text-left">No.</th>
+                                    <th className="border border-gray-500 px-2 py-1 text-left">User</th>
+                                    <th className="border border-gray-500 px-2 py-1 text-left">Level</th>
+                                    <th className="border border-gray-500 px-2 py-1 text-left">Course</th>
+                                    <th className="border border-gray-500 px-2 py-1 text-left">Price</th>
+                                    <th className="border border-gray-500 px-2 py-1 text-left">Earnings</th>
+                                    <th className="border border-gray-500 px-2 py-1 text-left">Time</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {historyData.history.map((h, idx) => {
+                                    const user = h.buyer_display_name ?? h.buyer_username ?? h.buyer_email ?? "Unknown user";
+                                    const price = h.course_price !== null && typeof h.course_price === "number" ? `₹${h.course_price}` : "-";
+                                    const earnings = typeof h.commission_amount === "number" ? `₹${h.commission_amount.toFixed(2)}` : "-";
+                                    const time = h.bought_at ?? h.created_at ?? null; // fallback to created_at if bought_at missing
+
+                                    return (
+                                      <tr key={h.referral_earning_id} className="border border-gray-500">
+                                        <td className="border border-gray-500 px-2 py-1">{idx + 1}</td>
+                                        <td className="border border-gray-500 px-2 py-1">{user}</td>
+                                        <td className="border border-gray-500 px-2 py-1">{h.referral_level ?? "-"}</td>
+                                        <td className="border border-gray-500 px-2 py-1">{h.course_title ?? "-"}</td>
+                                        <td className="border border-gray-500 px-2 py-1">{price}</td>
+                                        <td className="border border-gray-500 px-2 py-1">{earnings}</td>
+                                        <td className="border border-gray-500 px-2 py-1">{time ? new Date(time).toLocaleString() : "unknown"}</td>
+                                      </tr>
+                                    );
+                                  })}
+                                </tbody>
+                              </table>
+                            </>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>

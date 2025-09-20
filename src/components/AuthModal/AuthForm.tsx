@@ -18,7 +18,9 @@ type Props = {
   setShowPassword: (v: boolean) => void;
   onSignIn: () => Promise<void>;
   onSignUp: () => Promise<void>;
+  handleForgotPassword: () => Promise<void>;
   loading: boolean;
+  error: string | null;
 };
 
 const AuthForm: React.FC<Props> = ({
@@ -32,7 +34,9 @@ const AuthForm: React.FC<Props> = ({
   setShowPassword,
   onSignIn,
   onSignUp,
+  handleForgotPassword,
   loading,
+  error,
 }) => {
   // Local state for toggling between Sign Up and Sign In
     const dispatch = useAppDispatch();
@@ -46,7 +50,7 @@ const AuthForm: React.FC<Props> = ({
       setReferralCode(storedRef);
     }
   }, [isAuthModelOpen]);
-
+console.log("Error:", error);
   return (
     <div className="flex flex-col min-h-full">
       {/* Form content */}
@@ -73,7 +77,7 @@ const AuthForm: React.FC<Props> = ({
       
         {/* Email field */}
      
-              <div>
+        <div>
           <label className="block text-sm font-medium text-card-foreground mb-2">
             Email Address
           </label>
@@ -120,6 +124,8 @@ const AuthForm: React.FC<Props> = ({
           </div>
         </div>
 
+      {error === "Invalid login credentials" && <p onClick={handleForgotPassword} className="text-sm hover:cursor-pointer font-medium text-card-foreground text-red-500 mb-2">Forgot password?</p>}
+
       {/* Referral Code (only if exists) */}
       {!isSignUp && referralCode && (
         <div>
@@ -163,10 +169,10 @@ const AuthForm: React.FC<Props> = ({
           </span>
           <span className="flex-grow border-t border-gray-300"></span>
         </div>
-        {!isSignUp && 
+       
         <Button onClick={() => handleGoogleAuth()} className="w-full mt-4" variant="outline">
           Continue with Google
-        </Button>}
+        </Button>
       </div>
 
       {/* Bottom switch button */}

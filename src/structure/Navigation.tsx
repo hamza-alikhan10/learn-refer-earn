@@ -11,12 +11,13 @@ import ReferralProgram from "@/pages/ReferralProgram";
 import About from "@/pages/About";
 import NotFound from "@/pages/NotFound";
 import Contact from "@/pages/Contact";
+import ResetPasswordPage from "@/pages/auth/reset-password";
 
 function DefaultLayout_00 ({children}) {
     // const {isClicked, BlurDiv ,} = useAuth();
 
     return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen w-full bg-white">
       <Header/>
         {children}
         <Footer/>
@@ -37,6 +38,7 @@ export const getNavigationButtons = ( ) => {
       { path: "/how-it-works",                   name: 'How It Works',                 element: <DefaultLayout_00><HowItWorks/></DefaultLayout_00>,                                                isPrivate: false },
       { path: "/referral-program",               name: 'Referral Program',             element: <DefaultLayout_00><ReferralProgram/></DefaultLayout_00>,                                           isPrivate: false },
       { path: "/contact-us",                     name: 'Contact',                      element: <DefaultLayout_00><Contact/></DefaultLayout_00>,                                                   isPrivate: false },
+      { path: "/auth/reset-password",            name: 'ResetPassword',                element: <ResetPasswordPage/>,                                                                              isPrivate: false },
       { path: "*",                               name: 'Not Found',                    element: <NotFound/>,                                                                                       isPrivate: false },
 
     ];

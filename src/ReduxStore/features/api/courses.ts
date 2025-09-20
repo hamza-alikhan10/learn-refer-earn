@@ -25,6 +25,7 @@ export interface Course {
   created_at: string;
   updated_at: string;
   reviews: Review[];
+  is_course_available: boolean | null;
 }
 
 export interface CoursesResponse {

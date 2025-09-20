@@ -59,7 +59,7 @@ const Footer: React.FC = () => {
             <h4 className="text-lg font-semibold mb-4 text-white tracking-wide">Connect</h4>
             <div className="space-y-3 text-sm md:text-base">
               <p className="text-gray-300 hover:text-blue-400 transition-colors">
-                <a href="mailto:support@learnhub.com">support@learnhub.com</a>
+                <a href="mailto:support@learnhub.com">info@earnlabs.in</a>
               </p>
               <p className="text-gray-300 hover:text-blue-400 transition-colors">
                 <a href="tel:+15551234567">+1 (555) 123-4567</a>

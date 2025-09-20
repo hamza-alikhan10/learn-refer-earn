@@ -5,6 +5,8 @@ import { Button } from './ui/button';
 import { useNavigate } from "react-router-dom";
 import { useAppSelector, useAppDispatch } from '@/ReduxStore/hooks';
 import { useLazyGetReferralDataQuery } from '@/ReduxStore/features/api/referralModelData';
+import { useCheckEnrollmentMutation } from '@/ReduxStore/features/api/enrollmentApi'; 
+import { useState, useEffect } from 'react';
 import {
   setIsOpen,
   setCourseData,
@@ -22,6 +24,7 @@ interface Course {
   rating: number;
   students: number;
   duration: string;
+  is_course_available: boolean | null ;
 }
 
 interface CourseCardProps {
@@ -54,10 +57,41 @@ const CourseCard: React.FC<CourseCardProps> = ({
   course, 
 }) => {
 
+    // enrollment check hook
+    const [checkEnrollment, { isLoading: checkingEnrollment }] = useCheckEnrollmentMutation();
+    const [isEnrolled, setIsEnrolled] = useState<boolean | null>(null); // null = unknown/loading
     const navigate = useNavigate();  
     const dispatch = useAppDispatch();
     const { userId } = useAppSelector((state) => state.auth); 
     
+      // run enrollment check when userId changes
+    useEffect(() => {
+      let mounted = true;
+      setIsEnrolled(null); // reset to "unknown" when user changes
+
+      // If no userId, we treat as not enrolled (do not call endpoint)
+      if (!userId) {
+        if (mounted) setIsEnrolled(false);
+        return () => {
+          mounted = false;
+        };
+      }
+
+      (async () => {
+        try {
+          const res = await checkEnrollment({ userId }).unwrap();
+          if (mounted) setIsEnrolled(Boolean(res?.enrolled));
+        } catch (err) {
+          console.error("checkEnrollment error", err);
+          if (mounted) setIsEnrolled(false);
+        }
+      })();
+
+      return () => {
+        mounted = false;
+      };
+    }, [userId, checkEnrollment]);
+
     const handleView = () => {
     const url = userId 
       ? `/courses/${course.id}?userId=${userId}` 
@@ -72,8 +106,16 @@ const CourseCard: React.FC<CourseCardProps> = ({
       console.warn("User not logged in!");
       return;
     }
+    if (!isEnrolled) {
+      console.warn("User is not enrolled — cannot refer");
+      return;
+    }
     fetchReferralData(course.id, userId, trigger, dispatch);
   };
+
+  const showReferButton = isEnrolled === true;
+  const isAvailable = Boolean(course?.is_course_available); // normalize possible undefined
+  const canRefer = isAvailable && showReferButton; // only refer when course is available and user enrolled
 
 
   return (
@@ -101,10 +143,10 @@ const CourseCard: React.FC<CourseCardProps> = ({
           <span className="text-sm font-medium px-3 py-1 bg-accent/20 text-accent rounded-full">
             {course.category}
           </span>
-          <div className="flex items-center space-x-1 bg-warning/10 px-2 py-1 rounded-full">
+         { isAvailable && <div className="flex items-center space-x-1 bg-warning/10 px-2 py-1 rounded-full">
             <Star className="w-4 h-4 text-warning fill-current icon-3d" />
             <span className="text-sm font-medium text-warning">{course.rating}</span>
-          </div>
+          </div>}
         </div>
         
         <h3 className="text-lg sm:text-xl font-bold text-card-foreground mb-2 line-clamp-2 leading-tight">
@@ -120,51 +162,67 @@ const CourseCard: React.FC<CourseCardProps> = ({
         </p>
         
         <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 space-y-2 sm:space-y-0 text-sm text-muted-foreground mb-6">
-          <div className="flex items-center space-x-1">
+         { isAvailable && <><div className="flex items-center space-x-1">
             <Users className="w-4 h-4 icon-3d" />
             <span>{course.students.toLocaleString()} students</span>
           </div>
           <div className="flex items-center space-x-1">
             <Clock className="w-4 h-4 icon-3d" />
             <span>{course.duration}</span>
-          </div>
-        </div>
-        
+          </div></>}
+        </div> 
         <div className="flex flex-col sm:flex-row gap-3">
-          <Button
-            onClick={handleView}
-            className="flex-1 group"
-            size="touch"
-          >
-            <Eye className="w-4 h-4 mr-2 icon-3d" />
-            View Details
-          </Button>
-          
-          {userId && (
-            <div className="space-y-2">
+            {/* View Details button - always visible */}
             <Button
-              onClick={handleOpenReferralModal}
-              disabled={referralModelLoading}
-              variant="accent"
+              onClick={handleView}
+              className="flex-1 group"
               size="touch"
-              className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 shadow-lg hover:shadow-xl transition-all duration-200"
-              title={`Refer Course & Earn ₹${Math.floor(course.price * 0.5)}`}
             >
-              {referralModelLoading ? (
-                <span className="animate-spin border-2 border-white border-t-transparent rounded-full w-4 h-4" />
-              ) : (
-                <>
-                  <Share2 className="w-4 h-4 mr-2 icon-3d" />
-                  <span>Refer & Earn</span>
-                </>
-              )}
+              <Eye className="w-4 h-4 mr-2 icon-3d" />
+              View Details
             </Button>
-              <p className="text-center text-sm font-semibold text-green-600">
-                Earn ₹{Math.floor(course.price * 0.5)} per referral
-              </p>
-            </div>
-          )}
-        </div>
+
+            {/* If course is NOT available -> Coming soon (always shown for any visitor) */}
+            {!isAvailable && (
+              <div className="space-y-2">
+                <Button 
+                disabled={false} 
+                variant="accent" 
+                size="touch" 
+                className="w-full cursor-default bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 shadow-lg hover:shadow-xl transition-all duration-200" 
+                > 
+                  <span>Comming soon ..</span> 
+                </Button> 
+              </div>
+            )}
+
+            {/* If course IS available AND user is enrolled -> show Refer & Earn */}
+            {canRefer && (
+              <div className="space-y-2 flex-1">
+                <Button
+                  onClick={handleOpenReferralModal}
+                  disabled={referralModelLoading}
+                  variant="accent"
+                  size="touch"
+                  className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 shadow-lg hover:shadow-xl transition-all duration-200"
+                  title={`Refer Course & Earn ₹${Math.floor(course.price * 0.5)}`}
+                >
+                  {referralModelLoading ? (
+                    <span className="animate-spin border-2 border-white border-t-transparent rounded-full w-4 h-4" />
+                  ) : (
+                    <>
+                      <Share2 className="w-4 h-4 mr-2 icon-3d" />
+                      <span>Refer & Earn</span>
+                    </>
+                  )}
+                </Button>
+
+                <p className="text-center text-sm font-semibold text-green-600">
+                  Earn ₹{Math.floor(course.price * 0.5)} per referral
+                </p>
+              </div>
+            )}
+          </div>
       </div>
     </div>
   );

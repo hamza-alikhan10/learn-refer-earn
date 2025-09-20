@@ -15,6 +15,8 @@ import { Button } from "@/components/ui/button";
 
 import { useAppSelector, useAppDispatch } from "@/ReduxStore/hooks";
 import { useLazyGetReferralDataQuery } from "@/ReduxStore/features/api/referralModelData";
+import { useCheckEnrollmentMutation } from '@/ReduxStore/features/api/enrollmentApi'; 
+
 import {
   setIsOpen,
   setCourseData,
@@ -40,6 +42,7 @@ type CourseType = {
   created_at: string;
   updated_at: string;
   category: string;
+  is_course_available: boolean | null ;
 };
 
 type CourseResponse = {
@@ -81,7 +84,9 @@ const CourseDetailsPage: React.FC = () => {
   const queryParams = new URLSearchParams(location.search);
   const queryUserId = queryParams.get("userId") ?? undefined;
   const effectiveUserId = (queryUserId || reduxUserId) ?? undefined;
-
+  // enrollment check hook
+  const [checkEnrollment, { isLoading: checkingEnrollment }] = useCheckEnrollmentMutation();
+  const [isEnrolled, setIsEnrolled] = useState<boolean | null>(null); // null = unknown/loading
   const { id } = useParams<{ id: string }>();
 
   const { startCoursePayment, orderCreating, paymentVerifying } = useCoursePayment();
@@ -182,11 +187,44 @@ const CourseDetailsPage: React.FC = () => {
     prevVerifyingRef.current = currentlyVerifying;
   }, [paymentVerifying, id, effectiveUserId, refetchCourse]);
 
+        // run enrollment check when userId changes
+      useEffect(() => {
+        let mounted = true;
+        setIsEnrolled(null); // reset to "unknown" when user changes
+  
+        // If no userId, we treat as not enrolled (do not call endpoint)
+        if (!effectiveUserId) {
+          if (mounted) setIsEnrolled(false);
+          return () => {
+            mounted = false;
+          };
+        }
+  
+        (async () => {
+          try {
+            const res = await checkEnrollment({ userId: effectiveUserId }).unwrap();
+            if (mounted) setIsEnrolled(Boolean(res?.enrolled));
+          } catch (err) {
+            console.error("checkEnrollment error", err);
+            if (mounted) setIsEnrolled(false);
+          }
+        })();
+  
+        return () => {
+          mounted = false;
+        };
+      }, [effectiveUserId, checkEnrollment]);
+  
   // Referral modal opener
   const handleOpenReferralModal = () => {
     if (!reduxUserId) {
       console.warn("User not logged in!");
       dispatch(setIsAuthModelOpen(true));
+      return;
+    }
+
+    if (!isEnrolled) {
+      console.warn("User is not enrolled — cannot refer");
       return;
     }
     // triggerReferral is the lazy query trigger returned from useLazyGetReferralDataQuery
@@ -209,9 +247,12 @@ const CourseDetailsPage: React.FC = () => {
     );
   }
 
-  console.log("New vedio fethch data", videoUrls);
-
   const { course, visitorType } = data;
+
+  const showReferButton = isEnrolled === true;
+
+  const isAvailable = Boolean(course?.is_course_available); 
+  const canRefer = isAvailable && showReferButton;
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
@@ -223,13 +264,13 @@ const CourseDetailsPage: React.FC = () => {
             <div className="bg-white rounded-lg shadow-md p-8">
               <div className="flex items-center space-x-2 text-sm text-blue-600 font-medium mb-4">
                 <span>{course.category}</span>
-                <div className="flex items-center space-x-1">
+          {  isAvailable &&    <div className="flex items-center space-x-1">
                   <Star className="w-4 h-4 text-yellow-400 fill-current" />
                   <span>{course.rating}</span>
                   <span className="text-gray-500">
                     ({course.total_students.toLocaleString()} students)
                   </span>
-                </div>
+                </div>}
               </div>
 
               <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
@@ -246,14 +287,16 @@ const CourseDetailsPage: React.FC = () => {
                     <span className="font-semibold">{course.instructor}</span>
                   </span>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <Clock className="w-5 h-5" />
-                  <span>{course.duration}</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Users className="w-5 h-5" />
-                  <span>{course.total_students.toLocaleString()} students</span>
-                </div>
+            {  isAvailable &&  <>
+                  <div className="flex items-center space-x-2">
+                    <Clock className="w-5 h-5" />
+                    <span>{course.duration}</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Users className="w-5 h-5" />
+                    <span>{course.total_students.toLocaleString()} students</span>
+                  </div>
+                </>}
               </div>
             </div>
 
@@ -289,7 +332,7 @@ const CourseDetailsPage: React.FC = () => {
               </div>
             </div>
 
-            <CourseReviewsSection courseId={data.course.id} userId={effectiveUserId} />
+            {/* <CourseReviewsSection courseId={data.course.id} userId={effectiveUserId} /> */}
 
           </div>
 
@@ -303,13 +346,23 @@ const CourseDetailsPage: React.FC = () => {
                 <p className="text-gray-600">Full lifetime access</p>
               </div>
 
-              <div className="space-y-4 mb-6">
-         <div className="space-y-4 mb-6">
-        {/* CTA logic:
-            - when process happening -> show finalizing message
-            - else if user is enrolled -> show Start Learning button (clicking triggers videos fetch)
-            - else -> show Enroll Now button
-        */}
+<div className="space-y-4 mb-6">
+  { !isAvailable ? (
+    // ONLY show this when course is NOT available
+    <div className="space-y-2">
+      <div
+        role="button"
+        aria-disabled="true"
+        className="w-full flex items-center justify-center py-3 rounded-lg bg-gradient-to-r from-green-500 to-green-600 opacity-90 shadow-lg select-none cursor-not-allowed"
+        title="Coming soon"
+      >
+        <span className="text-white font-semibold">Coming soon</span>
+      </div>
+    </div>
+  ) : (
+    // course IS available -> render the full CTA block + optional refer button
+    <>
+      <div>
         {isProcessHappening ? (
           <div className="w-full py-3 px-6 rounded-lg bg-yellow-100 text-yellow-800 text-center">
             Finalizing enrollment — please wait...
@@ -330,7 +383,7 @@ const CourseDetailsPage: React.FC = () => {
                 ? startCoursePayment(effectiveUserId, course.id, course.price)
                 : (navigate("/"), dispatch(setIsAuthModelOpen(true)))
             }
-            disabled={orderCreating}
+            disabled={orderCreating || paymentVerifying}
             className={`w-full text-white py-3 px-6 rounded-lg font-semibold transition-colors flex items-center justify-center space-x-2 ${
               orderCreating || paymentVerifying ? "bg-blue-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700 cursor-pointer"
             }`}
@@ -343,47 +396,49 @@ const CourseDetailsPage: React.FC = () => {
             <span>{orderCreating || paymentVerifying ? "Processing..." : "Enroll Now"}</span>
           </button>
         )}
-
-        {/* Referral button & info */}
-        {effectiveUserId && (
-          <div className="space-y-3">
-            <Button
-              onClick={handleOpenReferralModal}
-              disabled={referralModelLoading}
-              variant="accent"
-              size="touch"
-              className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 shadow-lg hover:shadow-xl transition-all duration-200"
-              title={`Refer Course & Earn ₹${Math.floor(course.price * 0.5)}`}
-            >
-              {referralModelLoading ? (
-                <span className="animate-spin border-2 border-white border-t-transparent rounded-full w-4 h-4" />
-              ) : (
-                <>
-                  <Share2 className="w-4 h-4 mr-2 icon-3d" />
-                  <span>Refer & Earn</span>
-                </>
-              )}
-            </Button>
-
-            <p className="text-center text-sm font-semibold text-green-600">
-              Earn ₹{Math.floor(course.price * 0.5)} on referral
-            </p>
-          </div>
-        )}
       </div>
-              </div>
+
+      {/* Referral button & info — only for available courses and enrolled users */}
+      {canRefer && (
+        <div className="space-y-3">
+          <Button
+            onClick={handleOpenReferralModal}
+            disabled={referralModelLoading}
+            variant="accent"
+            size="touch"
+            className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 shadow-lg hover:shadow-xl transition-all duration-200"
+            title={`Refer Course & Earn ₹${Math.floor(course.price * 0.5)}`}
+          >
+            {referralModelLoading ? (
+              <span className="animate-spin border-2 border-white border-t-transparent rounded-full w-4 h-4" />
+            ) : (
+              <>
+                <Share2 className="w-4 h-4 mr-2 icon-3d" />
+                <span>Refer & Earn</span>
+              </>
+            )}
+          </Button>
+
+          <p className="text-center text-sm font-semibold text-green-600">
+            Earn ₹{Math.floor(course.price * 0.5)} on referral
+          </p>
+        </div>
+      )}
+    </>
+  )}
+</div>
 
               <div className="border-t border-gray-200 pt-6">
                 <h3 className="font-semibold text-gray-900 mb-4">
                   This course includes:
                 </h3>
                 <div className="space-y-3">
-                  <div className="flex items-center space-x-3">
+              {  isAvailable &&  <div className="flex items-center space-x-3">
                     <Clock className="w-5 h-5 text-gray-600" />
                     <span className="text-gray-700">
                       {course.duration} on-demand video
                     </span>
-                  </div>
+                  </div>}
                   <div className="flex items-center space-x-3">
                     <Award className="w-5 h-5 text-gray-600" />
                     <span className="text-gray-700">

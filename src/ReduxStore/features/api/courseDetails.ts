@@ -18,6 +18,7 @@ export interface Course {
   created_at: string;
   updated_at: string;
   category: string;
+  is_course_available: boolean | null ;
 }
 
 interface CourseResponse {
