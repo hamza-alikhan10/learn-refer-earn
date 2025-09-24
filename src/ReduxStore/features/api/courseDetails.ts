@@ -26,11 +26,43 @@ interface CourseResponse {
   visitorType: "public" | "logged_in" | "enrolled";
   isEnrolled: boolean;
 }
-export interface CourseVideosResponse {
-  videos: { path: string; url: string }[];
-  visitorType: 'public' | 'logged_in' | 'enrolled' | string;
+// types/courseVideos.ts
+
+export interface Episode {
+  id: string;
+  title: string;
+  duration: number | null;        // postgres interval comes back as string, e.g. number or null
+  metadata: any;                  // keep as any unless you have a stricter shape
+  course_id: string;
+  video_url: string;
+  created_at: string;             // ISO timestamp string
+  section_id: string;
+  updated_at: string;             // ISO timestamp string
+  description: string | null;
+}
+
+export interface SectionWithEpisodes {
+  id: string;
+  course_id: string;
+  title: string;
+  description: string | null;
+  metadata: any;
+  created_at: string;
+  updated_at: string;
+  episodes: Episode[];
+}
+
+export interface CourseWithSections {
+  id: string;
+  sections: SectionWithEpisodes[];
+}
+
+interface CourseVideosResponse {
+  course: CourseWithSections;
+  visitorType: "public" | "logged_in" | "enrolled" | string;
   isEnrolled: boolean;
 }
+
 
 export const courseDetails = createApi({
   reducerPath: "courseDetails",

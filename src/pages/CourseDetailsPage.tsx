@@ -26,6 +26,7 @@ import {
 import { useGetCourseByIdQuery, useGetCourseVideosQuery } from "@/ReduxStore/features/api/courseDetails";
 import CourseReviewsSection from "@/components/CourseReviewsSection";
 import { setIsAuthModelOpen } from "@/ReduxStore/features/slices/auth";
+import CourseSection from "@/components/courseSection";
 
 type CourseType = {
   id: string;
@@ -142,16 +143,21 @@ const CourseDetailsPage: React.FC = () => {
     // side-effects to update videoUrls handled by effect watching `videosData`
   };
 
-  // When videosData arrives, store urls and stop process indicator
+
+  // When videosData arrives, store the first video of the first section
   useEffect(() => {
-    if (videosData?.videos) {
-      setVideoUrls(videosData.videos.map((v) => v.url));
+    const firstVideoUrl =
+      videosData?.course?.sections?.[0]?.episodes?.[0]?.video_url;
+
+    if (firstVideoUrl) {
+      setVideoUrls([firstVideoUrl]); // store it as a single-item array
     }
-    // if the hook finished (either success or error), we stop the process indicator
+
     if (videosError) {
       console.error("Failed to load videos", videosError);
     }
   }, [videosData, vedioloading, videosError]);
+
 
   // When payment verification finishes -> wait 5s then fetch videos & refetch course
   const prevVerifyingRef = useRef(false);
@@ -311,12 +317,14 @@ const CourseDetailsPage: React.FC = () => {
                   />
                 ) : (
                   <img
-                    src={`https://csfrwmlgvlznrbcqcveo.supabase.co/storage/v1/object/public/learn-refer-earn/images/${course.image_url}`}
+                    src={course.image_url}
                     alt={course.title}
                     className="w-full h-64 md:h-96 object-cover"
                   />
                 )}
               </div>
+            <CourseSection videoData={videosData} setVideoUrls={setVideoUrls} />
+
             {/* What You'll Learn */}
             <div className="bg-white rounded-lg shadow-md p-8">
               <h2 className="text-2xl font-bold text-gray-900 mb-6">
@@ -331,7 +339,6 @@ const CourseDetailsPage: React.FC = () => {
                 ))}
               </div>
             </div>
-
             {/* <CourseReviewsSection courseId={data.course.id} userId={effectiveUserId} /> */}
 
           </div>
@@ -345,99 +352,97 @@ const CourseDetailsPage: React.FC = () => {
                 </div>
                 <p className="text-gray-600">Full lifetime access</p>
               </div>
+              <div className="space-y-4 mb-6">
+                { !isAvailable ? (
+                  // ONLY show this when course is NOT available
+                  <div className="space-y-2">
+                    <div
+                      role="button"
+                      aria-disabled="true"
+                      className="w-full flex items-center justify-center py-3 rounded-lg bg-gradient-to-r from-green-500 to-green-600 opacity-90 shadow-lg select-none cursor-not-allowed"
+                      title="Coming soon"
+                    >
+                      <span className="text-white font-semibold">Coming soon</span>
+                    </div>
+                  </div>
+                ) : (
+                  // course IS available -> render the full CTA block + optional refer button
+                  <>
+                    <div>
+                      {isProcessHappening ? (
+                        <div className="w-full py-3 px-6 rounded-lg bg-yellow-100 text-yellow-800 text-center">
+                          Finalizing enrollment — please wait...
+                        </div>
+                      ) : isUserEnrolled ? (
+                        <button
+                          onClick={handleStartLearningClick}
+                          disabled={vedioloading || isProcessHappening}
+                          className="w-full bg-green-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-green-700 transition-colors flex items-center justify-center space-x-2"
+                        >
+                          <Play className="w-5 h-5" />
+                          <span>{vedioloading ? "Loading..." : "Start Learning"}</span>
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() =>
+                            effectiveUserId
+                              ? startCoursePayment(effectiveUserId, course.id, course.price)
+                              : (navigate("/"), dispatch(setIsAuthModelOpen(true)))
+                          }
+                          disabled={orderCreating || paymentVerifying}
+                          className={`w-full text-white py-3 px-6 rounded-lg font-semibold transition-colors flex items-center justify-center space-x-2 ${
+                            orderCreating || paymentVerifying ? "bg-blue-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700 cursor-pointer"
+                          }`}
+                        >
+                          {orderCreating || paymentVerifying ? (
+                            <span className="animate-spin border-2 border-white border-t-transparent rounded-full w-4 h-4" />
+                          ) : (
+                            <Play className="w-5 h-5" />
+                          )}
+                          <span>{orderCreating || paymentVerifying ? "Processing..." : "Enroll Now"}</span>
+                        </button>
+                      )}
+                    </div>
 
-<div className="space-y-4 mb-6">
-  { !isAvailable ? (
-    // ONLY show this when course is NOT available
-    <div className="space-y-2">
-      <div
-        role="button"
-        aria-disabled="true"
-        className="w-full flex items-center justify-center py-3 rounded-lg bg-gradient-to-r from-green-500 to-green-600 opacity-90 shadow-lg select-none cursor-not-allowed"
-        title="Coming soon"
-      >
-        <span className="text-white font-semibold">Coming soon</span>
-      </div>
-    </div>
-  ) : (
-    // course IS available -> render the full CTA block + optional refer button
-    <>
-      <div>
-        {isProcessHappening ? (
-          <div className="w-full py-3 px-6 rounded-lg bg-yellow-100 text-yellow-800 text-center">
-            Finalizing enrollment — please wait...
-          </div>
-        ) : isUserEnrolled ? (
-          <button
-            onClick={handleStartLearningClick}
-            disabled={vedioloading || isProcessHappening}
-            className="w-full bg-green-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-green-700 transition-colors flex items-center justify-center space-x-2"
-          >
-            <Play className="w-5 h-5" />
-            <span>{vedioloading ? "Loading..." : "Start Learning"}</span>
-          </button>
-        ) : (
-          <button
-            onClick={() =>
-              effectiveUserId
-                ? startCoursePayment(effectiveUserId, course.id, course.price)
-                : (navigate("/"), dispatch(setIsAuthModelOpen(true)))
-            }
-            disabled={orderCreating || paymentVerifying}
-            className={`w-full text-white py-3 px-6 rounded-lg font-semibold transition-colors flex items-center justify-center space-x-2 ${
-              orderCreating || paymentVerifying ? "bg-blue-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700 cursor-pointer"
-            }`}
-          >
-            {orderCreating || paymentVerifying ? (
-              <span className="animate-spin border-2 border-white border-t-transparent rounded-full w-4 h-4" />
-            ) : (
-              <Play className="w-5 h-5" />
-            )}
-            <span>{orderCreating || paymentVerifying ? "Processing..." : "Enroll Now"}</span>
-          </button>
-        )}
-      </div>
+                    {/* Referral button & info — only for available courses and enrolled users */}
+                    {canRefer && (
+                      <div className="space-y-3">
+                        <Button
+                          onClick={handleOpenReferralModal}
+                          disabled={referralModelLoading}
+                          variant="accent"
+                          size="touch"
+                          className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 shadow-lg hover:shadow-xl transition-all duration-200"
+                          title={`Refer Course & Earn ₹${Math.floor(course.price * 0.5)}`}
+                        >
+                          {referralModelLoading ? (
+                            <span className="animate-spin border-2 border-white border-t-transparent rounded-full w-4 h-4" />
+                          ) : (
+                            <>
+                              <Share2 className="w-4 h-4 mr-2 icon-3d" />
+                              <span>Refer & Earn</span>
+                            </>
+                          )}
+                        </Button>
 
-      {/* Referral button & info — only for available courses and enrolled users */}
-      {canRefer && (
-        <div className="space-y-3">
-          <Button
-            onClick={handleOpenReferralModal}
-            disabled={referralModelLoading}
-            variant="accent"
-            size="touch"
-            className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 shadow-lg hover:shadow-xl transition-all duration-200"
-            title={`Refer Course & Earn ₹${Math.floor(course.price * 0.5)}`}
-          >
-            {referralModelLoading ? (
-              <span className="animate-spin border-2 border-white border-t-transparent rounded-full w-4 h-4" />
-            ) : (
-              <>
-                <Share2 className="w-4 h-4 mr-2 icon-3d" />
-                <span>Refer & Earn</span>
-              </>
-            )}
-          </Button>
-
-          <p className="text-center text-sm font-semibold text-green-600">
-            Earn ₹{Math.floor(course.price * 0.5)} on referral
-          </p>
-        </div>
-      )}
-    </>
-  )}
-</div>
-
+                        <p className="text-center text-sm font-semibold text-green-600">
+                          Earn ₹{Math.floor(course.price * 0.5)} on referral
+                        </p>
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
               <div className="border-t border-gray-200 pt-6">
                 <h3 className="font-semibold text-gray-900 mb-4">
                   This course includes:
                 </h3>
                 <div className="space-y-3">
               {  isAvailable &&  <div className="flex items-center space-x-3">
-                    <Clock className="w-5 h-5 text-gray-600" />
-                    <span className="text-gray-700">
+                    {/* <Clock className="w-5 h-5 text-gray-600" /> */}
+                    {/* <span className="text-gray-700">
                       {course.duration} on-demand video
-                    </span>
+                    </span> */}
                   </div>}
                   <div className="flex items-center space-x-3">
                     <Award className="w-5 h-5 text-gray-600" />

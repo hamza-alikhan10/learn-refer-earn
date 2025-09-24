@@ -122,7 +122,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
     <div className="bg-card rounded-xl shadow-md overflow-hidden card-hover border border-border">
       <div className="relative group">
         <img
-          src={`https://csfrwmlgvlznrbcqcveo.supabase.co/storage/v1/object/public/learn-refer-earn/images/${course.image}`}
+          src={course.image}
           alt={course.title}
           className="w-full h-48 sm:h-52 object-cover transition-transform duration-300 group-hover:scale-105"
         />
@@ -167,8 +167,8 @@ const CourseCard: React.FC<CourseCardProps> = ({
             <span>{course.students.toLocaleString()} students</span>
           </div>
           <div className="flex items-center space-x-1">
-            <Clock className="w-4 h-4 icon-3d" />
-            <span>{course.duration}</span>
+            {/* <Clock className="w-4 h-4 icon-3d" />
+            <span>{course.duration}</span> */}
           </div></>}
         </div> 
         <div className="flex flex-col sm:flex-row gap-3">
