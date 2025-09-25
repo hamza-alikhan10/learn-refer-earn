@@ -61,9 +61,7 @@ const Footer: React.FC = () => {
               <p className="text-gray-300 hover:text-blue-400 transition-colors">
                 <a href="mailto:support@learnhub.com">info@earnlabs.in</a>
               </p>
-              <p className="text-gray-300 hover:text-blue-400 transition-colors">
-                <a href="tel:+15551234567">+1 (555) 123-4567</a>
-              </p>
+            
               <div className="flex space-x-4 mt-4">
                 {socialLinks.map((link) => (
                   <a

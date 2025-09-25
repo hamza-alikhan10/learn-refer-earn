@@ -1,6 +1,5 @@
-
 import React from 'react';
-import { Star, Users, Clock, Share2, Eye, BookOpen } from 'lucide-react';
+import { Star, Users, Clock, Share2, Eye, BookOpen, Lock } from 'lucide-react';
 import { Button } from './ui/button';
 import { useNavigate } from "react-router-dom";
 import { useAppSelector, useAppDispatch } from '@/ReduxStore/hooks';
@@ -93,6 +92,9 @@ const CourseCard: React.FC<CourseCardProps> = ({
     }, [userId, checkEnrollment]);
 
     const handleView = () => {
+    // Only allow navigation if course is available
+    if (!isAvailable) return;
+    
     const url = userId 
       ? `/courses/${course.id}?userId=${userId}` 
       : `/courses/${course.id}`;
@@ -110,6 +112,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
       console.warn("User is not enrolled — cannot refer");
       return;
     }
+    if (!isAvailable) return; // Extra safety check
     fetchReferralData(course.id, userId, trigger, dispatch);
   };
 
@@ -119,8 +122,19 @@ const CourseCard: React.FC<CourseCardProps> = ({
 
 
   return (
-    <div className="bg-card rounded-xl shadow-md overflow-hidden card-hover border border-border">
-      <div className="relative group">
+    <div className="bg-card rounded-xl shadow-md overflow-hidden card-hover border border-border relative">
+      {/* Locked Overlay for unavailable courses */}
+      {!isAvailable && (
+        <div className="absolute inset-0 z-10 bg-black/60 backdrop-blur-sm flex flex-col items-center justify-center rounded-xl">
+          <div className="bg-white/10 backdrop-blur-md rounded-full p-6 mb-4">
+            <Lock className="w-12 h-12 text-white" />
+          </div>
+          <h3 className="text-2xl font-bold text-white mb-2">Coming Soon</h3>
+          <p className="text-white/80 text-sm">This course will be available shortly</p>
+        </div>
+      )}
+
+      <div className={`relative group ${!isAvailable ? 'blur-sm' : ''}`}>
         <img
           src={course.image}
           alt={course.title}
@@ -138,7 +152,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
         </div>
       </div>
       
-      <div className="p-4 sm:p-6">
+      <div className={`p-4 sm:p-6 ${!isAvailable ? 'blur-sm pointer-events-none' : ''}`}>
         <div className="flex items-center justify-between mb-3">
           <span className="text-sm font-medium px-3 py-1 bg-accent/20 text-accent rounded-full">
             {course.category}
@@ -172,29 +186,16 @@ const CourseCard: React.FC<CourseCardProps> = ({
           </div></>}
         </div> 
         <div className="flex flex-col sm:flex-row gap-3">
-            {/* View Details button - always visible */}
+            {/* View Details button - only clickable when available */}
             <Button
               onClick={handleView}
               className="flex-1 group"
               size="touch"
+              disabled={!isAvailable}
             >
               <Eye className="w-4 h-4 mr-2 icon-3d" />
               View Details
             </Button>
-
-            {/* If course is NOT available -> Coming soon (always shown for any visitor) */}
-            {!isAvailable && (
-              <div className="space-y-2">
-                <Button 
-                disabled={false} 
-                variant="accent" 
-                size="touch" 
-                className="w-full cursor-default bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 shadow-lg hover:shadow-xl transition-all duration-200" 
-                > 
-                  <span>Comming soon ..</span> 
-                </Button> 
-              </div>
-            )}
 
             {/* If course IS available AND user is enrolled -> show Refer & Earn */}
             {canRefer && (
