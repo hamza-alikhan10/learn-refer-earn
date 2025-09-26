@@ -1,17 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useAppDispatch, useAppSelector } from '@/ReduxStore/hooks';
-import { TrendingUp, Users, DollarSign, ExternalLink, Copy, CheckCircle } from 'lucide-react';
+import { TrendingUp, Users, DollarSign, ExternalLink, Copy, CheckCircle, ChevronDown, ChevronUp, Info, Award, Zap } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { setIsAuthModelOpen } from '@/ReduxStore/features/slices/auth';
 import { useGetDashboardQuery } from '@/ReduxStore/features/api/dashboard';
 import { useNavigate } from 'react-router-dom';
 import { useGetPaymentMethodsMutation } from '@/ReduxStore/features/api/paymentMethods';
 import WithdrawalModal from '@/components/WithdrawalModal';
-
 import { useLazyGetReferralHistoryQuery } from '@/ReduxStore/features/api/history';
 
 const Dashboard = () => {
   const [copiedLink, setCopiedLink] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
+  const [historyLoaded, setHistoryLoaded] = useState(false);
   const { toast } = useToast();
   const dispatch = useAppDispatch();
   const { user, userId, email, username } = useAppSelector((state) => state.auth);
@@ -36,6 +37,11 @@ const Dashboard = () => {
       setModalOpen(true);
     } catch (err) {
       console.error("Failed to fetch payment methods:", err);
+      toast({
+        title: "Error",
+        description: "Failed to load payment methods. Please try again.",
+        variant: "destructive"
+      });
     }
   };
 
@@ -43,7 +49,42 @@ const Dashboard = () => {
     { userId: userId || '' },
     { skip: !userId }
   );
-  console.log("Dashboard data:", dashboardData);
+
+  const handleLoadHistory = () => {
+    if (!userId) {
+      dispatch(setIsAuthModelOpen(true));
+      return;
+    }
+    if (!historyLoaded) {
+      triggerHistory({ userId });
+      setHistoryLoaded(true);
+    }
+    setShowHistory(!showHistory);
+  };
+
+  // Memoized calculations
+  const stats = useMemo(() => {
+    if (!dashboardData) return null;
+
+    const totalReferrals = dashboardData.referrals_primary + dashboardData.enrolled_users_secondary || 0;
+    const primaryEnrolled = dashboardData.enrolled_users_primary ?? 0;
+    const secondaryEnrolled = dashboardData.enrolled_users_secondary ?? 0;
+    const conversionRate = dashboardData.referrals_primary > 0 
+      ? ((primaryEnrolled / dashboardData.referrals_primary) * 100).toFixed(1) 
+      : '0';
+    
+    const nextBonus = Math.ceil(primaryEnrolled / 5) * 5;
+    const bonusProgress = ((primaryEnrolled % 5) / 5) * 100;
+
+    return {
+      totalReferrals,
+      primaryEnrolled,
+      secondaryEnrolled,
+      conversionRate,
+      nextBonus,
+      bonusProgress
+    };
+  }, [dashboardData]);
 
   if (!userId) {
     return (
@@ -78,7 +119,7 @@ const Dashboard = () => {
     );
   }
 
-  if (!dashboardData) {
+  if (!dashboardData || !stats) {
     return null;
   }
 
@@ -98,24 +139,9 @@ const Dashboard = () => {
     });
   };
 
-  const totalReferrals = dashboardData.referrals_primary + dashboardData.enrolled_users_secondary || 0;
-  const primaryReferrals = dashboardData.referrals_primary ?? 0;
-  const secondaryReferrals = dashboardData.referrals_secondary ?? 0;
   const dailyEarnings = dashboardData.earnings_daily ?? 0;
   const weeklyEarnings = dashboardData.earnings_weekly ?? 0;
   const monthlyEarnings = dashboardData.earnings_monthly ?? 0;
-  const primaryEnrolled = dashboardData.enrolled_users_primary ?? 0;
-  const secondaryEnrolled = dashboardData.enrolled_users_secondary ?? 0;
-
-    // Handler to trigger history fetch
-  const handleLoadHistory = () => {
-    if (!userId) {
-      dispatch(setIsAuthModelOpen(true));
-      return;
-    }
-    triggerHistory({ userId });
-  };
-
 
   return (
     <>
@@ -134,285 +160,462 @@ const Dashboard = () => {
         <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTM2IDM0YzAtMS4xMDQtLjg5Ni0yLTItMmgxYzAtMS4xMDQtLjg5Ni0yLTItMnMtMiAuODk2LTIgMnMuODk2IDIgMiAyaC0xYzAgMS4xMDQuODk2IDIgMiAyaC0xYzAgMS4xMDQuODk2IDIgMiAyIi8+PC9nPjwvZz48L3N2Zz4=)', backgroundSize: '30px 30px' }} />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          {/* Header Section - Enhanced */}
           <div className="mb-6 sm:mb-8">
-            <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">
-              Welcome back, {user || username || email}!
-            </h1>
-            <p className="text-gray-400">Track your affiliate marketing progress and referral earnings</p>
-            <div className="mt-2 text-sm text-indigo-400 font-medium flex flex-col sm:flex-row items-start sm:items-center gap-4">
-              <span>Your Referral Code: <span className="bg-indigo-900/50 px-2 py-1 rounded">{dashboardData.referral_code || userId}</span></span>
-              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 w-full sm:w-auto">
-                <input
-                  type="text"
-                  value={referralLink}
-                  readOnly
-                  className="px-3 py-1 border border-indigo-500/50 rounded-md bg-slate-900 text-sm text-gray-300 w-full sm:w-64 mb-2 sm:mb-0"
-                />
-                <div className="flex gap-2 w-full sm:w-auto">
-                  <button
-                    onClick={() => handleCopyLink(referralLink)}
-                    className="group relative flex items-center gap-2 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-500 px-3 py-1 text-xs font-medium text-white transition-all duration-300 hover:from-indigo-600 hover:to-purple-600 w-full sm:w-auto"
-                  >
-                    {copiedLink ? <CheckCircle className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                    Copy
-                  </button>
-                  {/* <button
-                    onClick={() => window.open(referralLink, '_blank')}
-                    className="group relative flex items-center gap-2 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 px-3 py-1 text-xs font-medium text-white transition-all duration-300 hover:from-purple-600 hover:to-pink-600 w-full sm:w-auto"
-                  >
-                    <ExternalLink className="w-4 h-4" />
-                    Visit
-                  </button> */}
+            <div className="flex items-center gap-3 mb-3">
+              <h1 className="text-2xl sm:text-3xl font-bold text-white">
+                Welcome back, {user || username || email}!
+              </h1>
+              <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-emerald-500/20 text-emerald-400 text-xs font-medium">
+                <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                Active
+              </div>
+            </div>
+            <p className="text-gray-400 mb-4">Track your affiliate marketing progress and referral earnings</p>
+            
+            {/* Referral Link Section - Improved */}
+            <div className="bg-slate-900/50 rounded-xl p-4 border border-indigo-500/20">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="bg-indigo-500/20 p-1.5 rounded-lg">
+                  <ExternalLink className="w-4 h-4 text-indigo-400" />
+                </div>
+                <span className="text-sm font-semibold text-indigo-300">Your Referral Link</span>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <div className="flex-1">
+                  <div className="text-xs text-gray-400 mb-1">Referral Code</div>
+                  <div className="bg-slate-950 px-3 py-2 rounded-lg border border-indigo-500/30 font-mono text-indigo-300">
+                    {dashboardData.referral_code || userId}
+                  </div>
+                </div>
+                <div className="flex-[2]">
+                  <div className="text-xs text-gray-400 mb-1">Share Link</div>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={referralLink}
+                      readOnly
+                      className="flex-1 px-3 py-2 border border-indigo-500/30 rounded-lg bg-slate-950 text-sm text-gray-300 font-mono"
+                    />
+                    <button
+                      onClick={() => handleCopyLink(referralLink)}
+                      className="group relative flex items-center gap-2 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-500 px-4 py-2 text-sm font-medium text-white transition-all duration-300 hover:from-indigo-600 hover:to-purple-600 hover:scale-105"
+                    >
+                      {copiedLink ? <CheckCircle className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                      {copiedLink ? 'Copied!' : 'Copy'}
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-8">
-            <div className="group relative flex flex-col rounded-xl bg-slate-950 p-4 shadow-2xl transition-all duration-300 hover:scale-[1.02] hover:shadow-indigo-500/20">
+          {/* Stats Grid - Enhanced with animations */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 sm:mb-8">
+            <div className="group relative flex flex-col rounded-xl bg-slate-950 p-5 shadow-2xl transition-all duration-300 hover:scale-[1.02] hover:shadow-indigo-500/20">
               <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 opacity-20 blur-sm transition-opacity duration-300 group-hover:opacity-30" />
               <div className="absolute inset-px rounded-[11px] bg-slate-950" />
               <div className="relative">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xs sm:text-sm font-medium text-gray-400">Total Earnings</p>
-                    <p className="text-lg sm:text-2xl font-bold text-white">₹{dashboardData.total_earnings.toFixed(0)}</p>
+                <div className="flex items-center justify-between mb-3">
+                  <div className="bg-indigo-500/20 p-3 rounded-xl">
+                    <DollarSign className="w-6 h-6 text-indigo-400" />
                   </div>
-                  <div className="bg-indigo-500/20 p-2 sm:p-3 rounded-full">
-                    <DollarSign className="w-4 h-4 sm:w-6 sm:h-6 text-indigo-400" />
+                  <div className="text-xs text-emerald-400 flex items-center gap-1">
+                    <TrendingUp className="w-3 h-3" />
+                    +{dailyEarnings > 0 ? ((dailyEarnings / dashboardData.total_earnings) * 100).toFixed(0) : 0}%
                   </div>
                 </div>
+                <p className="text-sm font-medium text-gray-400 mb-1">Total Earnings</p>
+                <p className="text-3xl font-bold text-white">₹{dashboardData.total_earnings.toFixed(0)}</p>
               </div>
             </div>
 
-            <div className="group relative flex flex-col rounded-xl bg-slate-950 p-4 shadow-2xl transition-all duration-300 hover:scale-[1.02] hover:shadow-purple-500/20">
+            <div className="group relative flex flex-col rounded-xl bg-slate-950 p-5 shadow-2xl transition-all duration-300 hover:scale-[1.02] hover:shadow-purple-500/20">
               <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-purple-500 via-pink-500 to-indigo-500 opacity-20 blur-sm transition-opacity duration-300 group-hover:opacity-30" />
               <div className="absolute inset-px rounded-[11px] bg-slate-950" />
               <div className="relative">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xs sm:text-sm font-medium text-gray-400">Total Referrals</p>
-                    <p className="text-lg sm:text-2xl font-bold text-white">{totalReferrals}</p>
+                <div className="flex items-center justify-between mb-3">
+                  <div className="bg-purple-500/20 p-3 rounded-xl">
+                    <Users className="w-6 h-6 text-purple-400" />
                   </div>
-                  <div className="bg-purple-500/20 p-2 sm:p-3 rounded-full">
-                    <Users className="w-4 h-4 sm:w-6 sm:h-6 text-purple-400" />
+                  <div className="text-xs text-purple-400 font-medium">
+                    {stats.conversionRate}% rate
                   </div>
                 </div>
+                <p className="text-sm font-medium text-gray-400 mb-1">Total Referrals</p>
+                <p className="text-3xl font-bold text-white">{stats.totalReferrals}</p>
               </div>
             </div>
 
-            <div className="group relative flex flex-col rounded-xl bg-slate-950 p-4 shadow-2xl transition-all duration-300 hover:scale-[1.02] hover:shadow-pink-500/20">
+            <div className="group relative flex flex-col rounded-xl bg-slate-950 p-5 shadow-2xl transition-all duration-300 hover:scale-[1.02] hover:shadow-pink-500/20">
               <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-pink-500 via-indigo-500 to-purple-500 opacity-20 blur-sm transition-opacity duration-300 group-hover:opacity-30" />
               <div className="absolute inset-px rounded-[11px] bg-slate-950" />
               <div className="relative">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xs sm:text-sm font-medium text-gray-400">Primary Referrals</p>
-                    <p className="text-lg sm:text-2xl font-bold text-white">{primaryEnrolled+"/"+primaryReferrals}</p>
+                <div className="flex items-center justify-between mb-3">
+                  <div className="bg-pink-500/20 p-3 rounded-xl">
+                    <TrendingUp className="w-6 h-6 text-pink-400" />
                   </div>
-                  <div className="bg-pink-500/20 p-2 sm:p-3 rounded-full">
-                    <TrendingUp className="w-4 h-4 sm:w-6 sm:h-6 text-pink-400" />
-                  </div>
+                  <div className="text-xs text-pink-400">70% comm.</div>
                 </div>
+                <p className="text-sm font-medium text-gray-400 mb-1">Primary Referrals</p>
+                <p className="text-3xl font-bold text-white">{stats.primaryEnrolled}/{dashboardData.referrals_primary}</p>
               </div>
             </div>
 
-            <div className="group relative flex flex-col rounded-xl bg-slate-950 p-4 shadow-2xl transition-all duration-300 hover:scale-[1.02] hover:shadow-emerald-500/20">
+            <div className="group relative flex flex-col rounded-xl bg-slate-950 p-5 shadow-2xl transition-all duration-300 hover:scale-[1.02] hover:shadow-emerald-500/20">
               <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-emerald-500 via-teal-500 to-green-500 opacity-20 blur-sm transition-opacity duration-300 group-hover:opacity-30" />
               <div className="absolute inset-px rounded-[11px] bg-slate-950" />
               <div className="relative">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xs sm:text-sm font-medium text-gray-400">Secondary Referrals</p>
-                    <p className="text-lg sm:text-2xl font-bold text-white">{secondaryEnrolled+"/"+secondaryReferrals}</p>
+                <div className="flex items-center justify-between mb-3">
+                  <div className="bg-emerald-500/20 p-3 rounded-xl">
+                    <Users className="w-6 h-6 text-emerald-400" />
                   </div>
-                  <div className="bg-emerald-500/20 p-2 sm:p-3 rounded-full">
-                    <Users className="w-4 h-4 sm:w-6 sm:h-6 text-emerald-400" />
-                  </div>
+                  <div className="text-xs text-emerald-400">10% comm.</div>
                 </div>
+                <p className="text-sm font-medium text-gray-400 mb-1">Secondary Referrals</p>
+                <p className="text-3xl font-bold text-white">{stats.secondaryEnrolled}/{dashboardData.referrals_secondary}</p>
               </div>
             </div>
           </div>
 
-          <div className="bg-slate-900/50 rounded-lg shadow-md mb-8 border-none">
+          {/* Main Content Card */}
+          <div className="bg-slate-900/50 rounded-xl shadow-2xl mb-8 border border-slate-800/50">
             <div className="p-4 sm:p-6">
               <div className="space-y-6">
-                <div className="bg-gradient-to-r from-indigo-500/20 to-purple-500/20 rounded-xl p-4 sm:p-6">
-                  <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center space-y-4 lg:space-y-0">
-                    <div>
-                      <h3 className="text-lg font-semibold text-indigo-300">Available Earnings</h3>
-                      <p className="text-2xl sm:text-3xl font-bold text-white">
+                {/* Withdrawal Section - Enhanced */}
+                <div className="bg-gradient-to-br from-indigo-500/20 via-purple-500/20 to-pink-500/20 rounded-xl p-6 border border-indigo-500/20">
+                  <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start gap-6">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="bg-indigo-500/30 p-2 rounded-lg">
+                          <DollarSign className="w-5 h-5 text-indigo-300" />
+                        </div>
+                        <h3 className="text-lg font-semibold text-indigo-200">Available for Withdrawal</h3>
+                      </div>
+                      <p className="text-4xl font-bold text-white mb-2">
                         ₹{dashboardData.available_balance.toFixed(2)}
                       </p>
-                      <p className="text-sm text-indigo-400 mt-1">
-                        {dashboardData.available_balance >= 1000
-                          ? 'Ready for withdrawal'
-                          : `Need ₹${(1000 - dashboardData.available_balance).toFixed(0)} more to withdraw`}
-                      </p>
+                      <div className="flex items-center gap-2">
+                        {dashboardData.available_balance >= 1000 ? (
+                          <div className="flex items-center gap-2 text-emerald-400 text-sm">
+                            <CheckCircle className="w-4 h-4" />
+                            Ready for withdrawal
+                          </div>
+                        ) : (
+                          <>
+                            <div className="flex-1 bg-slate-900/50 rounded-full h-2 overflow-hidden">
+                              <div 
+                                className="bg-gradient-to-r from-indigo-500 to-purple-500 h-full transition-all duration-500"
+                                style={{ width: `${(dashboardData.available_balance / 1000) * 100}%` }}
+                              />
+                            </div>
+                            <span className="text-sm text-indigo-300 whitespace-nowrap">
+                              ₹{(1000 - dashboardData.available_balance).toFixed(0)} more
+                            </span>
+                          </>
+                        )}
+                      </div>
+                      {dashboardData.available_balance < 1000 && (
+                        <p className="text-xs text-gray-400 mt-2">
+                          Minimum withdrawal amount is ₹1000
+                        </p>
+                      )}
                     </div>
                     <button
                       onClick={handleOpen}
                       disabled={paymentMethodLoading || dashboardData.available_balance < 1000}
-                      className={`group relative px-6 py-3 rounded-lg font-semibold transition-all duration-200 w-full sm:w-auto ${
+                      className={`group relative px-6 py-3 rounded-xl font-semibold transition-all duration-300 ${
                         dashboardData.available_balance >= 1000
-                          ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white hover:from-indigo-600 hover:to-purple-600 hover:scale-105'
+                          ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white hover:from-indigo-600 hover:to-purple-600 hover:scale-105 hover:shadow-lg hover:shadow-indigo-500/50'
                           : 'bg-slate-800 text-gray-500 cursor-not-allowed'
                       }`}
                     >
                       {paymentMethodLoading ? (
-                        <span className="animate-spin border-2 border-white border-t-transparent rounded-full w-4 h-4 inline-block" />
+                        <span className="flex items-center gap-2">
+                          <span className="animate-spin border-2 border-white border-t-transparent rounded-full w-4 h-4" />
+                          Loading...
+                        </span>
                       ) : (
-                        <span className="flex items-center justify-center gap-2">
+                        <span className="flex items-center gap-2">
                           Withdraw via UPI
                           <svg className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                           </svg>
                         </span>
                       )}
-                      <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 opacity-0 blur-md transition-all duration-300 group-hover:opacity-20" />
                     </button>
+                  </div>
+
+                  {/* Bonus Progress */}
+                  <div className="mt-6 pt-6 border-t border-indigo-500/20">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <Award className="w-5 h-5 text-yellow-400" />
+                        <span className="text-sm font-medium text-indigo-200">Next Bonus Milestone</span>
+                      </div>
+                      <span className="text-sm text-indigo-300 font-semibold">₹500 at {stats.nextBonus} referrals</span>
+                    </div>
+                    <div className="bg-slate-900/50 rounded-full h-3 overflow-hidden">
+                      <div 
+                        className="bg-gradient-to-r from-yellow-500 to-orange-500 h-full transition-all duration-500"
+                        style={{ width: `${stats.bonusProgress}%` }}
+                      />
+                    </div>
+                    <p className="text-xs text-gray-400 mt-2">
+                      {5 - (stats.primaryEnrolled % 5)} more primary referrals to unlock ₹500 bonus
+                    </p>
                   </div>
                 </div>
 
+                {/* Earnings Overview - Enhanced */}
                 <div>
-                  <h3 className="text-lg font-semibold text-white mb-4">Earnings Overview</h3>
+                  <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                    <Zap className="w-5 h-5 text-indigo-400" />
+                    Earnings Overview
+                  </h3>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                    <div className="group relative flex flex-col rounded-xl bg-slate-950 p-4 shadow-2xl transition-all duration-300 hover:scale-[1.02] hover:shadow-emerald-500/20">
-                      <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-emerald-500 via-teal-500 to-green-500 opacity-20 blur-sm transition-opacity duration-300 group-hover:opacity-30" />
+                    <div className="group relative flex flex-col rounded-xl bg-slate-950 p-4 shadow-xl transition-all duration-300 hover:scale-[1.02]">
+                      <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 opacity-20 blur-sm transition-opacity duration-300 group-hover:opacity-30" />
                       <div className="absolute inset-px rounded-[11px] bg-slate-950" />
                       <div className="relative">
-                        <p className="text-xs font-medium text-gray-400">Daily Earnings</p>
-                        <p className="text-lg font-bold text-white">₹{dailyEarnings.toFixed(2)}</p>
+                        <p className="text-xs font-medium text-gray-400 mb-1">Today</p>
+                        <p className="text-2xl font-bold text-white">₹{dailyEarnings.toFixed(2)}</p>
+                        <div className="mt-2 flex items-center gap-1 text-xs text-emerald-400">
+                          <TrendingUp className="w-3 h-3" />
+                          <span>Daily earnings</span>
+                        </div>
                       </div>
                     </div>
-                    <div className="group relative flex flex-col rounded-xl bg-slate-950 p-4 shadow-2xl transition-all duration-300 hover:scale-[1.02] hover:shadow-teal-500/20">
-                      <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-teal-500 via-emerald-500 to-green-500 opacity-20 blur-sm transition-opacity duration-300 group-hover:opacity-30" />
+                    <div className="group relative flex flex-col rounded-xl bg-slate-950 p-4 shadow-xl transition-all duration-300 hover:scale-[1.02]">
+                      <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-teal-500 to-cyan-500 opacity-20 blur-sm transition-opacity duration-300 group-hover:opacity-30" />
                       <div className="absolute inset-px rounded-[11px] bg-slate-950" />
                       <div className="relative">
-                        <p className="text-xs font-medium text-gray-400">Weekly Earnings</p>
-                        <p className="text-lg font-bold text-white">₹{weeklyEarnings.toFixed(2)}</p>
+                        <p className="text-xs font-medium text-gray-400 mb-1">This Week</p>
+                        <p className="text-2xl font-bold text-white">₹{weeklyEarnings.toFixed(2)}</p>
+                        <div className="mt-2 flex items-center gap-1 text-xs text-teal-400">
+                          <TrendingUp className="w-3 h-3" />
+                          <span>Last 7 days</span>
+                        </div>
                       </div>
                     </div>
-                    <div className="group relative flex flex-col rounded-xl bg-slate-950 p-4 shadow-2xl transition-all duration-300 hover:scale-[1.02] hover:shadow-green-500/20">
-                      <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-green-500 via-teal-500 to-emerald-500 opacity-20 blur-sm transition-opacity duration-300 group-hover:opacity-30" />
+                    <div className="group relative flex flex-col rounded-xl bg-slate-950 p-4 shadow-xl transition-all duration-300 hover:scale-[1.02]">
+                      <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-500 opacity-20 blur-sm transition-opacity duration-300 group-hover:opacity-30" />
                       <div className="absolute inset-px rounded-[11px] bg-slate-950" />
                       <div className="relative">
-                        <p className="text-xs font-medium text-gray-400">Monthly Earnings</p>
-                        <p className="text-lg font-bold text-white">₹{monthlyEarnings.toFixed(2)}</p>
+                        <p className="text-xs font-medium text-gray-400 mb-1">This Month</p>
+                        <p className="text-2xl font-bold text-white">₹{monthlyEarnings.toFixed(2)}</p>
+                        <div className="mt-2 flex items-center gap-1 text-xs text-cyan-400">
+                          <TrendingUp className="w-3 h-3" />
+                          <span>Last 30 days</span>
+                        </div>
                       </div>
                     </div>
                   </div>
 
-                  <div className="group relative flex flex-col rounded-xl bg-slate-950 p-4 shadow-2xl transition-all duration-300 hover:scale-[1.02] hover:shadow-indigo-500/20">
+                  {/* Earnings Trend Chart - Enhanced */}
+                  <div className="group relative flex flex-col rounded-xl bg-slate-950 p-6 shadow-xl transition-all duration-300 hover:scale-[1.01]">
                     <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 opacity-20 blur-sm transition-opacity duration-300 group-hover:opacity-30" />
                     <div className="absolute inset-px rounded-[11px] bg-slate-950" />
                     <div className="relative">
-               <>
-                             <div className="mb-4 flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-purple-500">
-                            <svg className="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                            </svg>
+                      <div className="mb-4 flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500 shadow-lg">
+                            <TrendingUp className="h-5 w-5 text-white" />
                           </div>
-                          <h3 className="text-sm font-semibold text-white">Earnings Trend</h3>
+                          <div>
+                            <h3 className="text-base font-semibold text-white">Earnings Trend</h3>
+                            <p className="text-xs text-gray-400">Visual performance overview</p>
+                          </div>
                         </div>
-                        <span className="flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-1 text-xs font-medium text-emerald-500">
-                          <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                        <span className="flex items-center gap-1 rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-400">
+                          <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
                           Live
                         </span>
                       </div>
                       
-                      <div className="mb-4 h-24 w-full overflow-hidden rounded-lg bg-slate-900/50 p-3">
-                        <div className="flex h-full w-full items-end justify-between gap-1">
-                          <div className="h-[40%] w-3 rounded-sm bg-indigo-500/30 group-hover:animate-pulse">
-                            <div className="h-[60%] w-full rounded-sm bg-indigo-500 transition-all duration-300 group-hover:h-[70%]" style={{ height: `${(dailyEarnings / Math.max(dailyEarnings, weeklyEarnings, monthlyEarnings) || 1) * 100}%` }} />
-                          </div>
-                          <div className="h-[60%] w-3 rounded-sm bg-indigo-500/30 group-hover:animate-pulse">
-                            <div className="h-[40%] w-full rounded-sm bg-indigo-500 transition-all duration-300 group-hover:h-[50%]" style={{ height: `${(weeklyEarnings / Math.max(dailyEarnings, weeklyEarnings, monthlyEarnings) || 1) * 100}%` }} />
-                          </div>
-                          <div className="h-[75%] w-3 rounded-sm bg-indigo-500/30 group-hover:animate-pulse">
-                            <div className="h-[80%] w-full rounded-sm bg-indigo-500 transition-all duration-300 group-hover:h-[90%]" style={{ height: `${(monthlyEarnings / Math.max(dailyEarnings, weeklyEarnings, monthlyEarnings) || 1) * 100}%` }} />
-                          </div>
+                      <div className="mb-6 h-32 w-full overflow-hidden rounded-xl bg-slate-900/50 p-4">
+                        <div className="flex h-full w-full items-end justify-between gap-2">
+                          {[dailyEarnings, weeklyEarnings, monthlyEarnings].map((value, idx) => {
+                            const maxValue = Math.max(dailyEarnings, weeklyEarnings, monthlyEarnings) || 1;
+                            const height = (value / maxValue) * 100;
+                            const colors = ['from-emerald-500 to-teal-500', 'from-teal-500 to-cyan-500', 'from-cyan-500 to-blue-500'];
+                            
+                            return (
+                              <div key={idx} className="flex-1 h-full flex flex-col justify-end">
+                                <div 
+                                  className={`w-full bg-gradient-to-t ${colors[idx]} rounded-t-lg transition-all duration-700 hover:opacity-80`}
+                                  style={{ height: `${height}%` }}
+                                />
+                              </div>
+                            );
+                          })}
                         </div>
                       </div>
                       
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-sm">
-                        <div className="text-gray-400">Today Earnings: ₹{dailyEarnings.toFixed(2)}</div>
-                        <div className="text-gray-400">Last Weekly Earnings: ₹{weeklyEarnings.toFixed(2)}</div>
-                        <div className="text-gray-400">Monthly Earnings: ₹{monthlyEarnings.toFixed(2)}</div>
+                      <div className="grid grid-cols-3 gap-4 text-sm mb-6">
+                        <div className="text-center p-2 rounded-lg bg-emerald-500/10">
+                          <div className="text-emerald-400 font-semibold">₹{dailyEarnings.toFixed(2)}</div>
+                          <div className="text-gray-400 text-xs">Daily</div>
+                        </div>
+                        <div className="text-center p-2 rounded-lg bg-teal-500/10">
+                          <div className="text-teal-400 font-semibold">₹{weeklyEarnings.toFixed(2)}</div>
+                          <div className="text-gray-400 text-xs">Weekly</div>
+                        </div>
+                        <div className="text-center p-2 rounded-lg bg-cyan-500/10">
+                          <div className="text-cyan-400 font-semibold">₹{monthlyEarnings.toFixed(2)}</div>
+                          <div className="text-gray-400 text-xs">Monthly</div>
+                        </div>
                       </div>
-               </>
 
-
-                      <div className="mt-4 w-full">
-                        <button type= "button" disabled={!userId || historyLoading}  onClick={handleLoadHistory} className="flex  items-center gap-2">
-                          <span className="text-xs font-medium text-gray-400">Last 30 days</span>
-                        {historyLoading ? 
-                          <svg className="h-4 w-4 animate-spin text-gray-400" viewBox="0 0 24 24" fill="none" role="status" aria-hidden="true" >
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
-                          </svg>
-                          :
-                          <svg className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                          </svg>}
+                      {/* History Toggle Button */}
+                      <div className="w-full border-t border-slate-800 pt-4">
+                        <button 
+                          type="button" 
+                          disabled={!userId || historyLoading}  
+                          onClick={handleLoadHistory} 
+                          className="w-full flex items-center justify-between px-4 py-3 rounded-lg bg-slate-900/50 hover:bg-slate-800/50 transition-colors group"
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="bg-indigo-500/20 p-2 rounded-lg">
+                              <Info className="w-4 h-4 text-indigo-400" />
+                            </div>
+                            <div className="text-left">
+                              <span className="text-sm font-medium text-gray-300">Transaction History</span>
+                              <p className="text-xs text-gray-500">Last 30 days activity</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            {historyLoading && (
+                              <svg className="h-4 w-4 animate-spin text-indigo-400" viewBox="0 0 24 24" fill="none">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                              </svg>
+                            )}
+                            {showHistory ? (
+                              <ChevronUp className="h-5 w-5 text-gray-400 group-hover:text-indigo-400 transition-colors" />
+                            ) : (
+                              <ChevronDown className="h-5 w-5 text-gray-400 group-hover:text-indigo-400 transition-colors" />
+                            )}
+                          </div>
                         </button>
 
-                        {/* <button className="flex items-center gap-1 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-500 px-3 py-1 text-xs font-medium text-white transition-all duration-300 hover:from-indigo-600 hover:to-purple-600">
-                          View Details
-                          <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                          </svg>
-                        </button> */}
-
-                        {/* History content */}
-                       <div className="mt-4 w-full overflow-x-auto scrollbar-hide">
-                          {historyLoading && (
-                            <div className="text-sm text-gray-500 text-center">Loading history…</div>
-                          )}
-
+                        {/* History Content with smooth transition */}
+                        <div className={`overflow-hidden transition-all duration-300 ${showHistory ? 'max-h-[2000px] opacity-100 mt-4' : 'max-h-0 opacity-0'}`}>
                           {historyIsError && (
-                            <div className="text-sm text-red-600 text-center">
-                              Error loading history: {String((historyError as any)?.data ?? (historyError as any)?.error ?? historyError)}
+                            <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4 text-center">
+                              <p className="text-sm text-red-400">
+                                Error loading history: {String((historyError as any)?.data ?? (historyError as any)?.error ?? historyError)}
+                              </p>
                             </div>
                           )}
 
                           {!historyLoading && historyData && (
-                            <>
-                              <div className="text-sm text-gray-400 mb-2 text-center">
-                                Showing <strong>{historyData.earnings_count}</strong> events since{" "}
-                                <strong>{new Date(historyData.since).toLocaleString()}</strong>
+                            <div className="space-y-4">
+                              <div className="bg-indigo-500/10 border border-indigo-500/20 rounded-lg p-4">
+                                <div className="flex items-center justify-between">
+                                  <div className="text-sm text-indigo-300">
+                                    <strong>{historyData.earnings_count}</strong> transactions found
+                                  </div>
+                                  <div className="text-xs text-gray-400">
+                                    Since {new Date(historyData.since).toLocaleDateString()}
+                                  </div>
+                                </div>
                               </div>
 
-                              {/* BONUS TABLE: show only if there are bonuses */}
+                              {/* Bonuses Table */}
                               {historyData.bonuses && historyData.bonuses.length > 0 && (
-                                <div className="mb-4 w-full">
-                                  <p className="text-sm text-gray-400 mb-2 text-left">Bonus History</p>
-                                  <table className="min-w-max border-collapse border w-full border-white text-sm text-gray-200 mb-4">
+                                <div className="bg-slate-900/50 rounded-lg p-4 border border-yellow-500/20">
+                                  <div className="flex items-center gap-2 mb-3">
+                                    <Award className="w-5 h-5 text-yellow-400" />
+                                    <h4 className="text-sm font-semibold text-yellow-300">Bonus History</h4>
+                                  </div>
+                                  <div className="overflow-x-auto">
+                                    <table className="w-full text-sm">
+                                      <thead>
+                                        <tr className="border-b border-slate-700">
+                                          <th className="text-left py-2 px-3 text-gray-400 font-medium">#</th>
+                                          <th className="text-left py-2 px-3 text-gray-400 font-medium">Milestone</th>
+                                          <th className="text-left py-2 px-3 text-gray-400 font-medium">Amount</th>
+                                          <th className="text-left py-2 px-3 text-gray-400 font-medium">Status</th>
+                                          <th className="text-left py-2 px-3 text-gray-400 font-medium">Date</th>
+                                        </tr>
+                                      </thead>
+                                      <tbody>
+                                        {historyData.bonuses.map((b, idx) => (
+                                          <tr key={b.bonus_id} className="border-b border-slate-800 hover:bg-slate-800/50 transition-colors">
+                                            <td className="py-3 px-3 text-gray-300">{idx + 1}</td>
+                                            <td className="py-3 px-3 text-gray-300">{b.milestone_count ?? "-"}</td>
+                                            <td className="py-3 px-3">
+                                              <span className="text-yellow-400 font-semibold">
+                                                ₹{typeof b.bonus_amount === "number" ? b.bonus_amount.toFixed(2) : "-"}
+                                              </span>
+                                            </td>
+                                            <td className="py-3 px-3">
+                                              <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                                b.status === 'credited' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-slate-700 text-gray-400'
+                                              }`}>
+                                                {b.status ?? "-"}
+                                              </span>
+                                            </td>
+                                            <td className="py-3 px-3 text-gray-400 text-xs">
+                                              {b.created_at ? new Date(b.created_at).toLocaleDateString() : "-"}
+                                            </td>
+                                          </tr>
+                                        ))}
+                                      </tbody>
+                                    </table>
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* Earnings Table */}
+                              <div className="bg-slate-900/50 rounded-lg p-4 border border-indigo-500/20">
+                                <div className="flex items-center gap-2 mb-3">
+                                  <DollarSign className="w-5 h-5 text-indigo-400" />
+                                  <h4 className="text-sm font-semibold text-indigo-300">Earnings History</h4>
+                                </div>
+                                <div className="overflow-x-auto">
+                                  <table className="w-full text-sm">
                                     <thead>
-                                      <tr className="border border-gray-500 ">
-                                        <th className="border border-gray-500 px-2 py-1 text-left">No.</th>
-                                        <th className="border border-gray-500 px-2 py-1 text-left">Milestone</th>
-                                        <th className="border border-gray-500  px-2 py-1 text-left">Amount</th>
-                                        <th className="border border-gray-500  px-2 py-1 text-left">Status</th>
-                                        <th className="border border-gray-500  px-2 py-1 text-left">Time</th>
+                                      <tr className="border-b border-slate-700">
+                                        <th className="text-left py-2 px-3 text-gray-400 font-medium">#</th>
+                                        <th className="text-left py-2 px-3 text-gray-400 font-medium">User</th>
+                                        <th className="text-left py-2 px-3 text-gray-400 font-medium">Level</th>
+                                        <th className="text-left py-2 px-3 text-gray-400 font-medium">Course</th>
+                                        <th className="text-left py-2 px-3 text-gray-400 font-medium">Price</th>
+                                        <th className="text-left py-2 px-3 text-gray-400 font-medium">Earnings</th>
+                                        <th className="text-left py-2 px-3 text-gray-400 font-medium">Date</th>
                                       </tr>
                                     </thead>
                                     <tbody>
-                                      {historyData.bonuses.map((b, idx) => {
-                                        const milestone = b.milestone_count ?? "-";
-                                        const amount = typeof b.bonus_amount === "number" ? `₹${b.bonus_amount.toFixed(2)}` : "-";
-                                        const time = b.created_at ?? null;
-
+                                      {historyData.history.map((h, idx) => {
+                                        const user = h.buyer_display_name ?? h.buyer_username ?? h.buyer_email ?? "Unknown user";
+                                        const time = h.bought_at ?? h.created_at ?? null;
+                                        
                                         return (
-                                          <tr key={b.bonus_id} className="border border-gray-500 ">
-                                            <td className="border border-gray-500  px-2 py-1">{idx + 1}</td>
-                                            <td className="border border-gray-500  px-2 py-1">{milestone}</td>
-                                            <td className="border border-gray-500  px-2 py-1">{amount}</td>
-                                            <td className="border border-gray-500  px-2 py-1">{b.status ?? "-"}</td>
-                                            <td className="border border-gray-500  px-2 py-1">
-                                              {time ? new Date(time).toLocaleString() : "-"}
+                                          <tr key={h.referral_earning_id} className="border-b border-slate-800 hover:bg-slate-800/50 transition-colors">
+                                            <td className="py-3 px-3 text-gray-300">{idx + 1}</td>
+                                            <td className="py-3 px-3 text-gray-300 max-w-[150px] truncate">{user}</td>
+                                            <td className="py-3 px-3">
+                                              <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                                h.referral_level === 1 || String(h.referral_level).toLowerCase() === 'primary'
+                                                  ? 'bg-pink-500/20 text-pink-400' 
+                                                  : 'bg-emerald-500/20 text-emerald-400'
+                                              }`}>
+                                                {h.referral_level === 1 ? 'primary' : h.referral_level === 2 ? 'secondary' : h.referral_level ?? "-"}
+                                              </span>
+                                            </td>
+                                            <td className="py-3 px-3 text-gray-300 max-w-[200px] truncate">{h.course_title ?? "-"}</td>
+                                            <td className="py-3 px-3 text-gray-400">
+                                              {h.course_price !== null && typeof h.course_price === "number" ? `₹${h.course_price}` : "-"}
+                                            </td>
+                                            <td className="py-3 px-3">
+                                              <span className="text-emerald-400 font-semibold">
+                                                {typeof h.commission_amount === "number" ? `₹${h.commission_amount.toFixed(2)}` : "-"}
+                                              </span>
+                                            </td>
+                                            <td className="py-3 px-3 text-gray-400 text-xs">
+                                              {time ? new Date(time).toLocaleDateString() : "unknown"}
                                             </td>
                                           </tr>
                                         );
@@ -420,43 +623,8 @@ const Dashboard = () => {
                                     </tbody>
                                   </table>
                                 </div>
-                              )}
-                              <p className="text-sm text-gray-400 mb-2 text-left">Earnings History</p>
-                              {/* HISTORY / EARNINGS TABLE (unchanged layout, only uses updated count variable) */}
-                              <table className="min-w-max w-full border-collapse border border-white text-sm text-gray-200">
-                                <thead>
-                                  <tr className="border border-gray-500">
-                                    <th className="border border-gray-500 px-2 py-1 text-left">No.</th>
-                                    <th className="border border-gray-500 px-2 py-1 text-left">User</th>
-                                    <th className="border border-gray-500 px-2 py-1 text-left">Level</th>
-                                    <th className="border border-gray-500 px-2 py-1 text-left">Course</th>
-                                    <th className="border border-gray-500 px-2 py-1 text-left">Price</th>
-                                    <th className="border border-gray-500 px-2 py-1 text-left">Earnings</th>
-                                    <th className="border border-gray-500 px-2 py-1 text-left">Time</th>
-                                  </tr>
-                                </thead>
-                                <tbody>
-                                  {historyData.history.map((h, idx) => {
-                                    const user = h.buyer_display_name ?? h.buyer_username ?? h.buyer_email ?? "Unknown user";
-                                    const price = h.course_price !== null && typeof h.course_price === "number" ? `₹${h.course_price}` : "-";
-                                    const earnings = typeof h.commission_amount === "number" ? `₹${h.commission_amount.toFixed(2)}` : "-";
-                                    const time = h.bought_at ?? h.created_at ?? null; // fallback to created_at if bought_at missing
-
-                                    return (
-                                      <tr key={h.referral_earning_id} className="border border-gray-500">
-                                        <td className="border border-gray-500 px-2 py-1">{idx + 1}</td>
-                                        <td className="border border-gray-500 px-2 py-1">{user}</td>
-                                        <td className="border border-gray-500 px-2 py-1">{h.referral_level ?? "-"}</td>
-                                        <td className="border border-gray-500 px-2 py-1">{h.course_title ?? "-"}</td>
-                                        <td className="border border-gray-500 px-2 py-1">{price}</td>
-                                        <td className="border border-gray-500 px-2 py-1">{earnings}</td>
-                                        <td className="border border-gray-500 px-2 py-1">{time ? new Date(time).toLocaleString() : "unknown"}</td>
-                                      </tr>
-                                    );
-                                  })}
-                                </tbody>
-                              </table>
-                            </>
+                              </div>
+                            </div>
                           )}
                         </div>
                       </div>
@@ -464,14 +632,43 @@ const Dashboard = () => {
                   </div>
                 </div>
 
-                <div className="bg-indigo-900/50 rounded-lg p-4">
-                  <h4 className="font-semibold text-indigo-300 mb-2">How It Works</h4>
-                  <ul className="text-sm text-indigo-200 space-y-1">
-                    <li>• Generate referral links and share</li>
-                    <li>• Earn 50% commission on direct referrals + 10% on second-level</li>
-                    <li>• Get ₹500 bonus for every 5 successful referrals</li>
-                    <li>• Minimum withdrawal: ₹1000</li>
-                  </ul>
+                {/* How It Works - Enhanced */}
+                <div className="bg-gradient-to-br from-indigo-900/30 to-purple-900/30 rounded-xl p-6 border border-indigo-500/20">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="bg-indigo-500/20 p-2 rounded-lg">
+                      <Info className="w-5 h-5 text-indigo-400" />
+                    </div>
+                    <h4 className="font-semibold text-indigo-200 text-lg">How It Works</h4>
+                  </div>
+                  <div className="grid sm:grid-cols-3 gap-4">
+                    <div className="bg-slate-900/50 rounded-lg p-4 border border-indigo-500/10">
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="bg-indigo-500/20 p-1.5 rounded">
+                          <span className="text-indigo-300 text-sm font-bold">1</span>
+                        </div>
+                        <h5 className="text-indigo-200 font-medium text-sm">Share Link</h5>
+                      </div>
+                      <p className="text-xs text-gray-400">Generate and share your unique referral link with friends</p>
+                    </div>
+                    <div className="bg-slate-900/50 rounded-lg p-4 border border-purple-500/10">
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="bg-purple-500/20 p-1.5 rounded">
+                          <span className="text-purple-300 text-sm font-bold">2</span>
+                        </div>
+                        <h5 className="text-purple-200 font-medium text-sm">Earn Commission</h5>
+                      </div>
+                      <p className="text-xs text-gray-400">Get up to 70% on direct + 10% on secondary referrals</p>
+                    </div>
+                    <div className="bg-slate-900/50 rounded-lg p-4 border border-pink-500/10">
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="bg-pink-500/20 p-1.5 rounded">
+                          <span className="text-pink-300 text-sm font-bold">3</span>
+                        </div>
+                        <h5 className="text-pink-200 font-medium text-sm">Get Bonuses</h5>
+                      </div>
+                      <p className="text-xs text-gray-400">Unlock ₹500 bonus for every 5 successful referrals</p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
