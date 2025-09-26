@@ -294,10 +294,10 @@ const CourseDetailsPage: React.FC = () => {
                   </span>
                 </div>
             {  isAvailable &&  <>
-                  <div className="flex items-center space-x-2">
+                  {/* <div className="flex items-center space-x-2">
                     <Clock className="w-5 h-5" />
                     <span>{course.duration}</span>
-                  </div>
+                  </div> */}
                   <div className="flex items-center space-x-2">
                     <Users className="w-5 h-5" />
                     <span>{course.total_students.toLocaleString()} students</span>
