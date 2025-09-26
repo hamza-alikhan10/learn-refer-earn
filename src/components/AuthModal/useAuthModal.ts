@@ -73,7 +73,7 @@ useEffect(() => {
           description: "You are signed in 🎉",
         });
 
-        navigate("/dashboard");
+        // navigate("/dashboard");
       }
 
       if (event === "SIGNED_OUT") {
