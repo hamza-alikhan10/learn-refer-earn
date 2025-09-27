@@ -207,14 +207,14 @@ const handleSignUp = async () => {
 
       toast({
         title: "Account Created!",
-        description: "Welcome to AffiliateHub 🎉 Redirecting to dashboard...",
+        description: "Welcome to AffiliateHub 🎉 ",
       });
 
       dispatch(setIsAuthModelOpen(!isAuthModelOpen))
 
       //  Clear password after signup (security best practice)
       dispatch(setField({ key: "password", value: "" }));
-      navigate("/dashboard");
+      navigate("/course-page");
     }
   } catch (e: any) {
     const message = e?.message || "An error occurred during signup";

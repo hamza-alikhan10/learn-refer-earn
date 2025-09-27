@@ -7,6 +7,7 @@ import { Share2, MessageCircle, Users, Instagram, Facebook, Download, Copy, Chec
 import flyerMockup from '@/assets/flyer-mockup.png';
 import socialTemplate from '@/assets/social-template.png';
 import motivationalflyer from '@/assets/motivational-flyer.png'
+import explainflyer from '@/assets/explain-flyer.png'
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 
@@ -90,15 +91,15 @@ const EarnLabsPromo = () => {
       downloads: 67,
       gradient: 'from-emerald-500 to-teal-500'
     },
-    // {
-    //   id: 4,
-    //   title: 'Success Story Template',
-    //   description: 'Share inspiring student achievements',
-    //   image: socialTemplate,
-    //   caption: '⭐ Join 50,000+ students who transformed their careers with EarnLabs! Master new skills, earn from referrals, and unlock your potential. Your success story starts here! 🎓 Learn more: earnlabs.com #SuccessStory #CareerGrowth',
-    //   downloads: 745,
-    //   gradient: 'from-blue-500 to-cyan-500'
-    // }
+    {
+      id: 4,
+      title: 'Starting Explaination Template',
+      description: 'Share inspiring student achievements',
+      image: explainflyer,
+      caption: '🚀 Affiliate marketing seekho aur EarnLabs ke saath earn karo!💰 Direct referrals pe 50% — Earning half-half: *half aapka, half hamara* , half-half hardwork! ➕ Extra 5% income: Agar aapke refer kiye bande ne kisi aur ko refer kiya aur usne ₹1000 earn kiya → aapko usme se ₹50 milega! 📈 Future courses pe 60–70% commission — launching soon! 👉 Content & strategy hum denge, aapko bas refer karna hai. #SuccessStory #EarnLabs #CareerGrowth',
+      downloads: 145,
+      gradient: 'from-blue-500 to-cyan-500'
+    }
   ];
 
   const getReferralLink = () => {

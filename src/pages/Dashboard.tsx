@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useAppDispatch, useAppSelector } from '@/ReduxStore/hooks';
-import { TrendingUp, Users, DollarSign, ExternalLink, Copy, CheckCircle, ChevronDown, ChevronUp, Info, Award, Zap } from 'lucide-react';
+import { TrendingUp, Users, DollarSign, ExternalLink, Copy, CheckCircle, ChevronDown, ChevronUp, Info, Award, Zap, Megaphone, MessageCircle, Send } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { setIsAuthModelOpen } from '@/ReduxStore/features/slices/auth';
 import { useGetDashboardQuery } from '@/ReduxStore/features/api/dashboard';
@@ -62,7 +62,6 @@ const Dashboard = () => {
     setShowHistory(!showHistory);
   };
 
-  // Memoized calculations
   const stats = useMemo(() => {
     if (!dashboardData) return null;
 
@@ -139,6 +138,18 @@ const Dashboard = () => {
     });
   };
 
+  const handleShareWhatsApp = () => {
+    const message = `Affiliate marketing seekho aur EarnLabs ke saath earn karo! 💰 Direct referrals pe 50% — Earning half-half: half aapka, half hamara, half-half hardwork! ➕ Saath hi, extra 5% income bhi milega—agar aapke refer kiye bande ne kisi aur ko refer kiya aur usne ₹1000 earn kiya, to aapko usme se ₹50 milega. 📈 Future courses pe 60–70% commission bhi milne wala hai jo jaldi launch ho rahe hain. 👉 Content aur strategy hum denge, aapko sirf refer karna hai! Use my referral link: ${referralLink}`;
+    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank');
+  };
+
+  const handleShareTelegram = () => {
+    const message = `Affiliate marketing seekho aur EarnLabs ke saath earn karo! 💰 Direct referrals pe 50% — Earning half-half: half aapka, half hamara, half-half hardwork! ➕ Saath hi, extra 5% income bhi milega—agar aapke refer kiye bande ne kisi aur ko refer kiya aur usne ₹1000 earn kiya, to aapko usme se ₹50 milega. 📈 Future courses pe 60–70% commission bhi milne wala hai jo jaldi launch ho rahe hain. 👉 Content aur strategy hum denge, aapko sirf refer karna hai! Use my referral link: ${referralLink}`;
+    const telegramUrl = `https://t.me/share/url?url=${encodeURIComponent(referralLink)}&text=${encodeURIComponent(message)}`;
+    window.open(telegramUrl, '_blank');
+  };
+
   const dailyEarnings = dashboardData.earnings_daily ?? 0;
   const weeklyEarnings = dashboardData.earnings_weekly ?? 0;
   const monthlyEarnings = dashboardData.earnings_monthly ?? 0;
@@ -160,7 +171,6 @@ const Dashboard = () => {
         <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTM2IDM0YzAtMS4xMDQtLjg5Ni0yLTItMmgxYzAtMS4xMDQtLjg5Ni0yLTItMnMtMiAuODk2LTIgMnMuODk2IDIgMiAyaC0xYzAgMS4xMDQuODk2IDIgMiAyaC0xYzAgMS4xMDQuODk2IDIgMiAyIi8+PC9nPjwvZz48L3N2Zz4=)', backgroundSize: '30px 30px' }} />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          {/* Header Section - Enhanced */}
           <div className="mb-6 sm:mb-8">
             <div className="flex items-center gap-3 mb-3">
               <h1 className="text-2xl sm:text-3xl font-bold text-white">
@@ -171,9 +181,21 @@ const Dashboard = () => {
                 Active
               </div>
             </div>
-            <p className="text-gray-400 mb-4">Track your affiliate marketing progress and referral earnings</p>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+              <p className="text-gray-400">Track your affiliate marketing progress and referral earnings</p>
+              
+              <button
+                onClick={() => navigate('/earnlabs-promo')}
+                className="group relative flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-orange-500 to-pink-500 text-white font-semibold transition-all duration-300 hover:from-orange-600 hover:to-pink-600 hover:scale-105 hover:shadow-lg hover:shadow-orange-500/50 sm:w-auto w-full"
+              >
+                <Megaphone className="w-4 h-4" />
+                <span>View Promotions</span>
+                <svg className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            </div>
             
-            {/* Referral Link Section - Improved */}
             <div className="bg-slate-900/50 rounded-xl p-4 border border-indigo-500/20">
               <div className="flex items-center gap-2 mb-3">
                 <div className="bg-indigo-500/20 p-1.5 rounded-lg">
@@ -181,36 +203,44 @@ const Dashboard = () => {
                 </div>
                 <span className="text-sm font-semibold text-indigo-300">Your Referral Link</span>
               </div>
-              <div className="flex flex-col sm:flex-row gap-3">
-                <div className="flex-1">
-                  <div className="text-xs text-gray-400 mb-1">Referral Code</div>
-                  <div className="bg-slate-950 px-3 py-2 rounded-lg border border-indigo-500/30 font-mono text-indigo-300">
-                    {dashboardData.referral_code || userId}
-                  </div>
+              <div className="flex flex-col gap-3">
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={referralLink}
+                    readOnly
+                    className="flex-1 px-3 py-2 border border-indigo-500/30 rounded-lg bg-slate-950 text-sm text-gray-300 font-mono"
+                  />
+                  <button
+                    onClick={() => handleCopyLink(referralLink)}
+                    className="group relative flex items-center gap-2 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-500 px-4 py-2 text-sm font-medium text-white transition-all duration-300 hover:from-indigo-600 hover:to-purple-600 hover:scale-105"
+                  >
+                    {copiedLink ? <CheckCircle className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                    {copiedLink ? 'Copied!' : 'Copy'}
+                  </button>
                 </div>
-                <div className="flex-[2]">
-                  <div className="text-xs text-gray-400 mb-1">Share Link</div>
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      value={referralLink}
-                      readOnly
-                      className="flex-1 px-3 py-2 border border-indigo-500/30 rounded-lg bg-slate-950 text-sm text-gray-300 font-mono"
-                    />
-                    <button
-                      onClick={() => handleCopyLink(referralLink)}
-                      className="group relative flex items-center gap-2 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-500 px-4 py-2 text-sm font-medium text-white transition-all duration-300 hover:from-indigo-600 hover:to-purple-600 hover:scale-105"
-                    >
-                      {copiedLink ? <CheckCircle className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                      {copiedLink ? 'Copied!' : 'Copy'}
-                    </button>
-                  </div>
+                
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-xs text-gray-400">Share via:</span>
+                  <button
+                    onClick={handleShareWhatsApp}
+                    className="group relative flex items-center gap-2 rounded-lg bg-[#25D366] px-4 py-2 text-sm font-medium text-white transition-all duration-300 hover:bg-[#20BA5A] hover:scale-105"
+                  >
+                    <MessageCircle className="w-4 h-4" />
+                    WhatsApp
+                  </button>
+                  <button
+                    onClick={handleShareTelegram}
+                    className="group relative flex items-center gap-2 rounded-lg bg-[#0088cc] px-4 py-2 text-sm font-medium text-white transition-all duration-300 hover:bg-[#006699] hover:scale-105"
+                  >
+                    <Send className="w-4 h-4" />
+                    Telegram
+                  </button>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Stats Grid - Enhanced with animations */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 sm:mb-8">
             <div className="group relative flex flex-col rounded-xl bg-slate-950 p-5 shadow-2xl transition-all duration-300 hover:scale-[1.02] hover:shadow-indigo-500/20">
               <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 opacity-20 blur-sm transition-opacity duration-300 group-hover:opacity-30" />
@@ -278,11 +308,9 @@ const Dashboard = () => {
             </div>
           </div>
 
-          {/* Main Content Card */}
           <div className="bg-slate-900/50 rounded-xl shadow-2xl mb-8 border border-slate-800/50">
             <div className="p-4 sm:p-6">
               <div className="space-y-6">
-                {/* Withdrawal Section - Enhanced */}
                 <div className="bg-gradient-to-br from-indigo-500/20 via-purple-500/20 to-pink-500/20 rounded-xl p-6 border border-indigo-500/20">
                   <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start gap-6">
                     <div className="flex-1">
@@ -346,7 +374,6 @@ const Dashboard = () => {
                     </button>
                   </div>
 
-                  {/* Bonus Progress */}
                   <div className="mt-6 pt-6 border-t border-indigo-500/20">
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2">
@@ -367,7 +394,6 @@ const Dashboard = () => {
                   </div>
                 </div>
 
-                {/* Earnings Overview - Enhanced */}
                 <div>
                   <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
                     <Zap className="w-5 h-5 text-indigo-400" />
@@ -412,7 +438,6 @@ const Dashboard = () => {
                     </div>
                   </div>
 
-                  {/* Earnings Trend Chart - Enhanced */}
                   <div className="group relative flex flex-col rounded-xl bg-slate-950 p-6 shadow-xl transition-all duration-300 hover:scale-[1.01]">
                     <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 opacity-20 blur-sm transition-opacity duration-300 group-hover:opacity-30" />
                     <div className="absolute inset-px rounded-[11px] bg-slate-950" />
@@ -467,7 +492,6 @@ const Dashboard = () => {
                         </div>
                       </div>
 
-                      {/* History Toggle Button */}
                       <div className="w-full border-t border-slate-800 pt-4">
                         <button 
                           type="button" 
@@ -499,7 +523,6 @@ const Dashboard = () => {
                           </div>
                         </button>
 
-                        {/* History Content with smooth transition */}
                         <div className={`overflow-hidden transition-all duration-300 ${showHistory ? 'max-h-[2000px] opacity-100 mt-4' : 'max-h-0 opacity-0'}`}>
                           {historyIsError && (
                             <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4 text-center">
@@ -522,7 +545,6 @@ const Dashboard = () => {
                                 </div>
                               </div>
 
-                              {/* Bonuses Table */}
                               {historyData.bonuses && historyData.bonuses.length > 0 && (
                                 <div className="bg-slate-900/50 rounded-lg p-4 border border-yellow-500/20">
                                   <div className="flex items-center gap-2 mb-3">
@@ -568,7 +590,6 @@ const Dashboard = () => {
                                 </div>
                               )}
 
-                              {/* Earnings Table */}
                               <div className="bg-slate-900/50 rounded-lg p-4 border border-indigo-500/20">
                                 <div className="flex items-center gap-2 mb-3">
                                   <DollarSign className="w-5 h-5 text-indigo-400" />
@@ -632,7 +653,6 @@ const Dashboard = () => {
                   </div>
                 </div>
 
-                {/* How It Works - Enhanced */}
                 <div className="bg-gradient-to-br from-indigo-900/30 to-purple-900/30 rounded-xl p-6 border border-indigo-500/20">
                   <div className="flex items-center gap-3 mb-4">
                     <div className="bg-indigo-500/20 p-2 rounded-lg">

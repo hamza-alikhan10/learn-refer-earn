@@ -56,6 +56,19 @@ const StyledWrapper = styled.div`
     background-color: #fff;
   }
 
+  /* Highlight styling for Refer tab */
+  .nav-container .nav-item.refer .name {
+    background: linear-gradient(90deg, #4f46e5, #c084fc);
+    color: white;
+    box-shadow: 0 0 8px rgba(79, 70, 229, 0.5); /* Subtle glow effect */
+    font-weight: 600;
+  }
+
+  .nav-container .nav-item.refer .name:hover {
+    background: linear-gradient(90deg, #5b21b6, #d8b4fe);
+    box-shadow: 0 0 12px rgba(79, 70, 229, 0.7);
+  }
+
   @media (max-width: 1279px) {
     .nav-container {
       display: none; /* Hide styled nav on xl and below */
@@ -76,6 +89,7 @@ const Header = () => {
     { id: 'courses', label: 'Courses', path: '/course-page' },
     { id: 'about', label: 'About', path: '/about' },
     { id: 'how-it-works', label: 'How It Works', path: '/how-it-works' },
+    { id: 'refer', label: 'Refer', path: '/Earnlabs-promo' }, // Added Refer tab
   ];
 
   const handleAuthClick = () => {
@@ -92,13 +106,12 @@ const Header = () => {
         <div className="flex justify-between items-center py-3">
           {/* Logo */}
           <div className="flex items-center flex-shrink-0">
-           <h1
-  className="text-xl sm:text-2xl lg:text-3xl font-bold cursor-pointer bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent hover:opacity-90 transition-opacity"
-  onClick={() => navigate('/')}
->
-  EarnLabs
-</h1>
-
+            <h1
+              className="text-xl sm:text-2xl lg:text-3xl font-bold cursor-pointer bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent hover:opacity-90 transition-opacity"
+              onClick={() => navigate('/')}
+            >
+              EarnLabs
+            </h1>
           </div>
 
           {/* Desktop Navigation (xl and above) */}
@@ -106,7 +119,10 @@ const Header = () => {
             <StyledWrapper>
               <div className="nav-container">
                 {navItems.map((item) => (
-                  <label key={item.id} className="nav-item">
+                  <label
+                    key={item.id}
+                    className={`nav-item ${item.id === 'refer' ? 'refer' : ''}`} // Add refer class for styling
+                  >
                     <input
                       type="radio"
                       name="nav"
@@ -127,7 +143,13 @@ const Header = () => {
                 key={item.id}
                 onClick={() => navigate(item.path)}
                 className={`text-sm font-medium text-gray-700 hover:text-blue-600 transition-all duration-200 px-2 py-2 rounded-lg hover:bg-blue-50
-                  ${location.pathname === item.path ? 'text-blue-600 font-semibold bg-blue-50' : ''}`}
+                  ${
+                    item.id === 'refer'
+                      ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-semibold hover:from-indigo-600 hover:to-purple-600 shadow-md'
+                      : location.pathname === item.path
+                      ? 'text-blue-600 font-semibold bg-blue-50'
+                      : ''
+                  }`}
               >
                 {item.label}
               </button>
@@ -141,7 +163,13 @@ const Header = () => {
                 key={item.id}
                 onClick={() => navigate(item.path)}
                 className={`text-xs font-medium text-gray-700 hover:text-blue-600 transition-all duration-200 px-1 sm:px-2 py-1 sm:py-2 rounded-md hover:bg-blue-50
-                  ${location.pathname === item.path ? 'text-blue-600 font-semibold bg-blue-50' : ''}`}
+                  ${
+                    item.id === 'refer'
+                      ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-semibold hover:from-indigo-600 hover:to-purple-600 shadow-md'
+                      : location.pathname === item.path
+                      ? 'text-blue-600 font-semibold bg-blue-50'
+                      : ''
+                  }`}
               >
                 {item.label}
               </button>
@@ -150,28 +178,28 @@ const Header = () => {
 
           {/* Auth Section - Desktop & Tablet */}
           <div className="hidden md:flex items-center flex-shrink-0">
-                <button
-                  onClick={() => {
-                    handleAuthClick();
-                    setMobileMenuOpen(false);
-                  }}
-                  className="flex items-center space-x-1 sm:space-x-2 text-left text-blue-600 hover:text-blue-700 px-2 sm:px-4 py-2 sm:py-3 rounded-lg hover:bg-blue-50 transition-all duration-200 font-medium"
-                >
-                  {!user && <LogIn className="w-4 h-4 sm:w-5 sm:h-5" />}
-                  <span>{user ? (user || username || email) : 'Sign In'}</span>
-                </button>
-                {user && (
-                <button
-                  onClick={() => {
-                    handleLogout();
-                    setMobileMenuOpen(false);
-                  }}
-                  className="flex items-center gap-2 hover:bg-red-600 text-red-500 px-2 sm:px-4 py-2 sm:py-3 rounded-lg hover:text-white transition-all duration-200 font-medium"
-                >
-                  <span>Logout</span>
-                  <LogOut className="w-4 h-4 sm:w-5 sm:h-5" />
-                </button>
-                )}
+            <button
+              onClick={() => {
+                handleAuthClick();
+                setMobileMenuOpen(false);
+              }}
+              className="flex items-center space-x-1 sm:space-x-2 text-left text-blue-600 hover:text-blue-700 px-2 sm:px-4 py-2 sm:py-3 rounded-lg hover:bg-blue-50 transition-all duration-200 font-medium"
+            >
+              {!user && <LogIn className="w-4 h-4 sm:w-5 sm:h-5" />}
+              <span>{user ? (user || username || email) : 'Sign In'}</span>
+            </button>
+            {user && (
+              <button
+                onClick={() => {
+                  handleLogout();
+                  setMobileMenuOpen(false);
+                }}
+                className="flex items-center gap-2 hover:bg-red-600 text-red-500 px-2 sm:px-4 py-2 sm:py-3 rounded-lg hover:text-white transition-all duration-200 font-medium"
+              >
+                <span>Logout</span>
+                <LogOut className="w-4 h-4 sm:w-5 sm:h-5" />
+              </button>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -199,7 +227,11 @@ const Header = () => {
                     setMobileMenuOpen(false);
                   }}
                   className={`text-left px-2 sm:px-4 py-2 sm:py-3 text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200 rounded-lg mx-1 sm:mx-2 font-medium ${
-                    location.pathname === item.path ? 'text-blue-600 font-semibold bg-blue-50' : ''
+                    item.id === 'refer'
+                      ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-semibold hover:from-indigo-600 hover:to-purple-600 shadow-md'
+                      : location.pathname === item.path
+                      ? 'text-blue-600 font-semibold bg-blue-50'
+                      : ''
                   }`}
                 >
                   {item.label}
@@ -219,7 +251,7 @@ const Header = () => {
                   <span>{user ? (user || username || email) : 'Sign In'}</span>
                 </button>
                 {user && (
-                 <button
+                  <button
                     onClick={() => {
                       handleLogout();
                       setMobileMenuOpen(false);
