@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
+import { useAppSelector } from '@/ReduxStore/hooks';
+import { useGetDashboardQuery } from '@/ReduxStore/features/api/dashboard';
 import { Button } from '@/components/ui/button';
+import { useToast } from '@/hooks/use-toast';
 import { Share2, MessageCircle, Users, Instagram, Facebook, Download, Copy, CheckCircle, Star, TrendingUp, Award, Zap, ExternalLink, Sparkles } from 'lucide-react';
 import flyerMockup from '@/assets/flyer-mockup.jpg';
 import socialTemplate from '@/assets/social-template.jpg';
@@ -8,6 +11,12 @@ import Footer from '@/components/Footer';
 
 const EarnLabsPromo = () => {
   const [copiedId, setCopiedId] = useState<number | null>(null);
+  const { toast } = useToast();
+  const { userId } = useAppSelector((state) => state.auth);
+  const { data: dashboardData } = useGetDashboardQuery(
+    { userId: userId || '' },
+    { skip: !userId }
+  );
 
   const socialPlatforms = [
     {
@@ -91,29 +100,91 @@ const EarnLabsPromo = () => {
     }
   ];
 
-  const handleShare = (platform: string, caption: string) => {
-    const shareText = encodeURIComponent(caption);
-    
-    const urls = {
-      WhatsApp: `https://wa.me/?text=${shareText}`,
-      Facebook: `https://www.facebook.com/sharer/sharer.php?u=https://earnlabs.com&quote=${shareText}`,
-      Instagram: '#',
-      LinkedIn: `https://www.linkedin.com/sharing/share-offsite/?url=https://earnlabs.com`
+  const getReferralLink = () => {
+    if (!dashboardData) return window.location.origin;
+    const baseUrl = window.location.origin;
+    const referralCode = dashboardData.referral_code || userId;
+    return `${baseUrl}/?ref=${encodeURIComponent(referralCode)}`;
+  };
+
+  const showShareInstructions = (platform: string) => {
+    const instructions = {
+      WhatsApp: {
+        title: "Ready to Share on WhatsApp! 🟢",
+        description: "Caption copied & Flyer downloaded!",
+        steps: [
+          "WhatsApp opened with your referral link",
+          "Click attach (📎) to add the downloaded image",
+          "Send to your contacts!"
+        ]
+      },
+      Facebook: {
+        title: "Ready to Share on Facebook! 🔵",
+        description: "Caption copied & Flyer downloaded!",
+        steps: [
+          "Facebook opened in new tab",
+          "Create a new post",
+          "Upload the downloaded flyer image",
+          "Paste the caption (Ctrl+V / Cmd+V)",
+          "Share to your network!"
+        ]
+      },
+      Instagram: {
+        title: "Ready to Share on Instagram! 📸",
+        description: "Caption copied & Flyer downloaded!",
+        steps: [
+          "Instagram opened",
+          "Create new post or story",
+          "Upload the downloaded flyer",
+          "Paste the caption with your link",
+          "Share and start earning!"
+        ]
+      },
+      LinkedIn: {
+        title: "Ready to Share on LinkedIn! 💼",
+        description: "Caption copied & Flyer downloaded!",
+        steps: [
+          "LinkedIn opened in new tab",
+          "Create a new post",
+          "Upload the downloaded flyer",
+          "Paste the caption (Ctrl+V / Cmd+V)",
+          "Share to professionals!"
+        ]
+      }
     };
+
+    const info = instructions[platform as keyof typeof instructions];
     
-    const url = urls[platform as keyof typeof urls];
-    if (url && url !== '#') {
-      window.open(url, '_blank', 'width=600,height=400');
-    } else {
-      navigator.clipboard.writeText(caption);
-      alert('Caption copied to clipboard! You can now paste it in your Instagram post.');
-    }
+    toast({
+      title: info.title,
+      description: (
+        <div className="space-y-3 mt-2">
+          <p className="font-semibold text-emerald-400">{info.description}</p>
+          <div className="space-y-2">
+            <p className="text-sm font-medium text-gray-300">Next Steps:</p>
+            <ol className="space-y-1 text-sm text-gray-400 list-decimal list-inside">
+              {info.steps.map((step, idx) => (
+                <li key={idx} className="leading-relaxed">{step}</li>
+              ))}
+            </ol>
+          </div>
+        </div>
+      ),
+      duration: 8000,
+    });
   };
 
   const handleCopyCaption = (caption: string, id: number) => {
-    navigator.clipboard.writeText(caption);
+    const referralLink = getReferralLink();
+    const fullCaption = `${caption}\n\n🔗 Join here: ${referralLink}`;
+    navigator.clipboard.writeText(fullCaption);
     setCopiedId(id);
     setTimeout(() => setCopiedId(null), 2000);
+    
+    toast({
+      title: "Caption Copied!",
+      description: "Caption with your referral link copied to clipboard",
+    });
   };
 
   const handleDownload = (imageUrl: string, title: string) => {
@@ -124,6 +195,94 @@ const EarnLabsPromo = () => {
     link.click();
     document.body.removeChild(link);
   };
+
+  const handleShare = async (platform: string, caption: string, imageUrl: string) => {
+    const referralLink = getReferralLink();
+    const fullCaption = `${caption}\n\n🔗 Join here: ${referralLink}`;
+    const shareText = encodeURIComponent(fullCaption);
+    const encodedUrl = encodeURIComponent(referralLink);
+    
+    if (navigator.share && platform === 'Instagram') {
+      try {
+        const response = await fetch(imageUrl);
+        const blob = await response.blob();
+        const file = new File([blob], 'earnlabs-flyer.jpg', { type: 'image/jpeg' });
+        
+        await navigator.share({
+          title: 'EarnLabs - Learn & Earn',
+          text: fullCaption,
+          files: [file]
+        });
+        return;
+      } catch (err) {
+        console.log('Web Share API failed, using fallback');
+      }
+    }
+    
+    switch(platform) {
+      case 'WhatsApp':
+        navigator.clipboard.writeText(fullCaption);
+        const whatsappUrl = `https://wa.me/?text=${shareText}`;
+        handleDownload(imageUrl, 'whatsapp-flyer');
+        
+        setTimeout(() => {
+          window.open(whatsappUrl, '_blank', 'width=600,height=400');
+          showShareInstructions('WhatsApp');
+        }, 500);
+        break;
+        
+      case 'Facebook':
+        navigator.clipboard.writeText(fullCaption);
+        handleDownload(imageUrl, 'facebook-flyer');
+        
+        setTimeout(() => {
+          window.open(
+            `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`,
+            '_blank',
+            'width=600,height=400'
+          );
+          showShareInstructions('Facebook');
+        }, 500);
+        break;
+        
+      case 'Instagram':
+        navigator.clipboard.writeText(fullCaption);
+        handleDownload(imageUrl, 'instagram-flyer');
+        
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        
+        setTimeout(() => {
+          if (isMobile) {
+            window.location.href = 'instagram://';
+            setTimeout(() => {
+              window.open('https://www.instagram.com/', '_blank');
+            }, 1000);
+          } else {
+            window.open('https://www.instagram.com/', '_blank');
+          }
+          showShareInstructions('Instagram');
+        }, 500);
+        break;
+        
+      case 'LinkedIn':
+        navigator.clipboard.writeText(fullCaption);
+        handleDownload(imageUrl, 'linkedin-flyer');
+        
+        setTimeout(() => {
+          window.open(
+            `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`,
+            '_blank',
+            'width=600,height=400'
+          );
+          showShareInstructions('LinkedIn');
+        }, 500);
+        break;
+        
+      default:
+        navigator.clipboard.writeText(fullCaption);
+    }
+  };
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
@@ -229,7 +388,7 @@ const EarnLabsPromo = () => {
                         {socialPlatforms.map((platform) => (
                           <Button
                             key={platform.name}
-                            onClick={() => handleShare(platform.name, flyer.caption)}
+                            onClick={() => handleShare(platform.name, flyer.caption, flyer.image)}
                             variant="outline"
                             size="sm"
                             className="border-slate-600 bg-slate-800/80 hover:bg-slate-700 text-gray-200 hover:text-white hover:border-slate-500 transition-all duration-200 text-xs sm:text-sm py-2"
@@ -291,7 +450,7 @@ const EarnLabsPromo = () => {
                   </div>
                   
                   <Button 
-                    onClick={() => handleShare(platform.name, flyerData[0].caption)}
+                    onClick={() => handleShare(platform.name, flyerData[0].caption, flyerData[0].image)}
                     variant="outline" 
                     className="w-full border-slate-600 bg-slate-800/80 hover:bg-slate-700 text-gray-200 hover:text-white hover:border-slate-500 transition-all duration-200 text-xs sm:text-sm"
                   >
@@ -369,9 +528,10 @@ const EarnLabsPromo = () => {
             </div>
           </div>
         </div>
-     
+         
+      
       </section>
-         <Footer/>
+       <Footer/>
     </div>
   );
 };

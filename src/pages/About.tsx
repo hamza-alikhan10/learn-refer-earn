@@ -1,6 +1,6 @@
 import React from 'react';
-import { CheckCircle, Users, Target, BookOpen, Gift, TrendingUp, Globe, Star, Clock, Award, Zap, Shield } from 'lucide-react';
-import { Button } from '../components/ui/button';
+import { CheckCircle, Users, Target, BookOpen, Gift, TrendingUp, Globe, Star, Clock, Award, Zap, Shield, Rocket } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import styled from 'styled-components';
 
 // Enhanced Wave Card with better responsiveness
@@ -166,14 +166,14 @@ const About = () => {
             <div className="relative inline-block mb-6">
               <div className="absolute inset-0 bg-gradient-to-br from-primary/40 to-accent/40 rounded-full blur-2xl animate-pulse"></div>
               <div className="relative bg-gradient-to-br from-primary/20 to-accent/20 p-6 sm:p-8 rounded-full w-20 h-20 sm:w-24 sm:h-24 flex items-center justify-center">
-                <Globe className="w-10 h-10 sm:w-12 sm:h-12 text-primary" />
+                <Rocket className="w-10 h-10 sm:w-12 sm:h-12 text-primary" />
               </div>
             </div>
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-4 sm:mb-6 font-poppins bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent animate-gradient bg-[length:200%_auto]">
               About LearnHub
             </h1>
             <p className="text-base sm:text-lg lg:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed font-noto-sans px-4">
-              Empowering affiliate marketers worldwide through quality education and rewarding partnerships
+              A fresh approach to affiliate marketing education with rewarding partnerships for everyone
             </p>
           </div>
 
@@ -188,10 +188,10 @@ const About = () => {
               </div>
               <div className="space-y-4">
                 <p className="text-muted-foreground leading-relaxed text-sm sm:text-base font-noto-sans">
-                  At LearnHub, we believe affiliate marketing education should be accessible to everyone, everywhere. Our mission is to democratize knowledge by connecting students with expert marketers and fostering opportunities for knowledge sharing that benefit entire communities.
+                  At LearnHub, we're launching with a clear mission: make affiliate marketing education accessible to everyone, everywhere. We connect aspiring marketers with expert knowledge and create opportunities for growth through community sharing.
                 </p>
                 <p className="text-muted-foreground leading-relaxed text-sm sm:text-base font-noto-sans">
-                  Our platform creates a ripple effect of growth through our innovative referral system, transforming individuals and communities alike.
+                  Our innovative referral system is designed to create a ripple effect of growth, transforming individuals and communities from day one.
                 </p>
               </div>
             </div>
@@ -205,10 +205,10 @@ const About = () => {
               </div>
               <div className="space-y-4">
                 <p className="text-muted-foreground leading-relaxed text-sm sm:text-base font-noto-sans">
-                  To build a global learning ecosystem where knowledge flows freely, instructors are rewarded for their expertise, and learners become ambassadors for education by sharing valuable courses with their networks.
+                  To build a thriving global learning ecosystem where knowledge flows freely, instructors are rewarded for their expertise, and learners become ambassadors for education by sharing valuable courses with their networks.
                 </p>
                 <p className="text-muted-foreground leading-relaxed text-sm sm:text-base font-noto-sans">
-                  We're not just a platform—we're a community where everyone thrives through the power of learning and sharing.
+                  We're not just another platform—we're building a community where everyone succeeds together through the power of learning and sharing.
                 </p>
               </div>
             </div>
@@ -245,7 +245,7 @@ const About = () => {
                       </div>
                       <h3 className="font-bold text-gray-900 dark:text-gray-100 mb-3 text-base sm:text-lg font-poppins">Community Driven</h3>
                       <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-                        Join a community of learners and earn rewards by sharing valuable educational content.
+                        Be part of our growing community of learners and earn rewards by sharing valuable educational content.
                       </p>
                     </div>
                   </div>
@@ -270,67 +270,17 @@ const About = () => {
             </div>
           </div>
 
-          {/* Our Journey - Wave Cards Section */}
-          <div className="py-12 sm:py-16 bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-950 dark:to-purple-950 rounded-2xl sm:rounded-3xl mb-12 sm:mb-16 shadow-xl">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="text-center mb-8 sm:mb-12">
-                <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-4 font-poppins">
-                  Our Journey
-                </h2>
-                <p className="text-sm sm:text-base lg:text-lg text-gray-600 dark:text-gray-400 max-w-3xl mx-auto font-noto-sans px-4">
-                  From humble beginnings to a global impact, here's how LearnHub grew.
-                </p>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 justify-items-center">
-                <StyledWaveCard>
-                  <div className="e-card playing">
-                    <div className="wave" />
-                    <div className="wave" />
-                    <div className="wave" />
-                    <div className="infotop">
-                      <Award className="icon" />
-                      2020: Founded
-                      <div className="description">LearnHub was born to democratize affiliate marketing education.</div>
-                    </div>
-                  </div>
-                </StyledWaveCard>
-                <StyledWaveCard>
-                  <div className="e-card playing">
-                    <div className="wave" />
-                    <div className="wave" />
-                    <div className="wave" />
-                    <div className="infotop">
-                      <Users className="icon" />
-                      2022: 10,000 Students
-                      <div className="description">Reached a milestone of empowering 10,000 learners worldwide.</div>
-                    </div>
-                  </div>
-                </StyledWaveCard>
-                <StyledWaveCard>
-                  <div className="e-card playing">
-                    <div className="wave" />
-                    <div className="wave" />
-                    <div className="wave" />
-                    <div className="infotop">
-                      <Globe className="icon" />
-                      2024: Global Expansion
-                      <div className="description">Expanded to over 100 countries with diverse courses.</div>
-                    </div>
-                  </div>
-                </StyledWaveCard>
-              </div>
-            </div>
-          </div>
+        
 
-          {/* Success Metrics - Enhanced */}
+          {/* Goals & Commitment - Enhanced */}
           <div className="py-12 sm:py-16 bg-white dark:bg-gray-800 rounded-2xl sm:rounded-3xl shadow-xl border border-border mb-12 sm:mb-16">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="text-center mb-8 sm:mb-12">
                 <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-4 font-poppins">
-                  Our Impact
+                  Our Commitment
                 </h2>
                 <p className="text-sm sm:text-base lg:text-lg text-gray-600 dark:text-gray-400 max-w-3xl mx-auto font-noto-sans px-4">
-                  LearnHub is transforming lives through education and opportunity.
+                  What we promise to deliver as we grow together with our community.
                 </p>
               </div>
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
@@ -338,44 +288,44 @@ const About = () => {
                   <div className="relative inline-block mb-4">
                     <div className="absolute inset-0 bg-blue-200 dark:bg-blue-800 rounded-full blur-md group-hover:blur-lg transition-all duration-300"></div>
                     <div className="relative bg-blue-100 dark:bg-blue-900 w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                      <Users className="w-7 h-7 sm:w-8 sm:h-8 text-blue-600 dark:text-blue-400" />
+                      <Shield className="w-7 h-7 sm:w-8 sm:h-8 text-blue-600 dark:text-blue-400" />
                     </div>
                   </div>
-                  <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 font-poppins">20,000+</p>
-                  <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 font-noto-sans mt-1">Students Enrolled</p>
+                  <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 font-poppins">Quality</p>
+                  <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 font-noto-sans mt-1">First Education</p>
                 </div>
 
                 <div className="text-center group">
                   <div className="relative inline-block mb-4">
                     <div className="absolute inset-0 bg-green-200 dark:bg-green-800 rounded-full blur-md group-hover:blur-lg transition-all duration-300"></div>
                     <div className="relative bg-green-100 dark:bg-green-900 w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                      <BookOpen className="w-7 h-7 sm:w-8 sm:h-8 text-green-600 dark:text-green-400" />
+                      <Users className="w-7 h-7 sm:w-8 sm:h-8 text-green-600 dark:text-green-400" />
                     </div>
                   </div>
-                  <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 font-poppins">50+</p>
-                  <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 font-noto-sans mt-1">Courses Offered</p>
+                  <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 font-poppins">Community</p>
+                  <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 font-noto-sans mt-1">Focused Support</p>
                 </div>
 
                 <div className="text-center group">
                   <div className="relative inline-block mb-4">
                     <div className="absolute inset-0 bg-purple-200 dark:bg-purple-800 rounded-full blur-md group-hover:blur-lg transition-all duration-300"></div>
                     <div className="relative bg-purple-100 dark:bg-purple-900 w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                      <Globe className="w-7 h-7 sm:w-8 sm:h-8 text-purple-600 dark:text-purple-400" />
+                      <Gift className="w-7 h-7 sm:w-8 sm:h-8 text-purple-600 dark:text-purple-400" />
                     </div>
                   </div>
-                  <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 font-poppins">100+</p>
-                  <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 font-noto-sans mt-1">Countries Reached</p>
+                  <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 font-poppins">Rewards</p>
+                  <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 font-noto-sans mt-1">That Truly Pay</p>
                 </div>
 
                 <div className="text-center group">
                   <div className="relative inline-block mb-4">
                     <div className="absolute inset-0 bg-yellow-200 dark:bg-yellow-800 rounded-full blur-md group-hover:blur-lg transition-all duration-300"></div>
                     <div className="relative bg-yellow-100 dark:bg-yellow-900 w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                      <Star className="w-7 h-7 sm:w-8 sm:h-8 text-yellow-600 dark:text-yellow-400" />
+                      <Zap className="w-7 h-7 sm:w-8 sm:h-8 text-yellow-600 dark:text-yellow-400" />
                     </div>
                   </div>
-                  <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 font-poppins">4.9/5</p>
-                  <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 font-noto-sans mt-1">Average Rating</p>
+                  <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 font-poppins">Innovation</p>
+                  <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 font-noto-sans mt-1">In Every Step</p>
                 </div>
               </div>
             </div>
@@ -386,10 +336,10 @@ const About = () => {
             <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMzYgMzRjMC0xLjEwNC0uODk2LTItMi0yaDFjMC0xLjEwNC0uODk2LTItMi0ycy0yIC44OTYtMiAycy44OTYgMiAyIDJoLTFjMCAxLjEwNC44OTYgMiAyIDJoLTFjMCAxLjEwNC44OTYgMiAyIDIiLz48L2c+PC9nPjwvc3ZnPg==')] opacity-20"></div>
             <div className="relative z-10">
               <h2 className="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4 font-poppins">
-                Ready to Start Learning?
+                Ready to Be Part of Something New?
               </h2>
               <p className="text-primary-foreground/90 mb-6 sm:mb-8 text-sm sm:text-base lg:text-lg max-w-2xl mx-auto leading-relaxed font-noto-sans px-4">
-                Join thousands of students transforming their careers and earning through referrals.
+                Join us at the beginning and help shape the future of affiliate marketing education while earning rewards.
               </p>
               <Button
                 onClick={() => window.location.href = '/course-page'}

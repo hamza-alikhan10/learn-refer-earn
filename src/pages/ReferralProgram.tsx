@@ -20,7 +20,7 @@ const ReferralProgram = () => {
           </div>
 
           <div className="bg-gradient-to-br from-success/10 to-primary/10 rounded-3xl p-6 sm:p-8 lg:p-12 mb-12 sm:mb-16 border border-success/20 text-center">
-            <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-card-foreground mb-4 font-poppins">Earn up to 60% Commission on Every Sale!</h2>
+            <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-card-foreground mb-4 font-poppins">Earn up to 70% Commission on Every Sale!</h2>
             <p className="text-sm sm:text-base lg:text-lg text-muted-foreground mb-8 max-w-2xl mx-auto leading-relaxed font-noto-sans">
               Industry-leading multi-level referral rewards for affiliate marketing education + milestone bonuses
             </p>
@@ -45,17 +45,17 @@ const ReferralProgram = () => {
                   <tbody>
                     <tr className="hover:bg-muted/30 transition-all duration-200">
                       <td className="p-3 sm:p-4 text-sm sm:text-base text-muted-foreground font-noto-sans border-b border-border">₹1000</td>
-                      <td className="p-3 sm:p-4 text-sm sm:text-base font-bold text-blue-600 font-noto-sans border-b border-border">40%</td>
+                      <td className="p-3 sm:p-4 text-sm sm:text-base font-bold text-blue-600 font-noto-sans border-b border-border">50%</td>
                       <td className="p-3 sm:p-4 text-sm sm:text-base font-bold text-green-600 font-noto-sans border-b border-border">5%</td>
                     </tr>
                     <tr className="hover:bg-muted/30 transition-all duration-200">
                       <td className="p-3 sm:p-4 text-sm sm:text-base text-muted-foreground font-noto-sans border-b border-border">₹3000</td>
-                      <td className="p-3 sm:p-4 text-sm sm:text-base font-bold text-blue-600 font-noto-sans border-b border-border">50%</td>
+                      <td className="p-3 sm:p-4 text-sm sm:text-base font-bold text-blue-600 font-noto-sans border-b border-border">60%</td>
                       <td className="p-3 sm:p-4 text-sm sm:text-base font-bold text-green-600 font-noto-sans border-b border-border">8%</td>
                     </tr>
                     <tr className="hover:bg-muted/30 transition-all duration-200">
                       <td className="p-3 sm:p-4 text-sm sm:text-base text-muted-foreground font-noto-sans border-b border-border">₹5000</td>
-                      <td className="p-3 sm:p-4 text-sm sm:text-base font-bold text-blue-600 font-noto-sans border-b border-border">60%</td>
+                      <td className="p-3 sm:p-4 text-sm sm:text-base font-bold text-blue-600 font-noto-sans border-b border-border">70%</td>
                       <td className="p-3 sm:p-4 text-sm sm:text-base font-bold text-green-600 font-noto-sans border-b border-border">10%</td>
                     </tr>
                   </tbody>
@@ -98,7 +98,7 @@ const ReferralProgram = () => {
                   </div>
                   <div>
                     <p className="font-semibold text-card-foreground mb-1 text-sm sm:text-base font-noto-sans">Earn Multi-Level Commissions</p>
-                    <p className="text-muted-foreground text-xs sm:text-sm leading-relaxed font-noto-sans">Receive 40%–60% direct + 5%–10% second-level commissions</p>
+                    <p className="text-muted-foreground text-xs sm:text-sm leading-relaxed font-noto-sans">Receive 50%–70% direct + 5%–10% second-level commissions</p>
                   </div>
                 </div>
                 <div className="flex items-start space-x-4">
@@ -125,7 +125,7 @@ const ReferralProgram = () => {
                     Multi-Level Commission
                   </h3>
                   <p className="text-blue-800 text-xs sm:text-sm leading-relaxed font-noto-sans">
-                    Earn 40%–60% on direct referrals + 5%–10% on second-level referrals - the highest structure in trading education.
+                    Earn 50%–60% on direct referrals + 5%–10% on second-level referrals - the highest structure in trading education.
                   </p>
                 </div>
                 <div className="bg-gradient-to-r from-green-50 to-green-100 p-4 rounded-xl border border-green-200">
@@ -173,7 +173,7 @@ const ReferralProgram = () => {
                 <ul className="space-y-3 text-muted-foreground text-xs sm:text-sm font-noto-sans">
                   <li className="flex items-start space-x-2">
                     <span className="text-success mt-1">•</span>
-                    <span>40%–60% commission on direct referrals + 5%–10% on second-level</span>
+                    <span>50%–70% commission on direct referrals + 5%–10% on second-level</span>
                   </li>
                   <li className="flex items-start space-x-2">
                     <span className="text-success mt-1">•</span>

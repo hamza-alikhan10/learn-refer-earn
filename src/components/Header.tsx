@@ -92,12 +92,13 @@ const Header = () => {
         <div className="flex justify-between items-center py-3">
           {/* Logo */}
           <div className="flex items-center flex-shrink-0">
-            <h1 
-              className="text-xl sm:text-2xl lg:text-3xl font-bold text-blue-600 cursor-pointer hover:text-blue-700 transition-colors"
-              onClick={() => navigate('/')}
-            >
-              EarnLabs
-            </h1>
+           <h1
+  className="text-xl sm:text-2xl lg:text-3xl font-bold cursor-pointer bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent hover:opacity-90 transition-opacity"
+  onClick={() => navigate('/')}
+>
+  EarnLabs
+</h1>
+
           </div>
 
           {/* Desktop Navigation (xl and above) */}
