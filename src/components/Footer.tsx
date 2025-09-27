@@ -9,6 +9,7 @@ const Footer: React.FC = () => {
     { id: 'how-it-works', label: 'How It Works', path: '/how-it-works' },
     { id: 'referral-program', label: 'Referral Program', path: '/referral-program' },
     { id: 'contact', label: 'Contact Us', path: '/contact-us' },
+     { id: 'Earnlabs-promo', label: 'Promotion', path: '/Earnlabs-promo' },
   ];
 
   const socialLinks = [

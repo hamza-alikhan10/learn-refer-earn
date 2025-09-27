@@ -5,7 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ScrollToTop from "./lib/ScrollToTop";
-
+import EarnLabsPromo from "./pages/EarnLabsPromo";
 import NotFound from "./pages/NotFound";
 import RenderRoutes from "./structure/RenderRoutes";
 
@@ -19,7 +19,16 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <ScrollToTop />
-          <RenderRoutes/>
+          <Routes>
+            {/* Your existing dynamic routes */}
+            <Route path="/*" element={<RenderRoutes />} />
+
+            {/* New route for EarnLabsPromo */}
+            <Route path="/earnlabs-promo" element={<EarnLabsPromo />} />
+
+            {/* Fallback */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
         </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>
