@@ -4,8 +4,9 @@ import { useGetDashboardQuery } from '@/ReduxStore/features/api/dashboard';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Share2, MessageCircle, Users, Instagram, Facebook, Download, Copy, CheckCircle, Star, TrendingUp, Award, Zap, ExternalLink, Sparkles } from 'lucide-react';
-import flyerMockup from '@/assets/flyer-mockup.jpg';
-import socialTemplate from '@/assets/social-template.jpg';
+import flyerMockup from '@/assets/flyer-mockup.png';
+import socialTemplate from '@/assets/social-template.png';
+import motivationalflyer from '@/assets/motivational-flyer.png'
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 
@@ -64,40 +65,40 @@ const EarnLabsPromo = () => {
   const flyerData = [
     {
       id: 1,
-      title: 'Course Promotion Flyer',
+      title: 'Explanatory Promotion Flyer',
       description: 'Perfect for promoting individual courses',
       image: flyerMockup,
-      caption: '🎓 Transform your career with EarnLabs! Access premium online courses and earn rewards by sharing with others. Join thousands who are already learning and earning! 💰✨ #EarnLabs #OnlineLearning #EarnWhileYouLearn',
-      downloads: 1240,
+      caption: ' 🎓 New to Affiliate Marketing? Start with EarnLabs’ Beginner Course! 💼 Ready to kickstart a side hustle that pays? 🚀 Our Beginner Affiliate Course is designed for complete novices, guiding you through every step of affiliate marketing with easy-to-follow lessons. 📚 Learn how to craft irresistible promotions, grow your audience, and drive sales using proven strategies. 📣 Once you’ve mastered the basics, you’ll be ready to promote our exciting upcoming online courses, earning a massive 50% commission on every purchase made through your unique referral link. 💰 No experience? No problem! Our expert-led course provides all the tools you need to succeed, plus you’ll join a supportive EarnLabs community dedicated to learning and earning. 🌟 Whether you’re a student, professional, or entrepreneur, this is your chance to build skills and income. Enroll today and start your affiliate journey. #AffiliateBeginner #LearnAndEarn #JoinEarnLabs',
+      downloads: 54,
       gradient: 'from-indigo-500 to-purple-500'
     },
     {
       id: 2,
-      title: 'Social Media Template',
+      title: 'Referral-Focused',
       description: 'Optimized for social media sharing',
       image: socialTemplate,
-      caption: '🚀 Ready to boost your skills AND your income? EarnLabs offers top-quality courses with an amazing referral program! Learn from experts, earn from referrals. Win-win! 🎯 Start today: earnlabs.com #SkillUp #PassiveIncome',
-      downloads: 890,
+      caption: '💸 Earn 50% Commissions with EarnLabs’ Referral Program! 🌟 Join EarnLabs, take our Beginner Affiliate Course, and start earning big! 🎓 Learn the essentials of affiliate marketing, then promote our upcoming online courses to your network. Every time someone purchases through your referral link, you’ll pocket 50% of the sale. 🤑 It’s simple: share, earn, repeat! 🚀 No prior experience needed—just a passion for growth. Sign up, grab your unique link, and start earning today. #EarnMoneyOnline #AffiliateMarketing #EarnLabsCommunity',
+      downloads: 78,
       gradient: 'from-pink-500 to-orange-500'
     },
     {
       id: 3,
       title: 'Referral Program Flyer',
       description: 'Highlight the earning opportunity',
-      image: flyerMockup,
-      caption: '💰 Earn while you learn! EarnLabs offers 70% commission on direct referrals + 10% on second-level. Share courses, earn rewards, and help others succeed! 🚀 Join now: earnlabs.com #EarnMoney #ReferralProgram',
-      downloads: 1056,
+      image: motivationalflyer,
+      caption: '🌟 From Beginner to Affiliate Success with EarnLabs! 🚀 Imagine turning your love for learning into a thriving income stream! 💡 With EarnLabs’ Beginner Affiliate Course, you’ll master affiliate marketing skills to promote our upcoming online courses and earn 50% commission on every sale you drive. 💰 Picture this: Sarah, a college student, took our course, shared her referral link on social media, and earned hundreds in commissions within weeks! 📣 You could be next. No experience needed—just determination and our expert guidance. 🎓 Join the EarnLabs community, upskill, and build a future where learning pays. Start your success story today. #AffiliateJourney #PassiveIncome #JoinEarnLabs',
+      downloads: 67,
       gradient: 'from-emerald-500 to-teal-500'
     },
-    {
-      id: 4,
-      title: 'Success Story Template',
-      description: 'Share inspiring student achievements',
-      image: socialTemplate,
-      caption: '⭐ Join 50,000+ students who transformed their careers with EarnLabs! Master new skills, earn from referrals, and unlock your potential. Your success story starts here! 🎓 Learn more: earnlabs.com #SuccessStory #CareerGrowth',
-      downloads: 745,
-      gradient: 'from-blue-500 to-cyan-500'
-    }
+    // {
+    //   id: 4,
+    //   title: 'Success Story Template',
+    //   description: 'Share inspiring student achievements',
+    //   image: socialTemplate,
+    //   caption: '⭐ Join 50,000+ students who transformed their careers with EarnLabs! Master new skills, earn from referrals, and unlock your potential. Your success story starts here! 🎓 Learn more: earnlabs.com #SuccessStory #CareerGrowth',
+    //   downloads: 745,
+    //   gradient: 'from-blue-500 to-cyan-500'
+    // }
   ];
 
   const getReferralLink = () => {
@@ -497,7 +498,7 @@ const EarnLabsPromo = () => {
               <Button 
                 size="lg" 
                 variant="outline"
-                className="border-2 border-slate-700 hover:border-indigo-500 text-white hover:bg-indigo-500/10 font-semibold px-6 sm:px-8 py-3 sm:py-4 rounded-full transition-all duration-300 hover:scale-105 text-sm sm:text-base"
+                className="border-2 border-slate-700 hover:border-indigo-500 text-black hover:bg-indigo-500/10 font-semibold px-6 sm:px-8 py-3 sm:py-4 rounded-full transition-all duration-300 hover:scale-105 text-sm sm:text-base"
               >
                 View All Courses
               </Button>

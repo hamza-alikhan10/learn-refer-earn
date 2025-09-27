@@ -315,7 +315,7 @@ const Homepage = () => {
                   <div className="header">
                     <Users className="w-8 h-8 text-blue-600 mx-auto mb-4" />
                   </div>
-                  <p className="heading">15,000+</p>
+                  <p className="heading">500+</p>
                   <div className="footer">Affiliate Marketers</div>
                 </div>
               </div>
@@ -348,7 +348,7 @@ const Homepage = () => {
                   <div className="header">
                     <TrendingUp className="w-8 h-8 text-yellow-600 mx-auto mb-4" />
                   </div>
-                  <p className="heading">Up to 60%</p>
+                  <p className="heading">Up to 70%</p>
                   <div className="footer">Commission Rate</div>
                 </div>
               </div>
@@ -380,7 +380,7 @@ const Homepage = () => {
               <TrendingUp className="w-8 h-8 text-green-600 mb-4 mx-auto" />
               <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2 font-poppins">High Commissions</h3>
               <p className="text-sm sm:text-base text-gray-600 font-noto-sans">
-                Earn 40%–60% on direct referrals plus 5%–10% on sub-referrals.
+                Earn 50%–70% on direct referrals plus 5%–10% on sub-referrals.
               </p>
             </div>
             <div className="bg-gray-50 p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow">

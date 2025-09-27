@@ -170,10 +170,10 @@ const About = () => {
               </div>
             </div>
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-foreground mb-4 sm:mb-6 font-poppins bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent animate-gradient bg-[length:200%_auto]">
-              About LearnHub
+              About EarnLabs
             </h1>
             <p className="text-base sm:text-lg lg:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed font-noto-sans px-4">
-              A fresh approach to affiliate marketing education with rewarding partnerships for everyone
+              Where Learning Meets Earning - Transform Your Skills Into Income in 2025
             </p>
           </div>
 
@@ -188,10 +188,10 @@ const About = () => {
               </div>
               <div className="space-y-4">
                 <p className="text-muted-foreground leading-relaxed text-sm sm:text-base font-noto-sans">
-                  At LearnHub, we're launching with a clear mission: make affiliate marketing education accessible to everyone, everywhere. We connect aspiring marketers with expert knowledge and create opportunities for growth through community sharing.
+                  EarnLabs is revolutionizing online education in 2025. We're not just another learning platform—we're your partner in building a profitable side income while mastering in-demand skills. Learn from expert-curated courses and earn generous rewards by sharing knowledge with your network.
                 </p>
                 <p className="text-muted-foreground leading-relaxed text-sm sm:text-base font-noto-sans">
-                  Our innovative referral system is designed to create a ripple effect of growth, transforming individuals and communities from day one.
+                  Our game-changing referral system lets you earn 70% commission on every referral, plus 10% on second-tier referrals, and a ₹500 bonus for every 5 successful referrals. Start earning from day one!
                 </p>
               </div>
             </div>
@@ -205,19 +205,19 @@ const About = () => {
               </div>
               <div className="space-y-4">
                 <p className="text-muted-foreground leading-relaxed text-sm sm:text-base font-noto-sans">
-                  To build a thriving global learning ecosystem where knowledge flows freely, instructors are rewarded for their expertise, and learners become ambassadors for education by sharing valuable courses with their networks.
+                  To create the world's most rewarding learning ecosystem where anyone can upskill AND earn passive income simultaneously. We're building a community where education pays—literally. Every course you complete opens doors to earnings, and every referral multiplies your income potential.
                 </p>
                 <p className="text-muted-foreground leading-relaxed text-sm sm:text-base font-noto-sans">
-                  We're not just another platform—we're building a community where everyone succeeds together through the power of learning and sharing.
+                  By 2026, we envision thousands of EarnLabs members generating steady monthly income while helping others access quality education. Your success is our success, and we're investing heavily in making you profitable.
                 </p>
               </div>
             </div>
           </div>
 
-          {/* Why Choose LearnHub - Enhanced with Skew Cards */}
+          {/* Why Choose EarnLabs - Enhanced with Skew Cards */}
           <div className="bg-gradient-to-br from-muted/50 to-muted/30 rounded-2xl sm:rounded-3xl p-6 sm:p-8 lg:p-12 mb-12 sm:mb-16 border border-border shadow-xl">
             <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-8 sm:mb-12 text-center font-poppins">
-              Why Choose LearnHub?
+              Why EarnLabs Pays More Than Others
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
               <StyledSkewCard>
@@ -227,9 +227,9 @@ const About = () => {
                       <div className="bg-primary/10 p-3 rounded-xl inline-flex mb-4">
                         <BookOpen className="w-7 h-7 sm:w-8 sm:h-8 text-primary" />
                       </div>
-                      <h3 className="font-bold text-gray-900 dark:text-gray-100 mb-3 text-base sm:text-lg font-poppins">Expert-Led Courses</h3>
+                      <h3 className="font-bold text-gray-900 dark:text-gray-100 mb-3 text-base sm:text-lg font-poppins">Premium Courses</h3>
                       <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-                        Learn from successful affiliate marketers with real-world experience and proven track records.
+                        Access cutting-edge courses in AI, marketing, tech, and business from industry experts. Learn skills that actually pay in 2025.
                       </p>
                     </div>
                   </div>
@@ -243,9 +243,9 @@ const About = () => {
                       <div className="bg-success/10 p-3 rounded-xl inline-flex mb-4">
                         <Users className="w-7 h-7 sm:w-8 sm:h-8 text-success" />
                       </div>
-                      <h3 className="font-bold text-gray-900 dark:text-gray-100 mb-3 text-base sm:text-lg font-poppins">Community Driven</h3>
+                      <h3 className="font-bold text-gray-900 dark:text-gray-100 mb-3 text-base sm:text-lg font-poppins">Earn While Learning</h3>
                       <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-                        Be part of our growing community of learners and earn rewards by sharing valuable educational content.
+                        Start earning immediately! Share courses with friends and earn up to 70% commission + bonuses. No experience needed.
                       </p>
                     </div>
                   </div>
@@ -259,9 +259,9 @@ const About = () => {
                       <div className="bg-accent/10 p-3 rounded-xl inline-flex mb-4">
                         <Gift className="w-7 h-7 sm:w-8 sm:h-8 text-accent" />
                       </div>
-                      <h3 className="font-bold text-gray-900 dark:text-gray-100 mb-3 text-base sm:text-lg font-poppins">Generous Rewards</h3>
+                      <h3 className="font-bold text-gray-900 dark:text-gray-100 mb-3 text-base sm:text-lg font-poppins">Industry-Best Payouts</h3>
                       <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-                        Earn 70% commission on direct referrals + 10% on second-level + ₹500 bonus every 5 referrals.
+                        70% direct commission + 10% tier-2 + ₹500 bonus every 5 referrals. The most generous rewards in online education!
                       </p>
                     </div>
                   </div>
@@ -270,17 +270,15 @@ const About = () => {
             </div>
           </div>
 
-        
-
           {/* Goals & Commitment - Enhanced */}
           <div className="py-12 sm:py-16 bg-white dark:bg-gray-800 rounded-2xl sm:rounded-3xl shadow-xl border border-border mb-12 sm:mb-16">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="text-center mb-8 sm:mb-12">
                 <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-4 font-poppins">
-                  Our Commitment
+                  What You Get With EarnLabs
                 </h2>
                 <p className="text-sm sm:text-base lg:text-lg text-gray-600 dark:text-gray-400 max-w-3xl mx-auto font-noto-sans px-4">
-                  What we promise to deliver as we grow together with our community.
+                  Real benefits that translate to real earnings and career growth in 2025.
                 </p>
               </div>
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
@@ -291,8 +289,8 @@ const About = () => {
                       <Shield className="w-7 h-7 sm:w-8 sm:h-8 text-blue-600 dark:text-blue-400" />
                     </div>
                   </div>
-                  <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 font-poppins">Quality</p>
-                  <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 font-noto-sans mt-1">First Education</p>
+                  <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 font-poppins">High-Value</p>
+                  <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 font-noto-sans mt-1">Course Content</p>
                 </div>
 
                 <div className="text-center group">
@@ -302,8 +300,8 @@ const About = () => {
                       <Users className="w-7 h-7 sm:w-8 sm:h-8 text-green-600 dark:text-green-400" />
                     </div>
                   </div>
-                  <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 font-poppins">Community</p>
-                  <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 font-noto-sans mt-1">Focused Support</p>
+                  <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 font-poppins">Instant</p>
+                  <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 font-noto-sans mt-1">Earning Start</p>
                 </div>
 
                 <div className="text-center group">
@@ -313,8 +311,8 @@ const About = () => {
                       <Gift className="w-7 h-7 sm:w-8 sm:h-8 text-purple-600 dark:text-purple-400" />
                     </div>
                   </div>
-                  <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 font-poppins">Rewards</p>
-                  <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 font-noto-sans mt-1">That Truly Pay</p>
+                  <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 font-poppins">Maximum</p>
+                  <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 font-noto-sans mt-1">Commission Rates</p>
                 </div>
 
                 <div className="text-center group">
@@ -324,8 +322,8 @@ const About = () => {
                       <Zap className="w-7 h-7 sm:w-8 sm:h-8 text-yellow-600 dark:text-yellow-400" />
                     </div>
                   </div>
-                  <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 font-poppins">Innovation</p>
-                  <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 font-noto-sans mt-1">In Every Step</p>
+                  <p className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100 font-poppins">Passive</p>
+                  <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 font-noto-sans mt-1">Income Stream</p>
                 </div>
               </div>
             </div>
@@ -336,10 +334,10 @@ const About = () => {
             <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMzYgMzRjMC0xLjEwNC0uODk2LTItMi0yaDFjMC0xLjEwNC0uODk2LTItMi0ycy0yIC44OTYtMiAycy44OTYgMiAyIDJoLTFjMCAxLjEwNC44OTYgMiAyIDJoLTFjMCAxLjEwNC44OTYgMiAyIDIiLz48L2c+PC9nPjwvc3ZnPg==')] opacity-20"></div>
             <div className="relative z-10">
               <h2 className="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4 font-poppins">
-                Ready to Be Part of Something New?
+                Don't Miss Out—Join EarnLabs Today!
               </h2>
               <p className="text-primary-foreground/90 mb-6 sm:mb-8 text-sm sm:text-base lg:text-lg max-w-2xl mx-auto leading-relaxed font-noto-sans px-4">
-                Join us at the beginning and help shape the future of affiliate marketing education while earning rewards.
+                Early members are already earning ₹10,000-50,000/month! Start your journey to financial freedom—Learn premium skills and earn unlimited income by referring. Sign up now and get your unique referral link instantly!
               </p>
               <Button
                 onClick={() => window.location.href = '/course-page'}
@@ -347,8 +345,8 @@ const About = () => {
                 size="lg"
                 className="shadow-xl bg-white text-primary hover:bg-gray-100 hover:scale-105 transition-transform duration-300 text-sm sm:text-base"
               >
-                <BookOpen className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-                Explore Courses
+                <Rocket className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                Start Earning Now
               </Button>
             </div>
           </div>
