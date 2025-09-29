@@ -16,6 +16,8 @@ type Props = {
   setPassword: (v: string) => void;
   showPassword: boolean;
   setShowPassword: (v: boolean) => void;
+  referredBy: string;
+  setReferredBy: (v: string) => void;
   onSignIn: () => Promise<void>;
   onSignUp: () => Promise<void>;
   handleForgotPassword: () => Promise<void>;
@@ -31,6 +33,8 @@ const AuthForm: React.FC<Props> = ({
   password,
   setPassword,
   showPassword,
+  referredBy,
+  setReferredBy,
   setShowPassword,
   onSignIn,
   onSignUp,
@@ -42,14 +46,18 @@ const AuthForm: React.FC<Props> = ({
     const dispatch = useAppDispatch();
     const {isSignUp, isAuthModelOpen} = useAppSelector((state) => state.auth);
     const { handleGoogleAuth } = useAuthModal();
-    const [referralCode, setReferralCode] = useState("");
 
-  useEffect(() => {
-    if (isAuthModelOpen) {
-      const storedRef = sessionStorage.getItem("referralCode") || "";
-      setReferralCode(storedRef);
-    }
-  }, [isAuthModelOpen]);
+    useEffect(() => {
+      if (isAuthModelOpen) {
+        const storedRef = sessionStorage.getItem("referralCode") || "";
+        setReferredBy(storedRef);
+      }
+    }, [isAuthModelOpen]);
+
+    const handleReferralChange = (e) => {
+      const val = e.target.value;
+      setReferredBy(val);
+    };
 console.log("Error:", error);
   return (
     <div className="flex flex-col min-h-full">
@@ -127,7 +135,7 @@ console.log("Error:", error);
       {error === "Invalid login credentials" && <p onClick={handleForgotPassword} className="text-sm hover:cursor-pointer font-medium text-card-foreground text-red-500 mb-2">Forgot password?</p>}
 
       {/* Referral Code (only if exists) */}
-      {!isSignUp && referralCode && (
+      {!isSignUp &&  (
         <div>
           <label className="block text-sm font-medium text-card-foreground mb-2">
             Referral Code
@@ -135,12 +143,13 @@ console.log("Error:", error);
           <div className="relative">
             <input
               type="text"
-              value={referralCode}
-              disabled
+              value={referredBy}
+              placeholder="Referral Code"
+              onChange={handleReferralChange}
               className="w-full pl-3 pr-4 py-3 border border-input rounded-lg 
                          bg-background text-foreground 
                          placeholder:text-muted-foreground 
-                         focus:outline-none cursor-not-allowed opacity-70"
+                         focus:outline-none opacity-70"
             />
           </div>
         </div>
@@ -160,7 +169,7 @@ console.log("Error:", error);
       </div>
 
       {/* Social login section */}
-      <div className="pt-6">
+      {/* <div className="pt-6">
         
           <div className="relative flex items-center">
           <span className="flex-grow border-t border-gray-300"></span>
@@ -173,7 +182,7 @@ console.log("Error:", error);
         <Button onClick={() => handleGoogleAuth()} className="w-full mt-4" variant="outline">
           Continue with Google
         </Button>
-      </div>
+      </div> */}
 
       {/* Bottom switch button */}
       <div className="mt-6 text-center">

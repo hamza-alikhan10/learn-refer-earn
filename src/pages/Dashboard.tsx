@@ -196,7 +196,7 @@ const Dashboard = () => {
               </button>
             </div>
             
-            <div className="bg-slate-900/50 rounded-xl p-4 border border-indigo-500/20">
+            {dashboardData.referral_code !== null && <div className="bg-slate-900/50 rounded-xl p-4 border border-indigo-500/20">
               <div className="flex items-center gap-2 mb-3">
                 <div className="bg-indigo-500/20 p-1.5 rounded-lg">
                   <ExternalLink className="w-4 h-4 text-indigo-400" />
@@ -238,7 +238,7 @@ const Dashboard = () => {
                   </button>
                 </div>
               </div>
-            </div>
+            </div>}
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 sm:mb-8">

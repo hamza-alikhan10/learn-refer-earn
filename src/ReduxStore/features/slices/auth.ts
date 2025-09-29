@@ -17,6 +17,7 @@ interface AuthState {
   isAuthModelOpen: boolean;
   startWithGoogle: boolean;
   isAuthenticated: string | null;
+  referredBy: string;
 }
 
 const initialState: AuthState = {
@@ -34,6 +35,7 @@ const initialState: AuthState = {
   isAuthModelOpen: false,
   startWithGoogle: false,
   isAuthenticated: "",
+  referredBy: "",
 
 };
 

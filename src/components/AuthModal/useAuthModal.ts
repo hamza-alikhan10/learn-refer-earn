@@ -22,6 +22,7 @@ export default function useAuthModal() {
     email,
     username,
     password,
+    referredBy,
     otp,
     showPassword,
     error,
@@ -135,8 +136,9 @@ const handleSignUp = async () => {
   dispatch(setError(null));
   dispatch(setLoading(true));
 
+  console.log("Signup clicked with:", { email, username, password, referredBy });
   // --- Validation ---
-  if (!email || !password || !username) {
+  if (!email || !password || !username || !referredBy) {
     dispatch(setError("Please fill in all fields"));
     toast({
       title: "Signup Failed",
@@ -185,13 +187,11 @@ const handleSignUp = async () => {
     };
 
     // Add referral_code only if not empty
-    if (referralCode.trim() !== "") {
-      signUpData.options.data.referral_code = referralCode.trim();
+    if (referredBy.trim() !== "") {
+      signUpData.options.data.referral_code = referredBy.trim();
     }
 
     const { data, error } = await supabase.auth.signUp(signUpData);
-
-    console.log("SignUp Data:", data);
 
     if (error) throw error;
     
@@ -406,6 +406,9 @@ const handleSignUp = async () => {
       password,
       setPassword: (v: string) =>
         dispatch(setField({ key: "password", value: v })),
+      referredBy,
+      setReferredBy: (v: string) =>
+        dispatch(setField({ key: "referredBy", value: v })),
       otp,
       setOtp: (v: string) => dispatch(setField({ key: "otp", value: v })),
       showPassword,

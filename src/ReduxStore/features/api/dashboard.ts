@@ -18,7 +18,7 @@ export interface CourseItem {
 
 export interface DashboardResponse {
   user_id: string;
-  referral_code: string;
+  referral_code:  string | null;
   total_earnings: number;
   available_balance: number;
   referrals_primary?: number;
