@@ -144,9 +144,10 @@ console.log("Error:", error);
             <input
               type="text"
               value={referredBy}
+              readOnly= { true }
               placeholder="Referral Code"
               onChange={handleReferralChange}
-              className="w-full pl-3 pr-4 py-3 border border-input rounded-lg 
+              className="w-full pl-3 pr-4 py-3 border , cursor-not-allowed border-input rounded-lg 
                          bg-background text-foreground 
                          placeholder:text-muted-foreground 
                          focus:outline-none opacity-70"

@@ -122,6 +122,22 @@ const CourseDetailsPage: React.FC = () => {
     { skip: !shouldFetchVideos || !effectiveUserId } // skip on initial render or when no user
   );
 
+    // --- NEW: determine referral percent based on course.level
+  const getReferralPercent = (level?: string) => {
+    if (!level) return 50; // fallback
+
+    switch (level) {
+      case 'Entry Level':
+        return 50;
+      case 'Advanced':
+        return 60;
+      case 'Professional':
+        return 70;
+      default:
+        return 50; // safe default
+    }
+  };
+
   // compute enrolled state from either course endpoint or videos response
   const isUserEnrolled =
     videosData?.visitorType === "enrolled" ||
@@ -259,6 +275,11 @@ const CourseDetailsPage: React.FC = () => {
 
   const isAvailable = Boolean(course?.is_course_available); 
   const canRefer = isAvailable && showReferButton;
+
+      // --- NEW: referral percent + amount calculation
+  const referralPercent = getReferralPercent(course.level);
+  const priceNumeric = Number(course?.price ?? 0);
+  const referralAmount = Math.floor((priceNumeric * referralPercent) / 100);
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
@@ -426,7 +447,7 @@ const CourseDetailsPage: React.FC = () => {
                         </Button>
 
                         <p className="text-center text-sm font-semibold text-green-600">
-                          Earn ₹{Math.floor(course.price * 0.5)} on referral
+                          Earn ₹{referralAmount} on referral
                         </p>
                       </div>
                     )}

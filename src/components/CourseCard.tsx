@@ -24,6 +24,7 @@ interface Course {
   students: number;
   duration: string;
   is_course_available: boolean | null ;
+  level?: string;
 }
 
 interface CourseCardProps {
@@ -40,7 +41,7 @@ const fetchReferralData = async (
   try {
     // Call RTK Query endpoint
     const result = await trigger({ courseId, userId }).unwrap();
-
+    console.log("Referral data fetched:", result);
     // Save course + referral in Redux
     dispatch(setCourseData(result.course));
     dispatch(setReferralData(result.referral));
@@ -49,6 +50,22 @@ const fetchReferralData = async (
     dispatch(setIsOpen(true));
   } catch (err) {
     console.error("Failed to fetch referral data", err);
+  }
+};
+
+// --- NEW: determine referral percent based on course.level
+const getReferralPercent = (level?: string) => {
+  if (!level) return 50; // fallback
+
+  switch (level) {
+    case 'Entry Level':
+      return 50;
+    case 'Advanced':
+      return 60;
+    case 'Professional':
+      return 70;
+    default:
+      return 50; // safe default
   }
 };
 
@@ -118,6 +135,12 @@ const CourseCard: React.FC<CourseCardProps> = ({
 
   const showReferButton = isEnrolled === true;
   const isAvailable = Boolean(course?.is_course_available); // normalize possible undefined
+
+    // --- NEW: referral percent + amount calculation
+  const referralPercent = getReferralPercent(course.level);
+  const priceNumeric = Number(course?.price ?? 0);
+  const referralAmount = Math.floor((priceNumeric * referralPercent) / 100);
+
   const canRefer = isAvailable && showReferButton; // only refer when course is available and user enrolled
 
 
@@ -206,7 +229,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
                   variant="accent"
                   size="touch"
                   className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 shadow-lg hover:shadow-xl transition-all duration-200"
-                  title={`Refer Course & Earn ₹${Math.floor(course.price * 0.5)}`}
+                  title={`Refer Course & Earn ₹${referralAmount}`}
                 >
                   {referralModelLoading ? (
                     <span className="animate-spin border-2 border-white border-t-transparent rounded-full w-4 h-4" />
@@ -219,7 +242,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
                 </Button>
 
                 <p className="text-center text-sm font-semibold text-green-600">
-                  Earn ₹{Math.floor(course.price * 0.5)} per referral
+                  Earn ₹{referralAmount} per referral
                 </p>
               </div>
             )}

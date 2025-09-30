@@ -16,6 +16,22 @@ import { Button } from "./ui/button";
 import { useAppDispatch, useAppSelector } from "@/ReduxStore/hooks";
 import { setIsOpen } from "@/ReduxStore/features/slices/referralModelData";
 
+// --- NEW: determine referral percent based on course.level
+const getReferralPercent = (level?: string) => {
+  if (!level) return 50; // fallback
+
+  switch (level) {
+    case 'Entry Level':
+      return 50;
+    case 'Advanced':
+      return 60;
+    case 'Professional':
+      return 70;
+    default:
+      return 50; // safe default
+  }
+};
+
 const ReferralModal: React.FC = () => {
   const dispatch = useAppDispatch();
   const { isOpen, course, referral } = useAppSelector(
@@ -29,7 +45,6 @@ const ReferralModal: React.FC = () => {
 
   // Derived data
   const referralLink = `${window.location.origin}/?ref=${referral.referral_code}`;
-  const commission = Math.floor(course.price * 0.5);
 
   const handleClose = () => {
     dispatch(setIsOpen(false));
@@ -62,6 +77,11 @@ const ReferralModal: React.FC = () => {
     }
   };
 
+      // --- NEW: referral percent + amount calculation
+  const referralPercent = getReferralPercent(course?.level);
+  const priceNumeric = Number(course?.price ?? 0);
+  const referralAmount = Math.floor((priceNumeric * referralPercent) / 100);
+
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div className="bg-card rounded-xl max-w-md w-full max-h-[90vh] overflow-y-auto p-6 relative shadow-2xl border border-border animate-scale-in">
@@ -84,7 +104,7 @@ const ReferralModal: React.FC = () => {
           </h2>
           <p className="text-muted-foreground mt-2">
             Earn{" "}
-            <span className="font-bold text-success text-xl">₹{commission}</span>{" "}
+            <span className="font-bold text-success text-xl">₹{referralAmount}</span>{" "}
             for each successful referral!
           </p>
         </div>

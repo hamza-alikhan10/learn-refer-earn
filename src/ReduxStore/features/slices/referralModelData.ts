@@ -8,6 +8,7 @@ interface Course {
   description: string;
   instructor: string;
   price: number;
+  level?: string; 
 }
 
 interface Referral {
